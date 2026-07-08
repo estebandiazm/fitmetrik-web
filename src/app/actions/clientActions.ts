@@ -6,6 +6,9 @@ import { Client } from '../../domain/types/Client';
 import { DietPlan } from '../../domain/types/DietPlan';
 import { DailyStep, DailyStepSchema } from '../../domain/types/DailySteps';
 import { DailyWeight, DailyWeightSchema } from '../../domain/types/DailyWeight';
+import { MeasurementPoint, MeasurementPointSchema } from '../../domain/types/MeasurementPoint';
+import { BodyMeasurement, BodyMeasurementSchema } from '../../domain/types/BodyMeasurement';
+import { validateMeasurement, MEASUREMENT_POINTS_CATALOG } from '../../domain/services/bodyMeasurements';
 import { calculateWeeklyAverage } from '../../domain/services/weightAverageService';
 import { generateApiKey } from '../../lib/utils/crypto';
 
@@ -30,6 +33,8 @@ function toClient(doc: ClientDocument): Client & { id: string; updatedAt: Date }
     dailyWeights: plain.dailyWeights ?? [],
     stepGoal: plain.stepGoal,
     updatedAt: new Date(plain.updatedAt),
+    measurementPoints: plain.measurementPoints ?? [],
+    measurements: plain.measurements ?? [],
   };
 }
 
@@ -60,7 +65,9 @@ export async function createClient(
 
 export async function getClients(): Promise<(Client & { id: string; updatedAt: Date })[]> {
   await dbConnect();
-  const docs = await ClientModel.find().sort({ updatedAt: -1 });
+  const docs = await ClientModel.find()
+    .select('-measurements -measurementPoints')
+    .sort({ updatedAt: -1 });
   return docs.map((doc: ClientDocument) => toClient(doc));
 }
 
@@ -86,7 +93,9 @@ export async function getClientsByCoachId(
   coachId: string
 ): Promise<(Client & { id: string; updatedAt: Date })[]> {
   await dbConnect();
-  const docs = await ClientModel.find({ coachId }).sort({ updatedAt: -1 });
+  const docs = await ClientModel.find({ coachId })
+    .select('-measurements -measurementPoints')
+    .sort({ updatedAt: -1 });
   return docs.map((doc: ClientDocument) => toClient(doc));
 }
 
@@ -297,4 +306,108 @@ export async function setTargetWeight(
   );
   if (!doc) return null;
   return toClient(doc);
+}
+
+// ─── Body Measurements ───────────────────────────────────────────────────────
+
+const CATALOG_SLUGS = new Set(MEASUREMENT_POINTS_CATALOG.map((p) => p.slug));
+
+export async function setMeasurementPoints(
+  clientId: string,
+  points: MeasurementPoint[]
+): Promise<(Client & { id: string }) | null> {
+  await dbConnect();
+
+  for (const point of points) {
+    const parsed = MeasurementPointSchema.safeParse(point);
+    if (!parsed.success) {
+      throw new Error(`Validation error for point "${point.slug}": ${parsed.error.message}`);
+    }
+    if (!CATALOG_SLUGS.has(point.slug)) {
+      throw new Error(`Unknown slug: "${point.slug}"`);
+    }
+  }
+
+  const doc = await ClientModel.findByIdAndUpdate(
+    clientId,
+    { measurementPoints: points },
+    { new: true }
+  );
+  if (!doc) return null;
+  return toClient(doc);
+}
+
+export async function addMeasurementEntries(
+  clientId: string,
+  entries: Array<{ date: Date; pointSlug: string; valueCm: number; notes?: string }>
+): Promise<(Client & { id: string }) | null> {
+  await dbConnect();
+
+  const doc = await ClientModel.findById(clientId);
+  if (!doc) return null;
+
+  for (const entry of entries) {
+    const parsed = BodyMeasurementSchema.safeParse(entry);
+    if (!parsed.success) {
+      throw new Error(`Validation error: ${parsed.error.message}`);
+    }
+
+    const point = (doc.measurementPoints ?? []).find(
+      (p: MeasurementPoint) => p.slug === entry.pointSlug
+    );
+    if (!point) {
+      throw new Error(`Point "${entry.pointSlug}" is not configured for this client`);
+    }
+    if (!point.active) {
+      throw new Error(`Point "${entry.pointSlug}" is not active`);
+    }
+
+    const validation = validateMeasurement(point, entry.valueCm);
+    if (!validation.ok) {
+      throw new Error(validation.reason);
+    }
+
+    const normalizedDate = new Date(entry.date);
+    normalizedDate.setHours(0, 0, 0, 0);
+
+    const existingIndex = (doc.measurements ?? []).findIndex(
+      (m: BodyMeasurement) =>
+        m.pointSlug === entry.pointSlug &&
+        new Date(m.date).toDateString() === normalizedDate.toDateString()
+    );
+
+    const newEntry = {
+      date: normalizedDate,
+      pointSlug: entry.pointSlug,
+      valueCm: entry.valueCm,
+      notes: entry.notes,
+    };
+
+    if (existingIndex >= 0) {
+      doc.measurements[existingIndex] = newEntry;
+    } else {
+      if (!doc.measurements) doc.measurements = [];
+      doc.measurements.push(newEntry);
+    }
+  }
+
+  await doc.save();
+  return toClient(doc);
+}
+
+export async function getMeasurementsByPoint(
+  clientId: string,
+  pointSlug: string
+): Promise<BodyMeasurement[]> {
+  await dbConnect();
+
+  const doc = await ClientModel.findById(clientId);
+  if (!doc) return [];
+
+  return (doc.measurements ?? [])
+    .filter((m: BodyMeasurement) => m.pointSlug === pointSlug)
+    .sort(
+      (a: BodyMeasurement, b: BodyMeasurement) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 }

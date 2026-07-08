@@ -12,6 +12,7 @@ import TrendsChart from '@/components/activity/TrendsChart';
 import RecentRecords from '@/components/activity/RecentRecords';
 import StepGoalEditor from '@/components/coach/StepGoalEditor';
 import WeightGoalEditor from '@/components/coach/WeightGoalEditor';
+import MeasurementPointsEditor from '@/components/coach/MeasurementPointsEditor';
 import WeightTrendsChart from '@/components/activity/WeightTrendsChart';
 import WeightRecentRecords from '@/components/activity/WeightRecentRecords';
 
@@ -187,6 +188,23 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
                 <WeightRecentRecords weights={weights} />
               </div>
             )}
+          </div>
+
+          {/* Body Measurements Section */}
+          <div className="space-y-6 mt-8">
+            <h2 className="text-xl font-bold text-white">Body Measurements</h2>
+
+            <div className="bg-[#0f172a] border border-[#1e293b] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Measurement Points</h3>
+              <p className="text-sm text-gray-400 mb-4">
+                Select which body measurements this client will track. Deactivating a point hides it from new entries but preserves existing history.
+              </p>
+              <MeasurementPointsEditor
+                clientId={clientId}
+                currentPoints={client.measurementPoints ?? []}
+                existingMeasurements={client.measurements ?? []}
+              />
+            </div>
           </div>
         </main>
       </div>
