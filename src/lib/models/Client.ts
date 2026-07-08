@@ -2,6 +2,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { DietPlan } from '../../domain/types/DietPlan';
 import { Client as IClient } from '../../domain/types/Client';
 import { DailyWeight } from '../../domain/types/DailyWeight';
+import { MeasurementPoint } from '../../domain/types/MeasurementPoint';
+import { BodyMeasurement } from '../../domain/types/BodyMeasurement';
 
 // --- Sub-Schemas based on domain/types ---
 
@@ -47,9 +49,28 @@ const DailyWeightSchema = new Schema({
   notes: { type: String }
 }, { _id: false });
 
+const MeasurementPointSubSchema = new Schema({
+  slug: { type: String, required: true },
+  label: { type: String, required: true },
+  bodyCoords: {
+    x: { type: Number, required: true, min: 0, max: 100 },
+    y: { type: Number, required: true, min: 0, max: 100 },
+  },
+  active: { type: Boolean, required: true, default: false },
+  minCm: { type: Number, required: true },
+  maxCm: { type: Number, required: true },
+}, { _id: false });
+
+const BodyMeasurementSubSchema = new Schema({
+  date: { type: Date, required: true },
+  pointSlug: { type: String, required: true },
+  valueCm: { type: Number, required: true, min: 0.1, max: 300 },
+  notes: { type: String },
+}, { _id: false });
+
 // --- Main Client Schema ---
 
-export interface ClientDocument extends Omit<IClient, 'plans' | 'coachId' | 'authId' | 'dailySteps' | 'dailyWeights'>, Document {
+export interface ClientDocument extends Omit<IClient, 'plans' | 'coachId' | 'authId' | 'dailySteps' | 'dailyWeights' | 'measurementPoints' | 'measurements'>, Document {
   plans: DietPlan[];
   coachId: mongoose.Types.ObjectId;
   authId?: string;
@@ -57,6 +78,8 @@ export interface ClientDocument extends Omit<IClient, 'plans' | 'coachId' | 'aut
   dailyWeights: Array<DailyWeight>;
   stepGoal?: number;
   apiKey?: string;
+  measurementPoints: Array<MeasurementPoint>;
+  measurements: Array<BodyMeasurement>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,7 +93,9 @@ const ClientSchema = new Schema<ClientDocument>({
   dailySteps: [DailyStepsSchema],
   dailyWeights: [DailyWeightSchema],
   stepGoal: { type: Number },
-  apiKey: { type: String, unique: true, sparse: true, index: true }
+  apiKey: { type: String, unique: true, sparse: true, index: true },
+  measurementPoints: { type: [MeasurementPointSubSchema], default: [] },
+  measurements: { type: [BodyMeasurementSubSchema], default: [] },
 }, {
   timestamps: true,
   toJSON: { virtuals: true },

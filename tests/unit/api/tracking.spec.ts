@@ -16,11 +16,12 @@ vi.mock('@/app/api/utils/auth', () => ({
 vi.mock('@/app/actions/clientActions', () => ({
   addDailyStep: vi.fn(),
   addDailyWeight: vi.fn(),
+  addMeasurementEntries: vi.fn(),
 }));
 
 import { POST } from '@/app/api/clients/[clientId]/tracking/route';
 import { validateApiKey } from '@/app/api/utils/auth';
-import { addDailyStep, addDailyWeight } from '@/app/actions/clientActions';
+import { addDailyStep, addDailyWeight, addMeasurementEntries } from '@/app/actions/clientActions';
 import { NextRequest } from 'next/server';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ describe('POST /api/clients/[clientId]/tracking', () => {
     vi.mocked(validateApiKey).mockResolvedValue(true);
     vi.mocked(addDailyStep).mockResolvedValue(FAKE_CLIENT as any);
     vi.mocked(addDailyWeight).mockResolvedValue(FAKE_CLIENT as any);
+    vi.mocked(addMeasurementEntries).mockResolvedValue(FAKE_CLIENT as any);
   });
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -173,5 +175,94 @@ describe('POST /api/clients/[clientId]/tracking', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.data.notes).toBe('Morning walk');
+  });
+
+  // ── Measurements Extension (REQ-BMT-07 / unified-tracking-api delta) ──────
+
+  it('REQ-UTA-BMT-01: should accept measurements-only and call addMeasurementEntries', async () => {
+    const req = makeRequest(
+      {
+        date: '2026-04-19',
+        measurements: [
+          { pointSlug: 'cintura', valueCm: 85 },
+          { pointSlug: 'pecho', valueCm: 100 },
+        ],
+      },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(200);
+    expect(vi.mocked(addMeasurementEntries)).toHaveBeenCalledOnce();
+    expect(vi.mocked(addDailyStep)).not.toHaveBeenCalled();
+
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.data.measurements).toBe(2);
+  });
+
+  it('REQ-UTA-BMT-02: should accept combined steps+measurements and call both actions', async () => {
+    const req = makeRequest(
+      {
+        date: '2026-04-19',
+        steps: 8000,
+        measurements: [{ pointSlug: 'cintura', valueCm: 85 }],
+      },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(200);
+    expect(vi.mocked(addDailyStep)).toHaveBeenCalledOnce();
+    expect(vi.mocked(addMeasurementEntries)).toHaveBeenCalledOnce();
+
+    const body = await res.json();
+    expect(body.data.steps).toBe(8000);
+    expect(body.data.measurements).toBe(1);
+  });
+
+  it('REQ-UTA-BMT-03: should return 400 when all three fields are absent', async () => {
+    const req = makeRequest({ date: '2026-04-19' }, VALID_API_KEY);
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe('Validation failed');
+  });
+
+  it('REQ-UTA-BMT-04: should return 400 when measurements array is empty', async () => {
+    const req = makeRequest(
+      { date: '2026-04-19', measurements: [] },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('REQ-UTA-BMT-05: legacy steps-only still returns 200 (regression guard)', async () => {
+    const req = makeRequest({ date: '2026-04-19', steps: 5000 }, VALID_API_KEY);
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(200);
+    expect(vi.mocked(addMeasurementEntries)).not.toHaveBeenCalled();
+    const body = await res.json();
+    expect(body.data.steps).toBe(5000);
+  });
+
+  it('REQ-UTA-BMT-06: should return 400 when addMeasurementEntries throws (unknown slug or out-of-range)', async () => {
+    vi.mocked(addMeasurementEntries).mockRejectedValue(
+      new Error('Point "unknown-slug" is not configured for this client')
+    );
+
+    const req = makeRequest(
+      { date: '2026-04-19', measurements: [{ pointSlug: 'unknown-slug', valueCm: 85 }] },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toContain('unknown-slug');
   });
 });

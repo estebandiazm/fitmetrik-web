@@ -1,18 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { validateApiKey } from '../../../../../app/api/utils/auth';
-import { addDailyStep, addDailyWeight } from '../../../../../app/actions/clientActions';
+import { addDailyStep, addDailyWeight, addMeasurementEntries } from '../../../../../app/actions/clientActions';
+
+const MeasurementEntrySchema = z.object({
+  pointSlug: z.string().min(1),
+  valueCm: z.number().positive().max(300),
+  notes: z.string().max(500).optional(),
+});
 
 const TrackingEntrySchema = z
   .object({
     date: z.coerce.date(),
     steps: z.number().int().min(0).max(100000).optional(),
     weight: z.number().min(0.1).max(500).optional(),
+    measurements: z.array(MeasurementEntrySchema).optional(),
     notes: z.string().optional(),
   })
-  .refine((data) => data.steps !== undefined || data.weight !== undefined, {
-    message: 'At least steps or weight must be provided',
-  });
+  .refine(
+    (data) =>
+      data.steps !== undefined ||
+      data.weight !== undefined ||
+      (data.measurements !== undefined && data.measurements.length > 0),
+    { message: 'At least steps, weight, or measurements must be provided' }
+  );
 
 export async function POST(
   request: NextRequest,
@@ -51,7 +62,7 @@ export async function POST(
     }
 
     const entry = parsed.data;
-    const results: { steps?: unknown; weight?: unknown } = {};
+    const results: { steps?: unknown; weight?: unknown; measurements?: unknown } = {};
 
     // Dispatch to the appropriate action(s) based on what is present in the request
     if (entry.steps !== undefined) {
@@ -78,6 +89,25 @@ export async function POST(
         return NextResponse.json({ error: 'Client not found' }, { status: 404 });
       }
       results.weight = entry.weight;
+    }
+
+    if (entry.measurements && entry.measurements.length > 0) {
+      try {
+        const built = entry.measurements.map((m) => ({
+          date: entry.date,
+          pointSlug: m.pointSlug,
+          valueCm: m.valueCm,
+          notes: m.notes ?? entry.notes,
+        }));
+        const measurementResult = await addMeasurementEntries(clientId, built);
+        if (!measurementResult) {
+          return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+        }
+        results.measurements = built.length;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Measurement validation failed';
+        return NextResponse.json({ error: message }, { status: 400 });
+      }
     }
 
     return NextResponse.json(
