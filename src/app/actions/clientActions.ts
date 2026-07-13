@@ -261,10 +261,10 @@ export async function addDailyWeight(
   );
 
   if (existingIndex >= 0) {
-    doc.dailyWeights[existingIndex] = { date: normalizedDate, weight, finalNotes };
+    doc.dailyWeights[existingIndex] = { date: normalizedDate, weight, notes: finalNotes };
   } else {
     if (!doc.dailyWeights) doc.dailyWeights = [];
-    doc.dailyWeights.push({ date: normalizedDate, weight, finalNotes });
+    doc.dailyWeights.push({ date: normalizedDate, weight, notes: finalNotes });
   }
 
   await doc.save();
