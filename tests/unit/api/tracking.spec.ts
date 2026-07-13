@@ -36,6 +36,17 @@ function makeRequest(body: unknown, apiKey?: string): NextRequest {
   });
 }
 
+function makeRawRequest(rawBody: string, apiKey?: string): NextRequest {
+  const headers: Record<string, string> = { 'content-type': 'application/json' };
+  if (apiKey !== undefined) headers['x-api-key'] = apiKey;
+
+  return new NextRequest('http://localhost/api/clients/test-client/tracking', {
+    method: 'POST',
+    headers,
+    body: rawBody,
+  });
+}
+
 const VALID_CLIENT_ID = 'test-client';
 const VALID_API_KEY = 'valid-key-abc123';
 const VALID_PARAMS = Promise.resolve({ clientId: VALID_CLIENT_ID });
@@ -103,6 +114,53 @@ describe('POST /api/clients/[clientId]/tracking', () => {
     const res = await POST(req, { params: VALID_PARAMS });
 
     expect(res.status).toBe(400);
+  });
+
+  // ── Malformed body (Bug 1 regression) ─────────────────────────────────────
+
+  it('should return 400 (not 500) when the body is empty', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const req = makeRawRequest('', VALID_API_KEY);
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe('Invalid JSON body');
+    expect(errorSpy).toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+  });
+
+  it('should return 400 (not 500) when the body is malformed/truncated JSON', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const req = makeRawRequest('{"date": "2026-07-13", "steps":', VALID_API_KEY);
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe('Invalid JSON body');
+    expect(errorSpy).toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+  });
+
+  it('should log diagnostic details (raw body and content-type) when JSON parsing fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const req = makeRawRequest('not-json-at-all', VALID_API_KEY);
+    await POST(req, { params: VALID_PARAMS });
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('tracking'),
+      expect.objectContaining({
+        rawBody: 'not-json-at-all',
+        contentType: 'application/json',
+      })
+    );
+
+    errorSpy.mockRestore();
   });
 
   // ── Dispatch ──────────────────────────────────────────────────────────────

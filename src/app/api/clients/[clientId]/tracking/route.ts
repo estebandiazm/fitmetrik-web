@@ -40,7 +40,22 @@ export async function POST(
     }
 
     // Parse and validate body
-    const body = await request.json();
+    const rawBody = await request.text();
+
+    let body: unknown;
+    try {
+      body = JSON.parse(rawBody);
+    } catch (err) {
+      console.error('[tracking] Invalid JSON body received', {
+        clientId,
+        contentType: request.headers.get('content-type'),
+        contentLength: request.headers.get('content-length'),
+        rawBody,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
     const parsed = TrackingEntrySchema.safeParse(body);
 
     if (!parsed.success) {
