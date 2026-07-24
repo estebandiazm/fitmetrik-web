@@ -77,7 +77,7 @@ export default function RecentRecords({ steps, stepGoal }: RecentRecordsProps) {
                     <p className="text-xs text-gray-400 mt-1">{step.notes}</p>
                   )}
                 </td>
-                <td className="px-6 py-4 text-right text-pink-400 font-semibold">
+                <td className="px-6 py-4 text-right text-primary font-semibold">
                   {step.steps.toLocaleString()}
                 </td>
                 <td className="px-6 py-4 text-center">{getStatusBadge(step.steps)}</td>
@@ -91,7 +91,7 @@ export default function RecentRecords({ steps, stepGoal }: RecentRecordsProps) {
         <div className="p-4 text-center border-t border-white/5">
           <button
             onClick={() => setDisplayCount(displayCount + 10)}
-            className="text-pink-400 hover:text-pink-500 font-semibold transition"
+            className="text-primary hover:text-primary/80 font-semibold transition"
           >
             Load More
           </button>

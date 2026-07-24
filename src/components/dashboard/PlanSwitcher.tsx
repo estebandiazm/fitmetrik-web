@@ -31,7 +31,7 @@ export function PlanSwitcher({ plans, activeIndex }: PlanSwitcherProps) {
             scroll={false}
             className={`flex-1 flex text-center justify-center items-center px-4 lg:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all ${
               isActive
-                ? 'bg-gradient-to-br from-primary to-accent-purple text-white shadow-[0_0_15px_rgba(236,72,153,0.4)]'
+                ? 'bg-primary text-on-primary'
                 : 'text-on-surface-variant hover:text-white'
             }`}
           >

@@ -141,7 +141,7 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
       {/* Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/30 rounded-full blur-[120px] animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-900/20 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <TopAppBar clientName={clientRecord?.name || "Client User"} />
@@ -169,7 +169,7 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
 
           {/* Snacks count — now below the main widget row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <GlassCard className="rounded-3xl p-6 border-white/10 border-b-4 lg:border-l-4 lg:border-b-0 border-tertiary">
+            <GlassCard className="rounded-3xl p-6 border-b-4 lg:border-l-4 lg:border-b-0 border-tertiary">
               <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">Snacks per Day</h3>
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center text-tertiary shadow-inner">

@@ -98,7 +98,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
       <div className="bg-gradient-to-b from-[#0d1a33] to-[#14285a] border border-white/10 rounded-2xl w-full max-w-sm mx-4">
         {/* Header */}
         <div className="border-b border-white/10 px-6 py-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#7C9FFF]">save</span>
+          <span className="material-symbols-outlined text-tertiary">save</span>
           <h2 className="text-white font-bold">Guardar en Base de Datos</h2>
         </div>
 
@@ -116,7 +116,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
 
               {fetchingClients ? (
                 <div className="flex justify-center py-6">
-                  <span className="material-symbols-outlined text-[#7C9FFF] text-2xl animate-spin">hourglass_empty</span>
+                  <span className="material-symbols-outlined text-tertiary text-2xl animate-spin">hourglass_empty</span>
                 </div>
               ) : (
                 <>
@@ -128,7 +128,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
                           const client = clients.find((c) => c.id === e.target.value);
                           setSelectedClient(client || null);
                         }}
-                        className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white focus:border-[#7C9FFF] focus:outline-none"
+                        className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white focus:border-tertiary focus:outline-none"
                       >
                         <option value="">Seleccionar Cliente</option>
                         {clients.map((client) => (
@@ -139,7 +139,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
                       </select>
                       <button
                         onClick={() => setIsNewClient(true)}
-                        className="text-xs text-white/60 hover:text-[#7C9FFF] transition flex items-center gap-1"
+                        className="text-xs text-white/60 hover:text-tertiary transition flex items-center gap-1"
                       >
                         <span className="material-symbols-outlined text-sm">add_circle</span> Crear nuevo cliente
                       </button>
@@ -154,12 +154,12 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
                         value={newClientName}
                         onChange={(e) => setNewClientName(e.target.value)}
                         autoFocus
-                        className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none"
+                        className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none"
                       />
                       {clients.length > 0 && (
                         <button
                           onClick={() => setIsNewClient(false)}
-                          className="text-xs text-white/60 hover:text-[#7C9FFF] transition"
+                          className="text-xs text-white/60 hover:text-tertiary transition"
                         >
                           ← Seleccionar cliente existente
                         </button>
@@ -190,7 +190,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
             <button
               onClick={handleSave}
               disabled={!canSave || loading}
-              className="px-6 py-2 rounded-full bg-gradient-to-r from-[#E91E8C] to-[#9C27B0] text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:from-[#C2185B] hover:to-[#7B1FA2] transition flex items-center gap-2"
+              className="px-6 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2"
             >
               {loading ? (
                 <span className="material-symbols-outlined text-sm animate-spin">hourglass_empty</span>

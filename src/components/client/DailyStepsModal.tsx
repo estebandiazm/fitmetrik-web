@@ -86,7 +86,7 @@ export default function DailyStepsModal({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
                 />
               </div>
 
@@ -99,7 +99,7 @@ export default function DailyStepsModal({
                   placeholder="0"
                   min="0"
                   max="100000"
-                  className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
                 />
               </div>
 
@@ -110,7 +110,7 @@ export default function DailyStepsModal({
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g., Morning run"
                   rows={2}
-                  className="w-full px-4 py-2 rounded-2xl bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none resize-none"
+                  className="w-full px-4 py-2 rounded-2xl neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none resize-none"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function DailyStepsModal({
             <button
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className="px-4 py-2 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold hover:from-pink-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+              className="px-4 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
             >
               {loading && <span className="animate-spin">⏳</span>}
               Save

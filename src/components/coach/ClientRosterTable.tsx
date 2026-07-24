@@ -69,7 +69,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
 
   const SortIndicator = ({ active, direction }: { active: boolean; direction?: 'asc' | 'desc' }) => {
     if (!active) return <span className="text-[#475569] ml-1">↕</span>;
-    return <span className="text-[#ec4899] ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
+    return <span className="text-[#2dd4bf] ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
   };
 
   return (
@@ -113,7 +113,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#ec4899]/20 flex items-center justify-center text-[#ec4899] font-semibold text-xs">
+                      <div className="w-8 h-8 rounded-full bg-[#2dd4bf]/20 flex items-center justify-center text-[#2dd4bf] font-semibold text-xs">
                         {client.name.charAt(0).toUpperCase()}
                       </div>
                       <span className="font-medium text-white">{client.name}</span>
@@ -136,7 +136,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
                   <td className="px-5 py-4">
                     <Link
                       href={`/clients/${client.id}`}
-                      className="text-[#ec4899] hover:text-[#f472b6] text-xs font-medium transition-colors"
+                      className="text-[#2dd4bf] hover:text-[#5eead4] text-xs font-medium transition-colors"
                     >
                       View →
                     </Link>

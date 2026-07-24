@@ -14,8 +14,8 @@ export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps
   return (
     <GlassCard className="p-6 mb-6">
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 rounded-xl bg-pink-600/20 flex items-center justify-center">
-          <span className="material-symbols-outlined text-pink-400 text-2xl">directions_run</span>
+        <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+          <span className="material-symbols-outlined text-primary text-2xl">directions_run</span>
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase">Daily Average</p>
@@ -29,13 +29,13 @@ export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps
             Progress to Goal ({stepGoal.toLocaleString()})
           </p>
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="flex-1 h-2 neu-inset rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-pink-600 to-purple-600 rounded-full transition-all"
+                className="h-full bg-primary rounded-full transition-all"
                 style={{ width: `${progressPercent || 0}%` }}
               />
             </div>
-            <span className="text-sm font-semibold text-pink-400 min-w-fit">
+            <span className="text-sm font-semibold text-primary min-w-fit">
               {Math.round(progressPercent || 0)}%
             </span>
           </div>

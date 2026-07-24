@@ -48,7 +48,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
         placeholder="Days"
         value={plan.days}
         onChange={(e) => update('days', e.target.value)}
-        className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none mb-4"
+        className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none mb-4"
       />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -59,7 +59,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
               type="number"
               value={plan.proteins}
               onChange={(e) => update('proteins', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none pr-8"
+              className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
           </div>
@@ -71,7 +71,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
               type="number"
               value={plan.carbs}
               onChange={(e) => update('carbs', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none pr-8"
+              className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
           </div>
@@ -86,7 +86,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
               type="number"
               value={plan.fruits}
               onChange={(e) => update('fruits', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none pr-8"
+              className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
           </div>
@@ -98,7 +98,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
               type="number"
               value={plan.fats}
               onChange={(e) => update('fats', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none pr-8"
+              className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
           </div>

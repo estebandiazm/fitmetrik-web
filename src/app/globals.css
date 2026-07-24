@@ -11,7 +11,7 @@
   --color-on-primary-fixed: #000000;
   --color-secondary-container: #006970;
   --color-surface-container-high: #1a1f2f;
-  --color-secondary: #00eefc;
+  --color-secondary: #22d3ee;
   --color-on-error: #490006;
   --color-on-secondary-fixed: #003f43;
   --color-on-primary-fixed-variant: #5c0031;
@@ -29,7 +29,7 @@
   --color-error-container: #9f0519;
   --color-secondary-dim: #00deec;
   --color-primary-fixed-dim: #ff4f9d;
-  --color-tertiary-dim: #9547f7;
+  --color-tertiary-dim: #22d3ee;
   --color-on-background: #e2e4f6;
   --color-on-tertiary-fixed: #24004c;
   --color-on-primary-container: #4b0027;
@@ -43,12 +43,12 @@
   --color-on-secondary-fixed-variant: #005e64;
   --color-on-error-container: #ffa8a3;
   --color-primary-dim: #e1007f;
-  --color-tertiary: #b884ff;
+  --color-tertiary: #3b82f6;
   --color-on-secondary-container: #e3fdff;
-  --color-primary: #ff88b4;
-  --color-on-primary: #610033;
-  --color-accent-pink: #ec4899;
-  --color-accent-purple: #8b5cf6;
+  --color-primary: #2dd4bf;
+  --color-on-primary: #0a0e1a;
+  --color-accent-pink: #2dd4bf;
+  --color-accent-purple: #3b82f6;
   
   --font-display: "Public Sans", sans-serif;
   --font-headline: "Manrope", sans-serif;
@@ -110,35 +110,54 @@ body {
 }
 
 @layer components {
-  .glass-card {
-    background: rgba(32, 37, 55, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 0.5px solid rgba(226, 228, 246, 0.1);
-    border-left: 0.5px solid rgba(226, 228, 246, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  .neu-surface {
+    background: var(--color-surface-dim);
   }
-  
-  .btn-neon-gradient {
-    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  .neu-card {
+    background: var(--color-surface-container);
+    border-radius: 1.25rem;
+    box-shadow:
+      6px 6px 20px rgba(0, 0, 0, 0.35),
+      -6px -6px 20px rgba(255, 255, 255, 0.02);
   }
-  
-  .btn-neon-gradient:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+
+  .neu-inset {
+    background: var(--color-surface-dim);
+    box-shadow:
+      inset 3px 3px 10px rgba(0, 0, 0, 0.35),
+      inset -3px -3px 10px rgba(255, 255, 255, 0.02);
   }
-  
-  .neon-glow-pink {
-    box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+
+  .neu-btn {
+    background: var(--color-surface-container);
+    box-shadow:
+      5px 5px 16px rgba(0, 0, 0, 0.35),
+      -5px -5px 16px rgba(255, 255, 255, 0.02);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
   }
-  
-  .neon-glow-purple {
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+
+  .neu-btn:active {
+    box-shadow:
+      inset 3px 3px 8px rgba(0, 0, 0, 0.35),
+      inset -3px -3px 8px rgba(255, 255, 255, 0.02);
+    transform: scale(0.98);
   }
-  
-  .neon-glow-primary {
-    box-shadow: 0 0 20px rgba(255, 136, 180, 0.15);
+
+  .neu-btn-accent {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow:
+      5px 5px 16px rgba(0, 0, 0, 0.35),
+      -5px -5px 16px rgba(255, 255, 255, 0.02);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .neu-btn-accent:active {
+    box-shadow:
+      inset 3px 3px 8px rgba(0, 0, 0, 0.35),
+      inset -3px -3px 8px rgba(255, 255, 255, 0.02);
+    transform: scale(0.98);
   }
 }
 

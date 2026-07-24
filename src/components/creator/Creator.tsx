@@ -26,7 +26,7 @@ const createDefaultPlan = (): PlanDraft => ({
 
 // ─── styles ─────────────────────────────────────────────────────────────────
 
-const pillInputClass = 'w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-[#7C9FFF] focus:outline-none';
+const pillInputClass = 'w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none';
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -130,14 +130,14 @@ const Creator = ({ coachId }: CreatorProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1628] via-[#0d2157] to-[#0a1628] py-6 px-4 sm:px-6 md:px-12">
+    <div className="min-h-screen bg-surface-dim py-6 px-4 sm:px-6 md:px-12">
       <Menu />
 
       {/* ── Client header ── */}
       <div className="max-w-2xl mx-auto mb-8 mt-12">
         <div className="mb-4">
           <label className="text-xs text-white/60 font-semibold block mb-2">Client</label>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 border border-white/25 focus-within:border-[#7C9FFF]">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full neu-inset border border-transparent focus-within:border-tertiary">
             <span className="material-symbols-outlined text-white/60 text-sm">person</span>
             <input
               type="text"
@@ -151,7 +151,7 @@ const Creator = ({ coachId }: CreatorProps) => {
 
         <div>
           <label className="text-xs text-white/60 font-semibold block mb-2">Target Weight</label>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 border border-white/25 focus-within:border-[#7C9FFF]">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full neu-inset border border-transparent focus-within:border-tertiary">
             <span className="material-symbols-outlined text-white/60 text-sm">scale</span>
             <input
               type="number"
@@ -181,7 +181,7 @@ const Creator = ({ coachId }: CreatorProps) => {
         {/* ── Add Another Plan ── */}
         <button
           onClick={handleAddPlan}
-          className="w-full px-6 py-3 mb-4 rounded-full border border-white/30 text-white/80 font-semibold hover:border-[#7C9FFF] hover:text-[#7C9FFF] hover:bg-[#7C9FFF]/8 transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-4 rounded-full border border-white/30 text-white/80 font-semibold hover:border-tertiary hover:text-tertiary hover:bg-tertiary/8 transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">add_circle</span> Add Another Plan
         </button>
@@ -189,7 +189,7 @@ const Creator = ({ coachId }: CreatorProps) => {
         {/* ── Save All Plans ── */}
         <button
           onClick={handleSaveAll}
-          className="w-full px-6 py-3 mb-6 rounded-full bg-gradient-to-r from-[#E91E8C] to-[#9C27B0] text-white font-bold hover:from-[#C2185B] hover:to-[#7B1FA2] transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-6 rounded-full neu-btn-accent font-bold transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">save</span> Guardar Planes
         </button>
@@ -197,7 +197,7 @@ const Creator = ({ coachId }: CreatorProps) => {
         {/* ── Save to Database ── */}
         <button
           onClick={handleSaveToDB}
-          className="w-full px-6 py-3 mb-8 rounded-full border border-[#7C9FFF]/40 text-[#7C9FFF] font-semibold hover:border-[#7C9FFF] hover:bg-[#7C9FFF]/8 transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-8 rounded-full border border-tertiary/40 text-tertiary font-semibold hover:border-tertiary hover:bg-tertiary/8 transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">cloud_upload</span> Guardar en Base de Datos
         </button>

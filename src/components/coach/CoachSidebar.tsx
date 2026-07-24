@@ -25,7 +25,7 @@ export function CoachSidebar() {
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-[#ec4899]/10 text-[#ec4899]'
+                      ? 'bg-[#2dd4bf]/10 text-[#2dd4bf]'
                       : 'text-[#94a3b8] hover:bg-[#1e293b] hover:text-white'
                   }`}
                 >
@@ -41,7 +41,7 @@ export function CoachSidebar() {
       <div className="px-4 py-3 border-t border-[#1e293b]">
         <Link
           href="/clients/new"
-          className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-[#ec4899] text-white rounded-lg text-sm font-semibold hover:bg-[#db2777] transition-colors"
+          className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-[#2dd4bf] text-white rounded-lg text-sm font-semibold hover:bg-[#0d9488] transition-colors"
         >
           <span>+</span>
           New Client

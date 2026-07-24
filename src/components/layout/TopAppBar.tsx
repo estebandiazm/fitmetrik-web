@@ -16,10 +16,10 @@ export function TopAppBar({
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full glass-card border-b border-white/10 px-6 py-4 lg:px-20">
+    <header className="sticky top-0 z-50 w-full neu-surface border-b border-white/10 px-6 py-4 lg:px-20">
       <div className="max-w-[1440px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-tr from-pink-500 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+          <div className="w-10 h-10 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
             <span className="material-symbols-outlined">bolt</span>
           </div>
           <h2 className="text-xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-tertiary-dim font-manrope italic">

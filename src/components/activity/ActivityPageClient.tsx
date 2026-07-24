@@ -115,7 +115,7 @@ export function ActivityPageClient({
               ? 'Tu coach aún no configuró puntos de medición'
               : undefined
           }
-          className="px-6 py-3 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold hover:from-pink-700 hover:to-purple-700 disabled:opacity-40 disabled:cursor-not-allowed transition w-full lg:w-auto"
+          className="px-6 py-3 rounded-full neu-btn-accent font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition w-full lg:w-auto"
         >
           + Add Record
         </button>
@@ -127,7 +127,7 @@ export function ActivityPageClient({
           onClick={() => handleTabChange('steps')}
           className={`px-5 py-3 text-sm font-semibold transition border-b-2 -mb-px ${
             activeTab === 'steps'
-              ? 'text-pink-400 border-pink-400'
+              ? 'text-primary border-primary'
               : 'text-gray-400 border-transparent hover:text-white'
           }`}
         >

@@ -40,10 +40,10 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
   };
 
   return (
-    <div className="m-4 bg-gradient-to-b from-[#0a1628] via-[#0d2157] to-[#0a1628] min-h-screen p-6">
+    <div className="m-4 bg-surface-dim min-h-screen p-6">
       {/* Client header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 rounded-full bg-[#7C9FFF]/20 flex items-center justify-center text-white font-bold text-lg">
+        <div className="w-12 h-12 rounded-full bg-tertiary/20 flex items-center justify-center text-white font-bold text-lg">
           {clientName ? clientName.charAt(0).toUpperCase() : "U"}
         </div>
         <div>
@@ -66,7 +66,7 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
               {plan.label ?? `Plan ${planIndex + 1}`}
             </h3>
             {plan.days && (
-              <span className="text-xs px-3 py-1 rounded-full border border-[#7C9FFF]/40 text-[#7C9FFF] font-semibold">
+              <span className="text-xs px-3 py-1 rounded-full border border-tertiary/40 text-tertiary font-semibold">
                 {plan.days}
               </span>
             )}
@@ -91,7 +91,7 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {meal.blocks.map((block: any, bIndex: number) => (
                         <div key={bIndex} className="space-y-3">
-                          <span className="text-xs px-3 py-1 rounded-full border border-[#7C9FFF]/40 text-[#7C9FFF] font-semibold inline-block">
+                          <span className="text-xs px-3 py-1 rounded-full border border-tertiary/40 text-tertiary font-semibold inline-block">
                             {block.blockType}
                           </span>
                           <FoodTable
@@ -115,7 +115,7 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
 
       <button
         onClick={saveHandler}
-        className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-[#E91E8C] to-[#9C27B0] text-white font-bold rounded-full hover:from-[#C2185B] hover:to-[#7B1FA2] transition"
+        className="w-full mt-6 px-6 py-3 neu-btn-accent font-bold rounded-full transition"
       >
         Regresar
       </button>

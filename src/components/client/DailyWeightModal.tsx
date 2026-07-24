@@ -87,7 +87,7 @@ export default function DailyWeightModal({
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   max={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
                 />
               </div>
 
@@ -101,7 +101,7 @@ export default function DailyWeightModal({
                   step="0.1"
                   min="0.1"
                   max="500"
-                  className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
                 />
               </div>
 
@@ -112,7 +112,7 @@ export default function DailyWeightModal({
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g., After breakfast"
                   rows={2}
-                  className="w-full px-4 py-2 rounded-2xl bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none resize-none"
+                  className="w-full px-4 py-2 rounded-2xl neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none resize-none"
                 />
               </div>
 
@@ -136,7 +136,7 @@ export default function DailyWeightModal({
             <button
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold hover:from-blue-700 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+              className="px-4 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
             >
               {loading && (
                 <span className="material-symbols-outlined text-base animate-spin">
