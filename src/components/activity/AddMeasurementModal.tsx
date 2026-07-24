@@ -150,7 +150,7 @@ export default function AddMeasurementModal({
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   max={todayISO()}
-                  className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white focus:border-emerald-400 focus:outline-none"
                 />
               </div>
 
@@ -175,7 +175,7 @@ export default function AddMeasurementModal({
                       value={values[point.slug] ?? ''}
                       onChange={(e) => handleValueChange(point.slug, e.target.value)}
                       data-testid={`add-measurement-input-${point.slug}`}
-                      className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-500 focus:border-emerald-400 focus:outline-none"
+                      className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-500 focus:border-emerald-400 focus:outline-none"
                     />
                     {fieldErrors[point.slug] && (
                       <p className="text-red-400 text-xs mt-1 pl-2">
@@ -208,7 +208,7 @@ export default function AddMeasurementModal({
               onClick={handleSubmit}
               disabled={loading}
               data-testid="add-measurement-submit"
-              className="px-4 py-2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+              className="px-4 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
             >
               {loading && (
                 <span className="material-symbols-outlined text-base animate-spin">

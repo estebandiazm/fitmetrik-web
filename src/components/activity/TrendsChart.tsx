@@ -47,8 +47,8 @@ export default function TrendsChart({ steps, stepGoal }: TrendsChartProps) {
             onClick={() => setPeriod('week')}
             className={`px-3 py-1 text-sm font-semibold transition ${
               period === 'week'
-                ? 'text-pink-500'
-                : 'text-gray-400 hover:text-pink-500'
+                ? 'text-primary'
+                : 'text-gray-400 hover:text-primary'
             }`}
           >
             Week
@@ -57,8 +57,8 @@ export default function TrendsChart({ steps, stepGoal }: TrendsChartProps) {
             onClick={() => setPeriod('month')}
             className={`px-3 py-1 text-sm font-semibold transition ${
               period === 'month'
-                ? 'text-pink-500'
-                : 'text-gray-400 hover:text-pink-500'
+                ? 'text-primary'
+                : 'text-gray-400 hover:text-primary'
             }`}
           >
             Month
@@ -90,15 +90,15 @@ export default function TrendsChart({ steps, stepGoal }: TrendsChartProps) {
             <Tooltip
               contentStyle={{
                 background: 'rgba(13, 26, 51, 0.95)',
-                border: '2px solid #E91E8C',
+                border: '2px solid #2dd4bf',
                 borderRadius: '8px',
-                boxShadow: '0 8px 32px rgba(233, 30, 140, 0.2)',
+                boxShadow: '0 8px 32px rgba(45, 212, 191, 0.2)',
               }}
               labelStyle={{ color: '#fff', fontWeight: 'bold' }}
               formatter={(value) => [value ? `${value.toLocaleString()} steps` : '0 steps', 'Steps']}
-              cursor={{ fill: 'rgba(233, 30, 140, 0.1)' }}
+              cursor={{ fill: 'rgba(45, 212, 191, 0.1)' }}
             />
-            <Bar dataKey="steps" fill="#E91E8C" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="steps" fill="#2dd4bf" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

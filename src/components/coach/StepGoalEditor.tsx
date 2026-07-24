@@ -51,7 +51,7 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
           onChange={(e) => setGoal(e.target.value)}
           placeholder="e.g., 10000"
           min="1"
-          className="w-full px-4 py-2 rounded-full bg-white/8 border border-white/25 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+          className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
         />
         {error && (
           <div className="mt-2 text-sm bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-2">
@@ -67,7 +67,7 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
       <button
         onClick={handleSave}
         disabled={!canSave}
-        className="px-4 py-2 mt-1 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold hover:from-pink-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="px-4 py-2 mt-1 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {loading ? '⏳' : 'Save'}
       </button>

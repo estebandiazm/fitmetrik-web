@@ -64,7 +64,7 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
           {/* Back Link */}
           <Link
             href="/clients"
-            className="text-[#ec4899] hover:text-[#f472b6] text-sm font-medium transition-colors inline-flex items-center gap-2 mb-6"
+            className="text-[#2dd4bf] hover:text-[#5eead4] text-sm font-medium transition-colors inline-flex items-center gap-2 mb-6"
           >
             ← Back to Clients
           </Link>
@@ -72,7 +72,7 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
           {/* Client Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 rounded-full bg-[#ec4899]/20 flex items-center justify-center text-[#ec4899] font-semibold">
+              <div className="w-12 h-12 rounded-full bg-[#2dd4bf]/20 flex items-center justify-center text-[#2dd4bf] font-semibold">
                 {client.name.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -99,13 +99,13 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
                     Progress to Goal ({stepGoal.toLocaleString()})
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 neu-inset rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-pink-600 to-purple-600 rounded-full transition-all"
+                        className="h-full bg-primary rounded-full transition-all"
                         style={{ width: `${Math.min((dailyAverage / stepGoal) * 100, 100)}%` }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-pink-400 min-w-fit">
+                    <span className="text-sm font-semibold text-primary min-w-fit">
                       {Math.round(Math.min((dailyAverage / stepGoal) * 100, 100))}%
                     </span>
                   </div>

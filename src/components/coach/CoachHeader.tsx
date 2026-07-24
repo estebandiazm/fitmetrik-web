@@ -11,7 +11,7 @@ export function CoachHeader({ coachName, coachEmail }: CoachHeaderProps) {
       {/* Logo */}
       <div className="flex items-center gap-2">
         <span className="text-xl font-bold text-white tracking-tight">
-          Fit<span className="text-[#ec4899]">Metrik</span>
+          Fit<span className="text-[#2dd4bf]">Metrik</span>
         </span>
       </div>
 
@@ -20,7 +20,7 @@ export function CoachHeader({ coachName, coachEmail }: CoachHeaderProps) {
         <input
           type="search"
           placeholder="Search clients..."
-          className="w-full bg-[#1e293b] text-[#e2e8f0] placeholder-[#475569] px-4 py-2 rounded-lg border border-[#334155] focus:outline-none focus:border-[#ec4899] text-sm"
+          className="w-full bg-[#1e293b] text-[#e2e8f0] placeholder-[#475569] px-4 py-2 rounded-lg border border-[#334155] focus:outline-none focus:border-[#2dd4bf] text-sm"
         />
       </div>
 
@@ -30,7 +30,7 @@ export function CoachHeader({ coachName, coachEmail }: CoachHeaderProps) {
           <p className="text-sm font-medium text-white">{coachName}</p>
           <p className="text-xs text-[#64748b]">{coachEmail}</p>
         </div>
-        <div className="w-9 h-9 rounded-full bg-[#ec4899] flex items-center justify-center text-white font-semibold text-sm">
+        <div className="w-9 h-9 rounded-full bg-[#2dd4bf] flex items-center justify-center text-white font-semibold text-sm">
           {coachName.charAt(0).toUpperCase()}
         </div>
       </div>

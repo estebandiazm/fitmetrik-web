@@ -28,7 +28,7 @@ export function WeightCounter({ weights, targetWeight }: WeightCounterProps) {
       : null;
 
   return (
-    <GlassCard className="rounded-3xl p-6 border-white/10 relative group cursor-pointer hover:border-primary/30 transition-colors">
+    <GlassCard className="rounded-3xl p-6 relative group cursor-pointer transition-colors">
       <Link href="/activity?tab=weight" className="absolute inset-0 rounded-3xl" />
       <div className="relative z-10 pointer-events-none">
         <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">
@@ -57,9 +57,9 @@ export function WeightCounter({ weights, targetWeight }: WeightCounterProps) {
         </div>
 
         {progressPercent !== null && (
-          <div className="w-full bg-white/5 h-1.5 rounded-full mt-4 overflow-hidden">
+          <div className="w-full neu-inset h-1.5 rounded-full mt-4 overflow-hidden">
             <div
-              className="bg-blue-400 h-full shadow-[0_0_15px_rgba(96,165,250,0.4)]"
+              className="bg-blue-400 h-full"
               style={{ width: `${progressPercent}%` }}
             />
           </div>

@@ -5,17 +5,17 @@ import { LogoutButton } from "@/components/ui/LogoutButton";
 const Menu = () => {
   return (
     <>
-      <header className="fixed top-0 z-50 w-full bg-[rgba(10,22,40,0.6)] backdrop-blur-[12px] border-b border-white/10">
+      <header className="fixed top-0 z-50 w-full neu-surface border-b border-white/10">
         <div className="flex items-center justify-between px-6 py-4 h-16">
           <Link href="/" className="no-underline">
-            <span className="text-xl font-black bg-gradient-to-r from-[#7C9FFF] to-[#E91E8C] bg-clip-text text-transparent">
+            <span className="text-xl font-black bg-gradient-to-r from-[#22d3ee] to-[#2dd4bf] bg-clip-text text-transparent">
               Calculadora Nutricional
             </span>
           </Link>
           <div className="flex items-center gap-6">
             <Link
               href="/creator"
-              className="flex items-center gap-2 px-4 py-2 text-white/70 font-semibold hover:text-[#7C9FFF] transition"
+              className="flex items-center gap-2 px-4 py-2 text-white/70 font-semibold hover:text-tertiary transition"
             >
               <span className="text-lg">✏️</span>
               Crear Plan
