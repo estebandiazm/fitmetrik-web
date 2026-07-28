@@ -18,6 +18,20 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
+# Env files (contain MongoDB URI, Supabase keys, etc.)
+.env
+.env.local
+.env.*.local
+
+# Claude Code local overrides (per-machine, not shared)
+.claude/settings.local.json
+
+# Skill registry cache (regenerated, not source of truth)
+.atl/.skill-registry.cache.json
+
+# CodeGraph local index (per-machine, rebuilt via init)
+.codegraph/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
