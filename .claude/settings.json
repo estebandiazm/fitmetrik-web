@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "engram@engram": true
+    "engram@engram": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true
   }
 }
