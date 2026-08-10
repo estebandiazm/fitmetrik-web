@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 import { DailyWeight } from '@/domain/types/DailyWeight';
 
 interface WeightRecentRecordsProps {
@@ -33,14 +33,14 @@ export default function WeightRecentRecords({ weights }: WeightRecentRecordsProp
 
   if (weights.length === 0) {
     return (
-      <GlassCard className="p-6">
+      <Card className="p-6">
         <p className="text-gray-400 text-center">No weight records yet. Start logging!</p>
-      </GlassCard>
+      </Card>
     );
   }
 
   return (
-    <GlassCard className="overflow-hidden">
+    <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -83,6 +83,6 @@ export default function WeightRecentRecords({ weights }: WeightRecentRecordsProp
           </button>
         </div>
       )}
-    </GlassCard>
+    </Card>
   );
 }

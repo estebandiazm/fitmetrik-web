@@ -5,7 +5,7 @@ stack:
   framework: Next.js 16 (App Router)
   language: TypeScript (strict)
   runtime: React 19
-  ui: MUI 7 + Tailwind CSS v4
+  ui: Tailwind CSS v4 (hand-rolled, no MUI)
   database: MongoDB (Mongoose)
   auth: Supabase Auth
   validation: Zod 4

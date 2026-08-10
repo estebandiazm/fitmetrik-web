@@ -95,7 +95,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gradient-to-b from-[#0d1a33] to-[#14285a] border border-white/10 rounded-2xl w-full max-w-sm mx-4">
+      <div className="neu-card w-full max-w-sm mx-4">
         {/* Header */}
         <div className="border-b border-white/10 px-6 py-4 flex items-center gap-2">
           <span className="material-symbols-outlined text-tertiary">save</span>

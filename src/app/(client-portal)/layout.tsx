@@ -4,7 +4,7 @@ export default function ClientPortalLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-surface-dim">
+    <div className="surface-client min-h-screen bg-surface-dim">
       {children}
     </div>
   );

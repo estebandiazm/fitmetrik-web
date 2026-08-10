@@ -11,16 +11,25 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 import { DailyWeight } from '@/domain/types/DailyWeight';
 
 interface WeightTrendsChartProps {
   weights: DailyWeight[];
   targetWeight?: number;
+  density?: 'compact' | 'spacious';
 }
 
-export default function WeightTrendsChart({ weights, targetWeight }: WeightTrendsChartProps) {
+export default function WeightTrendsChart({
+  weights,
+  targetWeight,
+  density = 'spacious',
+}: WeightTrendsChartProps) {
   const [period, setPeriod] = useState<'month' | 'week'>('month');
+  const isCompact = density === 'compact';
+  const tooltipRadius = isCompact ? '4px' : '8px';
+  const axisFontSize = isCompact ? '0.7rem' : '0.85rem';
+  const chartHeightClass = isCompact ? 'h-64' : 'h-80';
 
   const cutoffDate = new Date();
   const daysBack = period === 'week' ? 7 : 30;
@@ -49,7 +58,7 @@ export default function WeightTrendsChart({ weights, targetWeight }: WeightTrend
   if (weights.length === 0) return null;
 
   return (
-    <GlassCard className="p-6 mb-6">
+    <Card className="p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-white font-semibold text-lg">Weight Trends</h3>
         <div className="flex gap-2">
@@ -72,32 +81,32 @@ export default function WeightTrendsChart({ weights, targetWeight }: WeightTrend
         </div>
       </div>
 
-      <div className="w-full h-80">
+      <div className={`w-full ${chartHeightClass}`}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.01} />
+                <stop offset="5%" stopColor="var(--color-tertiary)" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="var(--color-tertiary)" stopOpacity={0.01} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="date" stroke="rgba(255,255,255,0.5)" style={{ fontSize: '0.85rem' }} />
+            <XAxis dataKey="date" stroke="rgba(255,255,255,0.5)" style={{ fontSize: axisFontSize }} />
             <YAxis
               stroke="rgba(255,255,255,0.5)"
-              style={{ fontSize: '0.85rem' }}
+              style={{ fontSize: axisFontSize }}
               domain={['dataMin - 2', 'dataMax + 2']}
             />
             {targetWeight && (
               <ReferenceLine
                 y={targetWeight}
-                stroke="#10b981"
+                stroke="var(--color-primary)"
                 strokeDasharray="5 5"
                 strokeWidth={2}
                 label={{
                   value: `Target: ${targetWeight} kg`,
                   position: 'right',
-                  fill: '#10b981',
+                  fill: 'var(--color-primary)',
                   fontSize: 12,
                   fontWeight: 'bold',
                 }}
@@ -106,33 +115,33 @@ export default function WeightTrendsChart({ weights, targetWeight }: WeightTrend
             <Tooltip
               contentStyle={{
                 background: 'rgba(13, 26, 51, 0.95)',
-                border: '2px solid #3b82f6',
-                borderRadius: '8px',
-                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.2)',
+                border: '2px solid var(--color-tertiary)',
+                borderRadius: tooltipRadius,
+                boxShadow: '0 8px 32px color-mix(in srgb, var(--color-tertiary) 20%, transparent)',
               }}
               labelStyle={{ color: '#fff', fontWeight: 'bold' }}
               formatter={(value) =>
                 value != null ? [`${value} kg`, 'Weight'] : ['No data', 'Weight']
               }
-              cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+              cursor={{ fill: 'color-mix(in srgb, var(--color-tertiary) 10%, transparent)' }}
             />
             <Area
               type="monotone"
               dataKey="weight"
-              stroke="#3b82f6"
+              stroke="var(--color-tertiary)"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorWeight)"
               dot={{
-                fill: '#3b82f6',
+                fill: 'var(--color-tertiary)',
                 r: 4,
                 strokeWidth: 2,
-                stroke: '#0d1a33',
+                stroke: 'var(--color-surface-dim)',
               }}
               activeDot={{
                 r: 6,
-                fill: '#3b82f6',
-                stroke: '#60a5fa',
+                fill: 'var(--color-tertiary)',
+                stroke: 'var(--color-tertiary-light)',
                 strokeWidth: 2,
               }}
               connectNulls={false}
@@ -140,6 +149,6 @@ export default function WeightTrendsChart({ weights, targetWeight }: WeightTrend
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </GlassCard>
+    </Card>
   );
 }

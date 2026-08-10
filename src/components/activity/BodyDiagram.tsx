@@ -36,7 +36,7 @@ export default function BodyDiagram({ points, selectedSlug, onSelect }: BodyDiag
                   cy={point.bodyCoords.y}
                   r="5"
                   fill="none"
-                  stroke="#10b981"
+                  stroke="var(--color-measurement-accent)"
                   strokeWidth="1"
                   opacity={0.5}
                   className="animate-ping"
@@ -47,8 +47,8 @@ export default function BodyDiagram({ points, selectedSlug, onSelect }: BodyDiag
                 cx={point.bodyCoords.x}
                 cy={point.bodyCoords.y}
                 r="3.5"
-                fill={isSelected ? '#10b981' : '#6ee7b7'}
-                stroke={isSelected ? '#064e3b' : '#065f46'}
+                fill={isSelected ? 'var(--color-measurement-accent)' : 'var(--color-measurement-accent-light)'}
+                stroke={isSelected ? 'var(--color-measurement-accent-dark)' : 'var(--color-measurement-accent-dim)'}
                 strokeWidth="0.8"
                 className="cursor-pointer transition-all"
                 style={

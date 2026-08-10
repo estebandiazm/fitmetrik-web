@@ -8,19 +8,19 @@
 }
 
 .error {
-  background-color: var(--auth-error-bg);
-  color: var(--auth-error);
-  border-color: var(--auth-error-bg);
+  background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
+  color: var(--color-error);
+  border-color: color-mix(in srgb, var(--color-error) 20%, transparent);
 }
 
 .success {
-  background-color: var(--auth-success-bg);
-  color: var(--auth-success);
-  border-color: var(--auth-success-bg);
+  background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 20%, transparent);
 }
 
 .info {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #93c5fd;
-  border-color: rgba(59, 130, 246, 0.1);
+  background-color: color-mix(in srgb, var(--color-tertiary) 12%, transparent);
+  color: var(--color-tertiary);
+  border-color: color-mix(in srgb, var(--color-tertiary) 20%, transparent);
 }

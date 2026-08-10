@@ -6,7 +6,7 @@ import { WeightCounter } from '@/components/dashboard/WeightCounter';
 import { HydrationTracker } from '@/components/dashboard/HydrationTracker';
 import { MacrosHUD } from '@/components/dashboard/MacrosHUD';
 import { PlanSectionCard, PlanSectionCardProps } from '@/components/dashboard/PlanSectionCard';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 import { PlanSwitcher } from '@/components/dashboard/PlanSwitcher';
 
 import { DietPlan } from '@/domain/types/DietPlan';
@@ -169,7 +169,7 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
 
           {/* Snacks count — now below the main widget row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <GlassCard className="rounded-3xl p-6 border-b-4 lg:border-l-4 lg:border-b-0 border-tertiary">
+            <Card className="rounded-3xl p-6 border-b-4 lg:border-l-4 lg:border-b-0 border-tertiary">
               <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">Snacks per Day</h3>
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center text-tertiary shadow-inner">
@@ -179,7 +179,7 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
                   <p className="text-2xl font-bold text-white">{activePlan.snacks?.length || 0}</p>
                 </div>
               </div>
-            </GlassCard>
+            </Card>
           </div>
 
           {/* BOTTOM SECTION: Full width Meals/Snacks grid */}

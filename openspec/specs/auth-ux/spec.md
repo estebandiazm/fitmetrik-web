@@ -101,3 +101,25 @@ The login Server Action (`src/app/(auth)/login/actions.ts`) SHALL read `user_met
 #### Scenario: User with unknown role is denied redirect
 - **WHEN** a Supabase user with user_metadata.role = "nutritionist" submits valid credentials on /login
 - **THEN** the system does NOT redirect to a protected route and displays an error message on /login
+
+<----------------------------------------------------------------------------------------------------------------------- SYNCED FROM ui-system-redesign -->
+
+## NEW Requirements (from ui-system-redesign)
+
+### Requirement: Neumorphic Client-Scope Visual Treatment
+Auth pages (`login`, `reset-password`, `update-password`) MUST apply the `.surface-client` scope treatment and MUST render using the shared `.neu-card` component instead of the legacy glassmorphism `.card` / CSS Modules. Dead `--auth-*` near-black/green tokens MUST be removed from `globals.css`; `--auth-error` and `--auth-success` MUST be folded into the main `@theme` block.
+
+#### Scenario: Login page renders neumorphic card
+- **WHEN** a user navigates to `/login`
+- **THEN** the form is contained in a `.neu-card` element, not the legacy glassmorphism `.card`
+- **AND** the surrounding layout carries the `.surface-client` scope class
+
+#### Scenario: Reset password page matches the system
+- **WHEN** a user navigates to `/reset-password`
+- **THEN** it uses `.surface-client` tokens and `.neu-card`, matching login/update-password — no unstyled light-mode scaffolding
+
+#### Scenario: Dead auth tokens removed
+- **GIVEN** `src/app/globals.css`
+- **WHEN** searched for `--auth-bg`, `--auth-surface`, `--auth-surface-hover`, `--auth-accent`, `--auth-accent-hover`, `--auth-text-primary`, `--auth-text-secondary`, `--auth-text-muted`, `--auth-border`
+- **THEN** zero matches remain
+- **AND** `--auth-error` / `--auth-success` exist only inside the main `@theme` block

@@ -2,11 +2,11 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { getClientById } from '../actions/clientActions';
-import { Client } from '../../domain/types/Client';
-import { DietPlan } from '../../domain/types/DietPlan';
-import Viewer from '../../components/viewer/Viewer';
-import ClientProvider from '../../context/ClientContext';
+import { getClientById } from '../../actions/clientActions';
+import { Client } from '../../../domain/types/Client';
+import { DietPlan } from '../../../domain/types/DietPlan';
+import Viewer from '../../../components/viewer/Viewer';
+import ClientProvider from '../../../context/ClientContext';
 
 // ─── Inner component that reads search params ────────────────────────────────
 

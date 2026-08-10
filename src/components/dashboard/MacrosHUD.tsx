@@ -1,9 +1,9 @@
 import React from 'react';
-import { GlassCard } from '../ui/GlassCard';
+import { Card } from '../ui/Card';
 
 export function MacrosHUD() {
   return (
-    <GlassCard className="rounded-3xl p-6 relative overflow-hidden">
+    <Card className="rounded-3xl p-6 relative overflow-hidden">
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-tertiary/10 blur-3xl"></div>
       <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">Macro Distribution</h3>
       <div className="space-y-5">
@@ -32,6 +32,6 @@ export function MacrosHUD() {
           </div>
         </div>
       </div>
-    </GlassCard>
+    </Card>
   );
 }

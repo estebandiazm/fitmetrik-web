@@ -8,7 +8,7 @@ interface TablePaginationProps {
 
 export function TablePagination({ page, totalPages, onPageChange }: TablePaginationProps) {
   return (
-    <div className="flex items-center justify-between text-sm text-[#64748b]">
+    <div className="flex items-center justify-between text-sm text-on-surface-muted">
       <span>
         Page {page + 1} of {totalPages}
       </span>
@@ -16,14 +16,14 @@ export function TablePagination({ page, totalPages, onPageChange }: TablePaginat
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page === 0}
-          className="px-3 py-1.5 rounded-lg border border-[#334155] text-[#94a3b8] hover:bg-[#1e293b] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-3 py-1.5 rounded-[var(--radius-control)] border border-[var(--surface-border)] text-on-surface-muted hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           ← Prev
         </button>
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page === totalPages - 1}
-          className="px-3 py-1.5 rounded-lg border border-[#334155] text-[#94a3b8] hover:bg-[#1e293b] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-3 py-1.5 rounded-[var(--radius-control)] border border-[var(--surface-border)] text-on-surface-muted hover:bg-surface-container-high disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Next →
         </button>

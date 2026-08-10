@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { GlassCard } from '../ui/GlassCard';
+import { Card } from '../ui/Card';
 
 interface StepsCounterProps {
   current?: number;
@@ -13,7 +13,7 @@ export function StepsCounter({ current = 8450, goal = 10000 }: StepsCounterProps
   const percentage = Math.min((current / goal) * 100, 100);
 
   return (
-    <GlassCard className="rounded-3xl p-6 relative group cursor-pointer transition-colors">
+    <Card className="rounded-3xl p-6 relative group cursor-pointer transition-colors">
       <Link href="/activity" className="absolute inset-0 rounded-3xl" />
       <div className="relative z-10 pointer-events-none">
         <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">Steps Counter</h3>
@@ -30,6 +30,6 @@ export function StepsCounter({ current = 8450, goal = 10000 }: StepsCounterProps
           <div className="bg-primary h-full" style={{ width: `${percentage}%` }}></div>
         </div>
       </div>
-    </GlassCard>
+    </Card>
   );
 }
