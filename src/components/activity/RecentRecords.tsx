@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 import { DailyStep } from '../../domain/types/DailySteps';
 
 interface RecentRecordsProps {
@@ -46,14 +46,14 @@ export default function RecentRecords({ steps, stepGoal }: RecentRecordsProps) {
 
   if (steps.length === 0) {
     return (
-      <GlassCard className="p-6">
+      <Card className="p-6">
         <p className="text-gray-400 text-center">No step records yet</p>
-      </GlassCard>
+      </Card>
     );
   }
 
   return (
-    <GlassCard className="overflow-hidden">
+    <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -97,6 +97,6 @@ export default function RecentRecords({ steps, stepGoal }: RecentRecordsProps) {
           </button>
         </div>
       )}
-    </GlassCard>
+    </Card>
   );
 }

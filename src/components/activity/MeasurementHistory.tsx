@@ -1,6 +1,6 @@
 'use client';
 
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
 
@@ -45,19 +45,19 @@ export default function MeasurementHistory({
   if (forPoint.length === 0) {
     return (
       <div data-testid="measurement-history">
-        <GlassCard className="p-6">
+        <Card className="p-6">
           <h3 className="text-white font-semibold text-base mb-3">
             Historial — {label}
           </h3>
           <p className="text-gray-400 text-sm text-center py-4">Sin registros todavía.</p>
-        </GlassCard>
+        </Card>
       </div>
     );
   }
 
   return (
     <div data-testid="measurement-history">
-    <GlassCard className="p-6">
+    <Card className="p-6">
       <h3 className="text-white font-semibold text-base mb-3">Historial — {label}</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -91,7 +91,7 @@ export default function MeasurementHistory({
           </tbody>
         </table>
       </div>
-    </GlassCard>
+    </Card>
     </div>
   );
 }

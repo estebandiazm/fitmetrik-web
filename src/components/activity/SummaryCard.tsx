@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 
 interface SummaryCardProps {
   dailyAverage: number;
@@ -12,7 +12,7 @@ export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps
   const progressPercent = stepGoal ? Math.min((dailyAverage / stepGoal) * 100, 100) : null;
 
   return (
-    <GlassCard className="p-6 mb-6">
+    <Card className="p-6 mb-6">
       <div className="flex items-center gap-4 mb-4">
         <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
           <span className="material-symbols-outlined text-primary text-2xl">directions_run</span>
@@ -45,6 +45,6 @@ export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps
           Goal not set — contact your coach
         </p>
       )}
-    </GlassCard>
+    </Card>
   );
 }

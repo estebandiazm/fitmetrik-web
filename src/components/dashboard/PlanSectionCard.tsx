@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GlassCard } from '../ui/GlassCard';
+import { Card } from '../ui/Card';
 
 export interface FoodItem {
   id: string;
@@ -31,7 +31,7 @@ export function PlanSectionCard({ title, description, totalWeight, totalProtein,
   );
 
   return (
-    <GlassCard className="p-5 flex flex-col gap-4 group border-primary/30">
+    <Card className="p-5 flex flex-col gap-4 group border-primary/30">
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none"></div>
       
       {/* Header */}
@@ -92,6 +92,6 @@ export function PlanSectionCard({ title, description, totalWeight, totalProtein,
           </div>
         </div>
       </div>
-    </GlassCard>
+    </Card>
   );
 }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { GlassCard } from '../ui/GlassCard';
+import { Card } from '../ui/Card';
 import { DailyWeight } from '@/domain/types/DailyWeight';
 
 interface WeightCounterProps {
@@ -28,7 +28,7 @@ export function WeightCounter({ weights, targetWeight }: WeightCounterProps) {
       : null;
 
   return (
-    <GlassCard className="rounded-3xl p-6 relative group cursor-pointer transition-colors">
+    <Card className="rounded-3xl p-6 relative group cursor-pointer transition-colors">
       <Link href="/activity?tab=weight" className="absolute inset-0 rounded-3xl" />
       <div className="relative z-10 pointer-events-none">
         <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">
@@ -69,6 +69,6 @@ export function WeightCounter({ weights, targetWeight }: WeightCounterProps) {
           {weights.length} {weights.length === 1 ? 'entry' : 'entries'} logged
         </div>
       </div>
-    </GlassCard>
+    </Card>
   );
 }

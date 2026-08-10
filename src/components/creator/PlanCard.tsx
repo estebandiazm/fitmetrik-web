@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { GlassCard } from '@/components/ui/GlassCard';
+import { Card } from '@/components/ui/Card';
 import { Food } from '../../domain/types/Food';
 
 export type PlanDraft = {
@@ -38,7 +38,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
     : `Plan | ${index + 1}`;
 
   return (
-    <GlassCard className="p-6 mb-6">
+    <Card className="p-6 mb-6">
       <h6 className="text-white font-bold text-center mb-4">
         {cardTitle}
       </h6>
@@ -131,7 +131,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
           ))}
         </div>
       )}
-    </GlassCard>
+    </Card>
   );
 };
 

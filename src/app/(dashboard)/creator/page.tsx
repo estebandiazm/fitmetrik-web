@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import ClientProvider from '../../context/ClientContext';
-import Creator from '../../components/creator/Creator';
+import ClientProvider from '../../../context/ClientContext';
+import Creator from '../../../components/creator/Creator';
 import { authProvider } from '@/lib/registry';
 import { getCoachByAuthId } from '@/app/actions/coachActions';
 

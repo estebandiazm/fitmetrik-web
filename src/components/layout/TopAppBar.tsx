@@ -32,8 +32,8 @@ export function TopAppBar({
             href="/dashboard"
             className={`text-sm font-semibold pb-1 border-b-2 transition-colors ${
               pathname === '/dashboard'
-                ? 'text-accent-pink border-accent-pink'
-                : 'text-white/90 border-transparent hover:text-accent-pink'
+                ? 'text-accent border-accent'
+                : 'text-white/90 border-transparent hover:text-accent'
             }`}
           >
             Dashboard
@@ -42,15 +42,15 @@ export function TopAppBar({
             href="/activity"
             className={`text-sm font-semibold pb-1 border-b-2 transition-colors ${
               pathname === '/activity'
-                ? 'text-accent-pink border-accent-pink'
-                : 'text-white/90 border-transparent hover:text-accent-pink'
+                ? 'text-accent border-accent'
+                : 'text-white/90 border-transparent hover:text-accent'
             }`}
           >
             Activity
           </a>
           <a
             href="#"
-            className="text-sm font-semibold text-white/90 hover:text-accent-pink transition-colors pb-1 border-b-2 border-transparent"
+            className="text-sm font-semibold text-white/90 hover:text-accent transition-colors pb-1 border-b-2 border-transparent"
           >
             My Plans
           </a>
@@ -68,7 +68,7 @@ export function TopAppBar({
                 Log out
               </button>
             </div>
-            <div className="w-10 h-10 rounded-full border-2 border-accent-pink p-0.5 overflow-hidden bg-white/5">
+            <div className="w-10 h-10 rounded-full border-2 border-accent p-0.5 overflow-hidden bg-white/5">
               <img 
                 className="w-full h-full rounded-full object-cover" 
                 alt="Client profile picture" 

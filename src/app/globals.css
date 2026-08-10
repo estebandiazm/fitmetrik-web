@@ -3,53 +3,51 @@
 @theme {
   --color-surface-dim: #0a0e1a;
   --color-surface-variant: #202537;
-  --color-tertiary-container: #9d50ff;
   --color-background-dark: #0a0f1e;
   --color-surface-container-lowest: #000000;
   --color-error: #ff716c;
   --color-surface-bright: #252b3f;
-  --color-on-primary-fixed: #000000;
   --color-secondary-container: #006970;
   --color-surface-container-high: #1a1f2f;
   --color-secondary: #22d3ee;
   --color-on-error: #490006;
   --color-on-secondary-fixed: #003f43;
-  --color-on-primary-fixed-variant: #5c0031;
   --color-surface: #0a0e1a;
-  --color-on-tertiary-fixed-variant: #51009c;
-  --color-primary-fixed: #ff6ea9;
   --color-surface-container: #141928;
-  --color-on-tertiary: #2f0060;
-  --color-tertiary-fixed-dim: #bd8cff;
   --color-secondary-fixed-dim: #00deec;
-  --color-inverse-primary: #ba0068;
   --color-on-secondary: #005359;
-  --color-surface-tint: #ff88b4;
   --color-outline: #717584;
   --color-error-container: #9f0519;
   --color-secondary-dim: #00deec;
-  --color-primary-fixed-dim: #ff4f9d;
   --color-tertiary-dim: #22d3ee;
   --color-on-background: #e2e4f6;
-  --color-on-tertiary-fixed: #24004c;
   --color-on-primary-container: #4b0027;
   --color-on-surface: #e2e4f6;
-  --color-on-tertiary-container: #000000;
   --color-secondary-fixed: #00eefc;
   --color-inverse-on-surface: #515463;
   --color-inverse-surface: #faf8ff;
   --color-surface-container-highest: #202537;
-  --color-tertiary-fixed: #c79eff;
   --color-on-secondary-fixed-variant: #005e64;
   --color-on-error-container: #ffa8a3;
-  --color-primary-dim: #e1007f;
   --color-tertiary: #3b82f6;
   --color-on-secondary-container: #e3fdff;
   --color-primary: #2dd4bf;
   --color-on-primary: #0a0e1a;
-  --color-accent-pink: #2dd4bf;
+  --color-accent: #2dd4bf;
   --color-accent-purple: #3b82f6;
-  
+  --color-success: #46d17f;
+  --color-on-success: #00391c;
+  --color-on-surface-muted: #94a3b8;
+
+  /* Chart accent tokens — deliberately distinct semantic colors, not aliases
+     of the brand primary/secondary/tertiary hues (Phase 5.8 hex sweep). */
+  --color-goal-line: #6366f1;
+  --color-tertiary-light: #60a5fa;
+  --color-measurement-accent: #10b981;
+  --color-measurement-accent-light: #6ee7b7;
+  --color-measurement-accent-dark: #064e3b;
+  --color-measurement-accent-dim: #065f46;
+
   --font-display: "Public Sans", sans-serif;
   --font-headline: "Manrope", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -60,37 +58,53 @@
 
 :root {
   /* Global Application Colors */
-  --bg-primary: #f8fafc;
-  --bg-gradient: radial-gradient(circle at top left, #e0e7ff 0%, #f0f4f8 50%, #f8fafc 100%);
-  --text-primary: #1e293b;
   --scrollbar-thumb: #cbd5e1;
   --scrollbar-hover: #94a3b8;
 
-  /* Stitch Auth Theme Tokens */
-  --auth-bg: #0D0D0D;
-  --auth-surface: #1A1A1A;
-  --auth-surface-hover: #262626;
-  --auth-accent: #13ec5b;
-  --auth-accent-hover: #0ed951;
-  --auth-text-primary: #FFFFFF;
-  --auth-text-secondary: #B3B3B3;
-  --auth-text-muted: #808080;
-  --auth-border: #333333;
-  --auth-error: #ef4444;
-  --auth-error-bg: rgba(239, 68, 68, 0.1);
-  --auth-success: #13ec5b;
-  --auth-success-bg: rgba(19, 236, 91, 0.1);
+  /* Semantic intensity tokens (base — overridden per .surface-* scope) */
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --shadow-card:
+    6px 6px 20px rgba(0, 0, 0, 0.35),
+    -6px -6px 20px rgba(255, 255, 255, 0.02);
+  --space-card-p: 1rem;
+  --transition-standard: 220ms ease;
+  --surface-border: rgba(255, 255, 255, 0.05);
+}
+
+/* Coach dashboard scope — denser, flatter (Evolution) */
+.surface-coach {
+  --radius-card: 10px;
+  --radius-control: 8px;
+  --shadow-card:
+    4px 4px 12px rgba(0, 0, 0, 0.5),
+    -1px -1px 2px rgba(255, 255, 255, 0.03);
+  --space-card-p: 0.75rem;
+  --transition-standard: 200ms ease;
+  --surface-border: rgba(255, 255, 255, 0.06);
+}
+
+/* Client portal / auth scope — spacious, dual-soft (Pastel) */
+.surface-client {
+  --radius-card: 16px;
+  --radius-control: 12px;
+  --shadow-card:
+    -5px -5px 15px rgba(255, 255, 255, 0.03),
+    5px 5px 15px rgba(0, 0, 0, 0.4);
+  --space-card-p: 1.5rem;
+  --transition-standard: 280ms ease;
+  --surface-border: rgba(255, 255, 255, 0.04);
 }
 
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: var(--bg-gradient);
+  background: var(--color-background-dark);
   background-attachment: fixed;
   min-height: 100vh;
   font-family: "Manrope", "Inter", "Geist", "Roboto", "Helvetica", "Arial", sans-serif;
-  color: var(--text-primary);
+  color: var(--color-on-background);
 }
 
 /* Base scrollbar styling for modern feel */
@@ -116,25 +130,28 @@ body {
 
   .neu-card {
     background: var(--color-surface-container);
-    border-radius: 1.25rem;
-    box-shadow:
-      6px 6px 20px rgba(0, 0, 0, 0.35),
-      -6px -6px 20px rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--surface-border);
+    transition: var(--transition-standard);
   }
 
   .neu-inset {
     background: var(--color-surface-dim);
+    border-radius: var(--radius-card);
     box-shadow:
       inset 3px 3px 10px rgba(0, 0, 0, 0.35),
       inset -3px -3px 10px rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--surface-border);
+    transition: var(--transition-standard);
   }
 
   .neu-btn {
     background: var(--color-surface-container);
-    box-shadow:
-      5px 5px 16px rgba(0, 0, 0, 0.35),
-      -5px -5px 16px rgba(255, 255, 255, 0.02);
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--surface-border);
+    transition: var(--transition-standard);
   }
 
   .neu-btn:active {
@@ -147,10 +164,10 @@ body {
   .neu-btn-accent {
     background: var(--color-primary);
     color: var(--color-on-primary);
-    box-shadow:
-      5px 5px 16px rgba(0, 0, 0, 0.35),
-      -5px -5px 16px rgba(255, 255, 255, 0.02);
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--surface-border);
+    transition: var(--transition-standard);
   }
 
   .neu-btn-accent:active {

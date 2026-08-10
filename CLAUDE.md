@@ -29,7 +29,7 @@ Unit tests use **Vitest** (not yet configured — target `domain/services/`).
 
 ## Architecture
 
-**Stack**: Next.js App Router · React 19 · TypeScript (strict) · MUI 7 · Tailwind CSS v4 · MongoDB (Mongoose) · Supabase Auth · Zod · Playwright
+**Stack**: Next.js App Router · React 19 · TypeScript (strict) · Tailwind CSS v4 (hand-rolled, no MUI) · MongoDB (Mongoose) · Supabase Auth · Zod · Playwright
 
 ### Folder roles
 

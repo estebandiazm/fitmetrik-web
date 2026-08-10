@@ -22,7 +22,7 @@ export default async function ClientsPage() {
   const clients = await getClientsByCoachId(coach.id);
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] flex flex-col">
+    <div className="min-h-screen bg-surface-dim flex flex-col">
       <CoachHeader coachName={coach.name} coachEmail={coach.email} />
 
       <div className="flex flex-1">
@@ -30,8 +30,8 @@ export default async function ClientsPage() {
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-white">Clients</h1>
-            <p className="text-[#94a3b8] text-sm mt-1">
+            <h1 className="text-2xl font-bold text-on-surface">Clients</h1>
+            <p className="text-on-surface-muted text-sm mt-1">
               Manage your client roster and track their progress.
             </p>
           </div>
