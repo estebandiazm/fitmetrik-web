@@ -14,6 +14,7 @@ const ClientProvider: React.FC<ClientContextProps> = ({ children }) => {
   const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
+    let next: Client = { name: "", plans: [], coachId: "" };
     try {
       const stored = localStorage.getItem("client");
       if (stored) {
@@ -23,14 +24,13 @@ const ClientProvider: React.FC<ClientContextProps> = ({ children }) => {
           parsed.plans = [parsed.plan];
           delete parsed.plan;
         }
-        setClient(parsed);
-      } else {
-        setClient({ name: "", plans: [], coachId: "" });
+        next = parsed;
       }
     } catch (err) {
       console.warn("Error leyendo localStorage", err);
-      setClient({ name: "", plans: [], coachId: "" });
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time client-only hydration from localStorage; SSR renders null so the first client render still matches before this runs
+    setClient(next);
   }, []);
 
   useEffect(() => {
@@ -42,7 +42,6 @@ const ClientProvider: React.FC<ClientContextProps> = ({ children }) => {
   const saveClient = (clientToSave: Client) => {
     setClient({ ...clientToSave });
     localStorage.setItem("client", JSON.stringify(clientToSave));
-    console.log("Client saved:", clientToSave);
   };
 
   if (!client) return null;

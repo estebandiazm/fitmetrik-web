@@ -39,10 +39,9 @@ function toClient(doc: ClientDocument): Client & { id: string; updatedAt: Date }
 }
 
 /** Strip Mongo internals from an embedded plan object. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function sanitisePlan(plan: any): DietPlan {
+function sanitisePlan(plan: Record<string, unknown>): DietPlan {
   const { _id, __v, updatedAt, ...rest } = plan;
-  return rest as DietPlan;
+  return rest as unknown as DietPlan;
 }
 
 // ─── Client CRUD ────────────────────────────────────────────────────────────
@@ -147,7 +146,7 @@ export async function addDailyStep(
   if (!doc) return null;
 
   const existingIndex = doc.dailySteps.findIndex(
-    (step: any) => new Date(step.date).toDateString() === normalizedDate.toDateString()
+    (step: DailyStep) => new Date(step.date).toDateString() === normalizedDate.toDateString()
   );
 
   if (existingIndex >= 0) {
@@ -169,12 +168,14 @@ export async function getDailyStepsRange(
   const doc = await ClientModel.findById(clientId);
   if (!doc) return [];
 
-  const filtered = doc.dailySteps.filter((step: any) => {
+  const filtered = doc.dailySteps.filter((step: DailyStep) => {
     const stepDate = new Date(step.date);
     return stepDate >= startDate && stepDate <= endDate;
   });
 
-  return filtered.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return filtered.sort(
+    (a: DailyStep, b: DailyStep) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 }
 
 export async function getDailyStepsAverage(
@@ -188,13 +189,13 @@ export async function getDailyStepsAverage(
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
 
-  const filtered = doc.dailySteps.filter((step: any) => {
+  const filtered = doc.dailySteps.filter((step: DailyStep) => {
     return new Date(step.date) >= cutoffDate;
   });
 
   if (filtered.length === 0) return { average: 0, count: 0 };
 
-  const total = filtered.reduce((sum: number, step: any) => sum + step.steps, 0);
+  const total = filtered.reduce((sum: number, step: DailyStep) => sum + step.steps, 0);
   const average = Math.round(total / filtered.length);
 
   return { average, count: filtered.length };

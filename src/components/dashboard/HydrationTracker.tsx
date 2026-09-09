@@ -3,10 +3,9 @@ import { Card } from '../ui/Card';
 
 interface HydrationTrackerProps {
   current?: number;
-  goal?: number;
 }
 
-export function HydrationTracker({ current = 3.5, goal = 3.5 }: HydrationTrackerProps) {
+export function HydrationTracker({ current = 3.5 }: HydrationTrackerProps) {
   return (
     <Card className="rounded-3xl p-6">
       <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">Hydration Goal</h3>

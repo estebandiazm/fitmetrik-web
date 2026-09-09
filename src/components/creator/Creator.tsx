@@ -6,7 +6,6 @@ import { ClientContextType } from '../../context/ClientContextType';
 import { DietEngine } from '../../domain/services/DietEngine';
 import { FoodDatabase } from '../../domain/services/FoodDatabase';
 import { useRouter } from 'next/navigation';
-import Menu from '../menu/Menu';
 import PlanCard, { PlanDraft } from './PlanCard';
 import SavePlanModal from './SavePlanModal';
 import { DietPlan } from '../../domain/types/DietPlan';
@@ -23,10 +22,6 @@ const createDefaultPlan = (): PlanDraft => ({
   fats: 0,
   foods: [],
 });
-
-// ─── styles ─────────────────────────────────────────────────────────────────
-
-const pillInputClass = 'w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-tertiary focus:outline-none';
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -131,10 +126,8 @@ const Creator = ({ coachId }: CreatorProps) => {
 
   return (
     <div className="min-h-screen bg-surface-dim py-6 px-4 sm:px-6 md:px-12">
-      <Menu />
-
       {/* ── Client header ── */}
-      <div className="max-w-2xl mx-auto mb-8 mt-12">
+      <div className="max-w-2xl mx-auto mb-8">
         <div className="mb-4">
           <label className="text-xs text-white/60 font-semibold block mb-2">Client</label>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full neu-inset border border-transparent focus-within:border-tertiary">

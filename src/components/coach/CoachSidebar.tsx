@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { label: 'Clients', href: '/clients', icon: '👥' },
-  { label: 'Diet Plans', href: '/creator', icon: '🥗' },
-  { label: 'Analytics', href: '/analytics', icon: '📊' },
-  { label: 'Settings', href: '/settings', icon: '⚙️' },
+  { label: 'Clients', href: '/clients', icon: 'group' },
+  { label: 'Diet Plans', href: '/creator', icon: 'restaurant' },
+  { label: 'Analytics', href: '/analytics', icon: 'monitoring' },
+  { label: 'Settings', href: '/settings', icon: 'settings' },
 ];
 
 export function CoachSidebar() {
@@ -29,7 +29,12 @@ export function CoachSidebar() {
                       : 'text-on-surface-muted hover:bg-surface-container-high hover:text-on-surface'
                   }`}
                 >
-                  <span className="text-base">{item.icon}</span>
+                  <span
+                    className="material-symbols-outlined text-[20px]"
+                    style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                  >
+                    {item.icon}
+                  </span>
                   {item.label}
                 </Link>
               </li>
@@ -43,7 +48,7 @@ export function CoachSidebar() {
           href="/clients/new"
           className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-primary text-on-primary rounded-[var(--radius-control)] text-sm font-semibold hover:opacity-90 transition-colors"
         >
-          <span>+</span>
+          <span className="material-symbols-outlined text-[18px]">add</span>
           New Client
         </Link>
       </div>

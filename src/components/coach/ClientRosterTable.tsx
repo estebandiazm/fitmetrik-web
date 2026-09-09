@@ -22,6 +22,11 @@ function formatDate(date: Date | string | undefined): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function SortIndicator({ active, direction }: { active: boolean; direction?: 'asc' | 'desc' }) {
+  if (!active) return <span className="text-on-surface-muted ml-1">↕</span>;
+  return <span className="text-primary ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
+}
+
 export function ClientRosterTable({ clients }: ClientRosterTableProps) {
   const [page, setPage] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>('lastUpdate');
@@ -31,18 +36,15 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
   const sorted = useMemo(() => {
     const copy = [...clients];
     copy.sort((a, b) => {
-      let aVal: any;
-      let bVal: any;
-
       if (sortKey === 'name') {
-        aVal = a.name.toLowerCase();
-        bVal = b.name.toLowerCase();
-      } else {
-        aVal = new Date(a.updatedAt).getTime();
-        bVal = new Date(b.updatedAt).getTime();
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        return sortDir === 'asc' ? (aName > bName ? 1 : -1) : (aName < bName ? 1 : -1);
       }
 
-      return sortDir === 'asc' ? (aVal > bVal ? 1 : -1) : (aVal < bVal ? 1 : -1);
+      const aTime = new Date(a.updatedAt).getTime();
+      const bTime = new Date(b.updatedAt).getTime();
+      return sortDir === 'asc' ? (aTime > bTime ? 1 : -1) : (aTime < bTime ? 1 : -1);
     });
     return copy;
   }, [clients, sortKey, sortDir]);
@@ -58,11 +60,6 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
       setSortDir('asc');
     }
     setPage(0); // Reset to first page on sort change
-  };
-
-  const SortIndicator = ({ active, direction }: { active: boolean; direction?: 'asc' | 'desc' }) => {
-    if (!active) return <span className="text-on-surface-muted ml-1">↕</span>;
-    return <span className="text-primary ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
   };
 
   return (

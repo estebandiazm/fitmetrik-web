@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { inviteCoach } from './actions';
 
 export default function InviteCoachPage({
@@ -55,12 +57,12 @@ export default function InviteCoachPage({
             >
               Send Invite
             </button>
-            <a
+            <Link
               href="/clients"
               className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 transition-colors"
             >
               Cancel
-            </a>
+            </Link>
           </div>
         </form>
       </div>

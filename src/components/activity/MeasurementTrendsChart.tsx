@@ -16,7 +16,6 @@ import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
 
 interface MeasurementTrendsChartProps {
   measurements: BodyMeasurement[];
-  activePoints: MeasurementPoint[];
   /** Active points + any inactive points that have at least one measurement entry */
   selectablePoints: MeasurementPoint[];
   selectedSlug: string;
@@ -26,7 +25,6 @@ interface MeasurementTrendsChartProps {
 
 export default function MeasurementTrendsChart({
   measurements,
-  activePoints,
   selectablePoints,
   selectedSlug,
   onSelectedSlugChange,

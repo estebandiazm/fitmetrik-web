@@ -22,7 +22,6 @@ type Tab = 'steps' | 'weight' | 'measurements';
 
 interface ActivityPageClientProps {
   clientId: string;
-  clientName: string;
   dailySteps: DailyStep[];
   dailyWeights: DailyWeight[];
   stepGoal?: number;
@@ -34,7 +33,6 @@ interface ActivityPageClientProps {
 
 export function ActivityPageClient({
   clientId,
-  clientName,
   dailySteps,
   dailyWeights,
   stepGoal,
@@ -224,7 +222,6 @@ export function ActivityPageClient({
                 />
                 <MeasurementTrendsChart
                   measurements={measurements}
-                  activePoints={activePoints}
                   selectablePoints={selectablePoints}
                   selectedSlug={selectedSlug}
                   onSelectedSlugChange={setSelectedSlug}

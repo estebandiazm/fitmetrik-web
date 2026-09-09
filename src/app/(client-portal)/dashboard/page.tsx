@@ -93,7 +93,7 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
   // Map plans for switcher
   const switcherPlans = plans.map(p => ({ label: p.label, days: p.days }));
 
-  const mealCardsData = activePlan.meals.map((meal, index) => {
+  const mealCardsData = activePlan.meals.map((meal) => {
     const foods = meal.blocks.flatMap(block => 
       block.options.map(opt => ({
         id: `${meal.mealName}-${opt.foodName}`,
@@ -163,7 +163,7 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MacrosHUD />
             <StepsCounter current={dailyAverage} goal={stepGoal} />
-            <HydrationTracker current={3.5} goal={3.5} />
+            <HydrationTracker current={3.5} />
             <WeightCounter weights={dailyWeights} targetWeight={targetWeight} />
           </div>
 

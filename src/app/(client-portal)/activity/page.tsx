@@ -40,7 +40,6 @@ export default async function ActivityPage() {
         <Suspense fallback={null}>
           <ActivityPageClient
             clientId={clientRecord.id}
-            clientName={clientRecord.name}
             dailySteps={dailySteps}
             dailyWeights={dailyWeights}
             stepGoal={stepGoal}
