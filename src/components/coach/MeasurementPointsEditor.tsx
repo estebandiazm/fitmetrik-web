@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { setMeasurementPoints } from '../../app/actions/clientActions';
 import { MEASUREMENT_POINTS_CATALOG } from '../../domain/services/bodyMeasurements';
 import type { MeasurementPoint } from '../../domain/types/MeasurementPoint';
@@ -35,9 +35,14 @@ export default function MeasurementPointsEditor({
   const [success, setSuccess] = useState(false);
   const [pendingDeactivateSlug, setPendingDeactivateSlug] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Re-sync local editable state when the caller passes a new set of points.
+  // Adjusting state during render (instead of in an effect) avoids a
+  // cascading re-render — see https://react.dev/learn/you-might-not-need-an-effect
+  const [prevCurrentPoints, setPrevCurrentPoints] = useState(currentPoints);
+  if (prevCurrentPoints !== currentPoints) {
+    setPrevCurrentPoints(currentPoints);
     setPoints(mergeWithCatalog(currentPoints));
-  }, [currentPoints]);
+  }
 
   function countEntriesForPoint(slug: string): number {
     return existingMeasurements.filter((m) => m.pointSlug === slug).length;

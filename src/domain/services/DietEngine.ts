@@ -1,4 +1,4 @@
-import { DietPlan, FoodOption, Meal, MealBlock } from "../types/DietPlan";
+import { DietPlan, FoodOption, Meal } from "../types/DietPlan";
 import { Food } from "../types/Food";
 
 export class DietEngine {

@@ -28,14 +28,24 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Reset transient state whenever the modal transitions to open.
+  // Adjusting state during render (instead of in an effect) avoids a
+  // cascading re-render — see https://react.dev/learn/you-might-not-need-an-effect
+  const [wasOpen, setWasOpen] = useState(open);
+  if (wasOpen !== open) {
+    setWasOpen(open);
+    if (open) {
+      setError(null);
+      setSuccess(false);
+      setSelectedClient(null);
+      setNewClientName('');
+      setIsNewClient(false);
+    }
+  }
+
   // Fetch existing clients when modal opens
   useEffect(() => {
     if (!open) return;
-    setError(null);
-    setSuccess(false);
-    setSelectedClient(null);
-    setNewClientName('');
-    setIsNewClient(false);
 
     (async () => {
       setFetchingClients(true);

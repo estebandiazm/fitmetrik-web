@@ -8,7 +8,6 @@ import { getClientById, getDailyWeights } from '@/app/actions/clientActions';
 import { CoachHeader } from '@/components/coach/CoachHeader';
 import { CoachSidebar } from '@/components/coach/CoachSidebar';
 import { Card } from '@/components/ui/Card';
-import SummaryCard from '@/components/activity/SummaryCard';
 import TrendsChart from '@/components/activity/TrendsChart';
 import RecentRecords from '@/components/activity/RecentRecords';
 import StepGoalEditor from '@/components/coach/StepGoalEditor';

@@ -1,11 +1,12 @@
 'use client'
 
 import FoodTable from "../food-table/FoodTable";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ClientContext } from "../../context/ClientContext";
 import { ClientContextType } from "../../context/ClientContextType";
 import { useRouter } from "next/navigation";
-import { DietPlan } from "../../domain/types/DietPlan";
+import { DietPlan, Meal, MealBlock, FoodOption } from "../../domain/types/DietPlan";
+import type { FoodCategory } from "../../domain/types/Food";
 
 interface ViewerProps {
   overridePlans?: DietPlan[];
@@ -16,17 +17,6 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
   const router = useRouter();
   const { client } = useContext(ClientContext) as ClientContextType;
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null);
-
-  let [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-    console.log(client)
-  }, [client]);
-
-  if (!isLoaded) {
-    return <p className="m-4 text-white">Cargando cliente...</p>;
-  }
 
   const clientName = overrideClientName ?? client.name;
   const plans: DietPlan[] = overridePlans ?? client.plans ?? [];
@@ -74,7 +64,7 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
           <div className="border-t border-white/10 mb-4" />
 
           {/* Meals */}
-          {plan.meals.map((meal: any, mealIndex: number) => {
+          {plan.meals.map((meal: Meal, mealIndex: number) => {
             const isExpanded = expandedMeal === `${planIndex}-${mealIndex}`;
             return (
               <div key={mealIndex} className="mb-4 border border-white/10 rounded-lg overflow-hidden">
@@ -89,16 +79,16 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
                 {isExpanded && (
                   <div className="p-4 bg-white/2">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {meal.blocks.map((block: any, bIndex: number) => (
+                      {meal.blocks.map((block: MealBlock, bIndex: number) => (
                         <div key={bIndex} className="space-y-3">
                           <span className="text-xs px-3 py-1 rounded-full border border-tertiary/40 text-tertiary font-semibold inline-block">
                             {block.blockType}
                           </span>
                           <FoodTable
-                            list={block.options.map((opt: any) => ({
+                            list={block.options.map((opt: FoodOption) => ({
                               name: opt.foodName,
                               totalGrams: opt.grams,
-                              category: block.blockType as any,
+                              category: block.blockType as FoodCategory,
                               grams: opt.grams
                             }))}
                           />

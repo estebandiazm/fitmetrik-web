@@ -40,8 +40,12 @@ export default function AddMeasurementModal({
     }
   }, [open, preselectedSlug]);
 
-  // Reset form when closed
-  useEffect(() => {
+  // Reset form whenever the modal transitions to closed.
+  // Adjusting state during render (instead of in an effect) avoids a
+  // cascading re-render — see https://react.dev/learn/you-might-not-need-an-effect
+  const [wasOpen, setWasOpen] = useState(open);
+  if (wasOpen !== open) {
+    setWasOpen(open);
     if (!open) {
       setDate(todayISO());
       setValues({});
@@ -49,7 +53,7 @@ export default function AddMeasurementModal({
       setGlobalError(null);
       setSuccess(false);
     }
-  }, [open]);
+  }
 
   function handleValueChange(slug: string, raw: string) {
     setValues((prev) => ({ ...prev, [slug]: raw }));

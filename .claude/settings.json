@@ -2,5 +2,11 @@
   "enabledPlugins": {
     "engram@engram": true,
     "ui-ux-pro-max@ui-ux-pro-max-skill": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
   }
 }
