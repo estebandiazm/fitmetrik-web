@@ -8,7 +8,13 @@ import { DailyStep, DailyStepSchema } from '../../domain/types/DailySteps';
 import { DailyWeight, DailyWeightSchema } from '../../domain/types/DailyWeight';
 import { MeasurementPoint, MeasurementPointSchema } from '../../domain/types/MeasurementPoint';
 import { BodyMeasurement, BodyMeasurementSchema } from '../../domain/types/BodyMeasurement';
-import { validateMeasurement, MEASUREMENT_POINTS_CATALOG } from '../../domain/services/bodyMeasurements';
+import {
+  validateMeasurement,
+  validateMeasurementEntries,
+  toPersistableEntries,
+  MEASUREMENT_POINTS_CATALOG,
+  type ValidationResult,
+} from '../../domain/services/bodyMeasurements';
 import { calculateWeeklyAverage } from '../../domain/services/weightAverageService';
 import { generateApiKey } from '../../lib/utils/crypto';
 
@@ -338,6 +344,73 @@ export async function setMeasurementPoints(
   return toClient(doc);
 }
 
+// REQ-UTA-04: read-only pre-persist validation for a measurement batch. Loads
+// the client's configured points, runs the pure validator, and writes nothing.
+// A missing client is NOT a batch-validation failure — the persistence actions
+// still return the 404 downstream.
+export async function validateMeasurementBatch(
+  clientId: string,
+  entries: Array<{ pointSlug: string; valueCm: number }>
+): Promise<ValidationResult> {
+  await dbConnect();
+
+  const doc = await ClientModel.findById(clientId);
+  if (!doc) return { ok: true };
+
+  return validateMeasurementEntries(doc.measurementPoints ?? [], entries);
+}
+
+// Validates one measurement entry against its point config and upserts it
+// (by date + pointSlug) into `doc.measurements`. Throws on any validation
+// failure; callers run this per-entry inside addMeasurementEntries.
+function applyMeasurementEntry(
+  doc: ClientDocument,
+  entry: { date: Date; pointSlug: string; valueCm: number; notes?: string }
+): void {
+  const parsed = BodyMeasurementSchema.safeParse(entry);
+  if (!parsed.success) {
+    throw new Error(`Validation error: ${parsed.error.message}`);
+  }
+
+  const point = (doc.measurementPoints ?? []).find(
+    (p: MeasurementPoint) => p.slug === entry.pointSlug
+  );
+  if (!point) {
+    throw new Error(`Point "${entry.pointSlug}" is not configured for this client`);
+  }
+  if (!point.active) {
+    throw new Error(`Point "${entry.pointSlug}" is not active`);
+  }
+
+  const validation = validateMeasurement(point, entry.valueCm);
+  if (!validation.ok) {
+    throw new Error(validation.reason);
+  }
+
+  const normalizedDate = new Date(entry.date);
+  normalizedDate.setHours(0, 0, 0, 0);
+
+  const existingIndex = (doc.measurements ?? []).findIndex(
+    (m: BodyMeasurement) =>
+      m.pointSlug === entry.pointSlug &&
+      new Date(m.date).toDateString() === normalizedDate.toDateString()
+  );
+
+  const newEntry = {
+    date: normalizedDate,
+    pointSlug: entry.pointSlug,
+    valueCm: entry.valueCm,
+    notes: entry.notes,
+  };
+
+  if (existingIndex >= 0) {
+    doc.measurements[existingIndex] = newEntry;
+  } else {
+    if (!doc.measurements) doc.measurements = [];
+    doc.measurements.push(newEntry);
+  }
+}
+
 export async function addMeasurementEntries(
   clientId: string,
   entries: Array<{ date: Date; pointSlug: string; valueCm: number; notes?: string }>
@@ -347,49 +420,10 @@ export async function addMeasurementEntries(
   const doc = await ClientModel.findById(clientId);
   if (!doc) return null;
 
-  for (const entry of entries) {
-    const parsed = BodyMeasurementSchema.safeParse(entry);
-    if (!parsed.success) {
-      throw new Error(`Validation error: ${parsed.error.message}`);
-    }
-
-    const point = (doc.measurementPoints ?? []).find(
-      (p: MeasurementPoint) => p.slug === entry.pointSlug
-    );
-    if (!point) {
-      throw new Error(`Point "${entry.pointSlug}" is not configured for this client`);
-    }
-    if (!point.active) {
-      throw new Error(`Point "${entry.pointSlug}" is not active`);
-    }
-
-    const validation = validateMeasurement(point, entry.valueCm);
-    if (!validation.ok) {
-      throw new Error(validation.reason);
-    }
-
-    const normalizedDate = new Date(entry.date);
-    normalizedDate.setHours(0, 0, 0, 0);
-
-    const existingIndex = (doc.measurements ?? []).findIndex(
-      (m: BodyMeasurement) =>
-        m.pointSlug === entry.pointSlug &&
-        new Date(m.date).toDateString() === normalizedDate.toDateString()
-    );
-
-    const newEntry = {
-      date: normalizedDate,
-      pointSlug: entry.pointSlug,
-      valueCm: entry.valueCm,
-      notes: entry.notes,
-    };
-
-    if (existingIndex >= 0) {
-      doc.measurements[existingIndex] = newEntry;
-    } else {
-      if (!doc.measurements) doc.measurements = [];
-      doc.measurements.push(newEntry);
-    }
+  // REQ-BMT-04: a blank field or 0 means "no data" — never persisted, never an error.
+  const persistable = toPersistableEntries(entries);
+  for (const entry of persistable) {
+    applyMeasurementEntry(doc, entry);
   }
 
   await doc.save();

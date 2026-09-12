@@ -67,32 +67,66 @@ The system SHALL allow a coach to activate or deactivate any subset of the 8 cat
 
 The system SHALL allow a client to submit one or more measurement entries in a single modal action. Each entry MUST include a point slug, a value in cm, and a date. Notes are optional.
 
+(Previously: `valueCm` had to fall within the per-point catalog range; the batch was all-or-none — any single invalid field discarded the entire batch.)
+
 | Attribute | Rule |
 |-----------|------|
 | Date | Past dates only (today or earlier); future dates MUST be rejected |
 | Points selectable | Only active points (coach-configured) |
-| valueCm | Must be within the per-point valid range (see catalog table) |
+| valueCm | MUST be a finite number and MUST NOT be negative. There is NO per-point minimum or maximum. |
+| No-data | A blank field or a value of `0` means "no data": it MUST NOT be persisted and MUST NOT raise an error |
 | Notes | Optional free text, max 500 chars |
-| Submission | All entries in the batch succeed or none are persisted |
+| Submission (partial save) | Each valid entry in the batch MUST be persisted even when a sibling entry in the same batch is invalid. An invalid entry MUST be reported to the client and MUST NOT be persisted. |
 | Duplicate date+point | New value replaces existing entry (upsert) |
 
 #### Scenario: Client submits a valid 3-point batch
 
 - GIVEN `cintura`, `pecho`, and `biceps-relajado` are active
-- WHEN the client opens AddMeasurementModal, enters 80 cm / 95 cm / 35 cm, and submits
+- WHEN the client enters 80 cm / 95 cm / 35 cm and submits
 - THEN all 3 entries are persisted and appear in the history table without a page reload
 
-#### Scenario: Client submits an out-of-range value
+#### Scenario: Client submits a value of 0
 
-- GIVEN `pantorrilla` is active (valid range: 10–100 cm)
-- WHEN the client enters 150 cm for `pantorrilla` and attempts to submit
-- THEN the system shows an inline validation error "Valor fuera del rango válido (10–100 cm)" and does NOT persist any entry in the batch
+- GIVEN `cintura` is active
+- WHEN the client enters `0` for `cintura` and submits
+- THEN no entry is persisted for `cintura` and no validation error is shown for that field
+
+#### Scenario: Client leaves a field blank
+
+- GIVEN `cintura` and `pecho` are active
+- WHEN the client enters 82 cm for `cintura`, leaves `pecho` blank, and submits
+- THEN only the `cintura` entry is persisted; `pecho` has no entry for that date
+
+#### Scenario: Client submits a large value
+
+- GIVEN `pantorrilla` is active
+- WHEN the client enters 250 cm and submits
+- THEN the entry is persisted with `valueCm = 250` — no out-of-range error
+
+#### Scenario: Client submits a negative value
+
+- GIVEN `cintura` is active
+- WHEN the client enters `-5` for `cintura` and submits
+- THEN the system shows a validation error for that field and does NOT persist that entry
+
+#### Scenario: Client submits a non-numeric value
+
+- GIVEN `cintura` is active
+- WHEN the field parses to `NaN` (not a finite number)
+- THEN the system shows a validation error for that field and does NOT persist that entry
+
+#### Scenario: Batch with one invalid entry and two valid entries
+
+- GIVEN `cintura`, `pecho`, and `pantorrilla` are active
+- WHEN the client enters 82 cm for `cintura`, 97 cm for `pecho`, and `-3` for `pantorrilla`, then submits
+- THEN the `cintura` and `pecho` entries are persisted
+- AND the `pantorrilla` entry is not persisted and is reported as invalid
 
 #### Scenario: Client selects a future date
 
 - GIVEN the add modal is open
 - WHEN the client selects tomorrow's date
-- THEN the system shows "La fecha no puede ser futura" and does NOT persist the entry
+- THEN the system shows "La fecha no puede ser futura" and does NOT persist any entry
 
 #### Scenario: Client resubmits the same date for an existing point
 
@@ -128,13 +162,16 @@ The system SHALL render an inline SVG body silhouette in the Measurements tab wi
 
 ### REQ-BMT-04: Measurement Trends Chart (Single Point with Dropdown)
 
-The system SHALL display a trends chart (Recharts AreaChart) for one measurement point at a time. A dropdown selector allows the client to switch between active points.
+The system SHALL display a trends chart (Recharts AreaChart) for one measurement point at a time. A dropdown selector allows the client to switch between active points. A date with no persisted entry for a point — including dates where the client left the field blank or entered `0` — MUST render as a gap (an absent data point) in the trends chart, the history table, and any point-entry counts. The system MUST NOT plot or display a synthetic `0` for missing data.
+
+(Previously: the requirement covered only the chart; no explicit rule that missing data renders as a gap rather than a plotted `0`.)
 
 | Element | Behavior |
 |---------|----------|
 | Default point | First active point alphabetically by slug |
 | Dropdown options | All active points (slug + label) |
 | Y-axis | Range auto-fitted to data; min = 0 |
+| Missing data | Rendered as a gap — never a plotted `0`; the line is not connected across the gap |
 | Empty state | "No hay datos para este punto" when no entries exist |
 | Formatter | Defensive: `undefined` values MUST NOT crash the formatter |
 
@@ -155,6 +192,24 @@ The system SHALL display a trends chart (Recharts AreaChart) for one measurement
 - GIVEN `biceps-relajado` is active but has no entries
 - WHEN the client selects it from the dropdown
 - THEN the chart shows "No hay datos para este punto" empty state
+
+#### Scenario: Skipped value renders as a gap, not a zero
+
+- GIVEN `cintura` has entries on 2026-05-01 (80 cm) and 2026-05-15 (82 cm) and the client submitted `0` (or blank) for 2026-05-08
+- WHEN the client views the `cintura` trends chart
+- THEN 2026-05-08 shows no data point and the line is not drawn down to `0`
+
+#### Scenario: No-data date absent from history table
+
+- GIVEN the client submitted a blank value for `pecho` on 2026-05-08
+- WHEN the client views the history table
+- THEN there is no `pecho` row for 2026-05-08
+
+#### Scenario: Point-entry counts ignore skipped values
+
+- GIVEN `gluteo` has 2 real entries and the client also submitted `0` for it once
+- WHEN a point-entry count is computed for `gluteo`
+- THEN the count is 2
 
 ---
 
@@ -207,29 +262,6 @@ The system SHALL add a third "Measurements" tab to the `ActivityPageClient` comp
 - GIVEN the Measurements tab has been added
 - WHEN the client navigates to the Steps or Weight tab
 - THEN those tabs behave exactly as before this change
-
----
-
-### REQ-BMT-07: Validation Ranges Enforced at API Boundary
-
-The system SHALL enforce per-point validation ranges via `validateMeasurementValue(pointSlug, valueCm)` in the Server Action AND return a structured error to the client UI without persisting invalid data.
-
-| Category | Range |
-|----------|-------|
-| trunk/core (`cintura`, `pecho`) | 30–200 cm |
-| limbs (all others) | 10–100 cm |
-
-#### Scenario: Valid value passes server-side validation
-
-- GIVEN `cintura` (trunk/core) with valueCm = 85
-- WHEN `addMeasurementEntries` is called
-- THEN the entry is persisted and the action returns `{ ok: true }`
-
-#### Scenario: Out-of-range value rejected at server action
-
-- GIVEN `pantorrilla` (limb) with valueCm = 120
-- WHEN `addMeasurementEntries` is called
-- THEN the action returns `{ ok: false, reason: "pantorrilla: valor fuera del rango (10–100 cm)" }` and nothing is persisted
 
 ---
 

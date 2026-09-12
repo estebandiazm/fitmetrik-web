@@ -17,11 +17,17 @@ vi.mock('@/app/actions/clientActions', () => ({
   addDailyStep: vi.fn(),
   addDailyWeight: vi.fn(),
   addMeasurementEntries: vi.fn(),
+  validateMeasurementBatch: vi.fn(),
 }));
 
 import { POST } from '@/app/api/clients/[clientId]/tracking/route';
 import { validateApiKey } from '@/app/api/utils/auth';
-import { addDailyStep, addDailyWeight, addMeasurementEntries } from '@/app/actions/clientActions';
+import {
+  addDailyStep,
+  addDailyWeight,
+  addMeasurementEntries,
+  validateMeasurementBatch,
+} from '@/app/actions/clientActions';
 import { NextRequest } from 'next/server';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -62,6 +68,7 @@ describe('POST /api/clients/[clientId]/tracking', () => {
     vi.mocked(addDailyStep).mockResolvedValue(FAKE_CLIENT as any);
     vi.mocked(addDailyWeight).mockResolvedValue(FAKE_CLIENT as any);
     vi.mocked(addMeasurementEntries).mockResolvedValue(FAKE_CLIENT as any);
+    vi.mocked(validateMeasurementBatch).mockResolvedValue({ ok: true } as any);
   });
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -306,6 +313,66 @@ describe('POST /api/clients/[clientId]/tracking', () => {
     expect(vi.mocked(addMeasurementEntries)).not.toHaveBeenCalled();
     const body = await res.json();
     expect(body.data.steps).toBe(5000);
+  });
+
+  it('REQ-BMT-07 removed: accepts a measurement value above the legacy 300 cm cap', async () => {
+    const req = makeRequest(
+      { date: '2026-04-19', measurements: [{ pointSlug: 'cintura', valueCm: 450 }] },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(200);
+    expect(vi.mocked(addMeasurementEntries)).toHaveBeenCalledOnce();
+  });
+
+  it('REQ-BMT-02: rejects a negative measurement value at the schema boundary', async () => {
+    const req = makeRequest(
+      { date: '2026-04-19', measurements: [{ pointSlug: 'cintura', valueCm: -4 }] },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+    expect(vi.mocked(addMeasurementEntries)).not.toHaveBeenCalled();
+  });
+
+  it('REQ-UTA-04: valid steps + an invalid measurement → 400 and NOTHING persists', async () => {
+    vi.mocked(validateMeasurementBatch).mockResolvedValue({
+      ok: false,
+      reason: 'El punto "unknown-slug" no está configurado',
+    } as any);
+
+    const req = makeRequest(
+      {
+        date: '2026-05-10',
+        steps: 6000,
+        measurements: [{ pointSlug: 'unknown-slug', valueCm: 85 }],
+      },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(400);
+    expect(vi.mocked(addDailyStep)).not.toHaveBeenCalled();
+    expect(vi.mocked(addMeasurementEntries)).not.toHaveBeenCalled();
+  });
+
+  it('REQ-UTA-04: validateMeasurementBatch runs before any persistence on a valid combined batch', async () => {
+    const req = makeRequest(
+      {
+        date: '2026-05-10',
+        steps: 8000,
+        measurements: [{ pointSlug: 'cintura', valueCm: 85 }],
+      },
+      VALID_API_KEY
+    );
+    const res = await POST(req, { params: VALID_PARAMS });
+
+    expect(res.status).toBe(200);
+    expect(vi.mocked(validateMeasurementBatch)).toHaveBeenCalledOnce();
+    expect(vi.mocked(addDailyStep)).toHaveBeenCalledOnce();
+    expect(vi.mocked(addMeasurementEntries)).toHaveBeenCalledOnce();
   });
 
   it('REQ-UTA-BMT-06: should return 400 when addMeasurementEntries throws (unknown slug or out-of-range)', async () => {
