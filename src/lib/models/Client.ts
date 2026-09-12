@@ -64,7 +64,8 @@ const MeasurementPointSubSchema = new Schema({
 const BodyMeasurementSubSchema = new Schema({
   date: { type: Date, required: true },
   pointSlug: { type: String, required: true },
-  valueCm: { type: Number, required: true, min: 0.1, max: 300 },
+  // REQ-BMT-07 removed: no per-point range. min: 0 is a last-resort negative floor.
+  valueCm: { type: Number, required: true, min: 0 },
   notes: { type: String },
 }, { _id: false });
 

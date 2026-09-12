@@ -77,9 +77,20 @@ class ActivityPage {
   }
 
   async fillMeasurementInput(slug: string, value: number) {
+    // The grouped tile grid renders a `type="text" inputMode="decimal"` field
+    // (sanitized on change) per point, keyed by the same test id.
+    const input = this.page.getByTestId(`add-measurement-input-${slug}`);
+    await input.click();
+    await input.fill(String(value));
+  }
+
+  async stepMeasurementInput(slug: string, direction: 'up' | 'down') {
+    const label = direction === 'up' ? /^Sumar 0\.5/ : /^Restar 0\.5/;
     await this.page
       .getByTestId(`add-measurement-input-${slug}`)
-      .fill(String(value));
+      .locator('xpath=..')
+      .getByRole('button', { name: label })
+      .click();
   }
 
   async submitMeasurements() {
@@ -217,5 +228,127 @@ test.describe('API: Tracking route measurements extension (REQ-BMT-07)', () => {
 
     // Should be 200 once implemented; RED state returns 400 (validation fails: at least steps or weight required)
     expect(response.status()).toBe(200);
+  });
+});
+
+// ── Shared Modal/Overlay Primitive (ui-design-system) ────────────────────────
+// `AddMeasurementModal` is the first adopter of `src/components/ui/Modal.tsx`.
+// These cover the 7 `ui-design-system` "Shared Modal/Overlay Primitive"
+// scenarios through that adopter. They stay `test.fixme` until the Body
+// Measurements E2E fixtures (seeded client, active points, auth) land — a
+// documented follow-up, NOT a merge gate for this change. See
+// openspec/changes/measurement-input-redesign/design.md (Testing Strategy).
+
+test.describe('ui/Modal primitive via AddMeasurementModal (ui-design-system)', () => {
+  test.fixme('renders as a bottom-sheet on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+    await activity.openAddMeasurementModal();
+
+    const panel = page.getByTestId('add-measurement-modal');
+    const panelBox = await panel.boundingBox();
+    const viewport = page.viewportSize();
+    // Anchored to the bottom edge, full-width.
+    expect(panelBox && viewport && panelBox.y + panelBox.height).toBeCloseTo(viewport!.height, 0);
+    expect(panelBox && viewport && panelBox.width).toBeCloseTo(viewport!.width, 0);
+  });
+
+  test.fixme('renders as a centered dialog on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+    await activity.openAddMeasurementModal();
+
+    const panel = page.getByTestId('add-measurement-modal');
+    const panelBox = await panel.boundingBox();
+    const viewport = page.viewportSize();
+    const centerY = panelBox!.y + panelBox!.height / 2;
+    expect(Math.abs(centerY - viewport!.height / 2)).toBeLessThan(24);
+    expect(panelBox!.width).toBeLessThan(viewport!.width);
+  });
+
+  test.fixme('Escape closes and restores focus to the trigger', async ({ page }) => {
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+    const trigger = page.getByRole('button', { name: /Add Record/i });
+    await trigger.click();
+    await expect(page.getByTestId('add-measurement-modal')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+
+    await expect(page.getByTestId('add-measurement-modal')).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test.fixme('backdrop click closes the overlay', async ({ page }) => {
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+    await activity.openAddMeasurementModal();
+
+    // Click the top-left corner of the viewport — outside the panel.
+    await page.mouse.click(5, 5);
+
+    await expect(page.getByTestId('add-measurement-modal')).toBeHidden();
+  });
+
+  test.fixme('focus is trapped and wraps within the overlay', async ({ page }) => {
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+    await activity.openAddMeasurementModal();
+
+    const panel = page.getByTestId('add-measurement-modal');
+    // Tab many times — focus must never leave the panel subtree.
+    for (let i = 0; i < 25; i += 1) {
+      await page.keyboard.press('Tab');
+      const focusInsidePanel = await panel.evaluate((el) => el.contains(document.activeElement));
+      expect(focusInsidePanel).toBe(true);
+    }
+  });
+
+  test.fixme('body scroll is locked while open and restored on close', async ({ page }) => {
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+
+    const before = await page.evaluate(() => document.body.style.overflow);
+    await activity.openAddMeasurementModal();
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe('hidden');
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('add-measurement-modal')).toBeHidden();
+    expect(await page.evaluate(() => document.body.style.overflow)).toBe(before);
+  });
+
+  test.fixme('portaled overlay preserves the client surface scope', async ({ page }) => {
+    const auth = new AuthPage(page);
+    await auth.loginAsClient();
+    const activity = new ActivityPage(page);
+    await activity.goto();
+    await activity.switchToMeasurementsTab();
+    await activity.openAddMeasurementModal();
+
+    // The portal root is a direct child of <body>; it must carry .surface-client.
+    const scopedRoots = await page
+      .locator('body > div.surface-client')
+      .count();
+    expect(scopedRoots).toBeGreaterThan(0);
   });
 });

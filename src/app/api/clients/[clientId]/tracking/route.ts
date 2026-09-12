@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { validateApiKey } from '../../../../../app/api/utils/auth';
-import { addDailyStep, addDailyWeight, addMeasurementEntries } from '../../../../../app/actions/clientActions';
+import {
+  addDailyStep,
+  addDailyWeight,
+  addMeasurementEntries,
+  validateMeasurementBatch,
+} from '../../../../../app/actions/clientActions';
 
 const MeasurementEntrySchema = z.object({
   pointSlug: z.string().min(1),
-  valueCm: z.number().positive().max(300),
+  // REQ-BMT-02: finite, non-negative. No per-point range (REQ-BMT-07 removed).
+  valueCm: z.number().min(0),
   notes: z.string().max(500).optional(),
 });
 
@@ -78,6 +84,19 @@ export async function POST(
 
     const entry = parsed.data;
     const results: { steps?: unknown; weight?: unknown; measurements?: unknown } = {};
+
+    // REQ-UTA-04: validate the entire payload — including every measurement —
+    // BEFORE any persistence call runs, so an invalid measurement can never
+    // leave orphaned step or weight data (validate-all-then-persist-all).
+    if (entry.measurements && entry.measurements.length > 0) {
+      const batchValidation = await validateMeasurementBatch(
+        clientId,
+        entry.measurements.map((m) => ({ pointSlug: m.pointSlug, valueCm: m.valueCm }))
+      );
+      if (!batchValidation.ok) {
+        return NextResponse.json({ error: batchValidation.reason }, { status: 400 });
+      }
+    }
 
     // Dispatch to the appropriate action(s) based on what is present in the request
     if (entry.steps !== undefined) {

@@ -11,6 +11,7 @@ import BodyDiagram from '@/components/activity/BodyDiagram';
 import MeasurementTrendsChart from '@/components/activity/MeasurementTrendsChart';
 import MeasurementHistory from '@/components/activity/MeasurementHistory';
 import AddMeasurementModal from '@/components/activity/AddMeasurementModal';
+import { calculateDailyAverage } from '@/domain/services/stepsAverageService';
 import DailyStepsModal from '@/components/client/DailyStepsModal';
 import DailyWeightModal from '@/components/client/DailyWeightModal';
 import { DailyStep } from '@/domain/types/DailySteps';
@@ -74,15 +75,11 @@ export function ActivityPageClient({
     setIsMeasurementModalOpen(true);
   };
 
-  const dailyAverage =
-    dailySteps.length > 0
-      ? Math.round(
-          dailySteps.reduce((sum, step) => sum + step.steps, 0) / dailySteps.length
-        )
-      : 0;
+  const dailyAverage = calculateDailyAverage(dailySteps);
 
   const handleSuccess = () => {
     setRefreshKey((prev) => prev + 1);
+    router.refresh();
     onRefresh?.();
   };
 
@@ -261,6 +258,7 @@ export function ActivityPageClient({
         clientId={clientId}
         activePoints={activePoints}
         preselectedSlug={preselectedSlug}
+        measurements={measurements}
         onSuccess={handleSuccess}
       />
     </>
