@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { authProvider } from '@/lib/registry';
 import { getCoachByAuthId } from '@/app/actions/coachActions';
 import { CoachHeader } from '@/components/coach/CoachHeader';
-import { CoachSidebar } from '@/components/coach/CoachSidebar';
 
 export default async function CreatorLayout({
   children,
@@ -20,12 +19,10 @@ export default async function CreatorLayout({
   }
 
   return (
-    <div className="min-h-screen bg-surface-dim flex flex-col">
+    <div className="min-h-screen bg-bg text-text-primary flex flex-col">
       <CoachHeader coachName={coach.name} coachEmail={coach.email} />
 
       <div className="flex flex-1">
-        <CoachSidebar />
-
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>

@@ -17,7 +17,7 @@ const VARIANT_CLASSES: Record<NonNullable<ButtonProps['variant']>, string> = {
 
 const SIZE_CLASSES: Record<NonNullable<ButtonProps['size']>, string> = {
   sm: 'px-4 py-1.5 text-xs',
-  md: 'px-6 py-2.5 text-sm',
+  md: 'px-5 py-3 text-sm',
 };
 
 export function Button({
@@ -29,7 +29,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} rounded-[var(--radius-control)] font-bold active:scale-95 transition-transform ${className}`}
+      className={`${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} inline-flex items-center justify-center gap-2 rounded-[10px] font-semibold active:scale-95 transition-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-teal disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
       {...rest}
     >
       {children}

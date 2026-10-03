@@ -1,96 +1,106 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { Card } from '../ui/Card';
+import { ChevronDownIcon, CookieIcon, SearchIcon, UtensilsIcon } from '../ui/icons';
 
 export interface FoodItem {
   id: string;
   name: string;
   category: string;
   amount: string;
-  colorClass: string;
 }
 
 export interface PlanSectionCardProps {
   title: string;
   description: string;
   totalWeight: string;
-  totalProtein: string;
   foods: FoodItem[];
   defaultExpanded?: boolean;
-  icon?: string;
+  variant?: 'meal' | 'snack';
 }
 
-export function PlanSectionCard({ title, description, totalWeight, totalProtein, foods, defaultExpanded = false, icon = 'restaurant_menu' }: PlanSectionCardProps) {
+export function PlanSectionCard({
+  title,
+  description,
+  totalWeight,
+  foods,
+  defaultExpanded = false,
+  variant = 'meal',
+}: PlanSectionCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [search, setSearch] = useState('');
+  const panelId = useId();
+  const Icon = variant === 'snack' ? CookieIcon : UtensilsIcon;
 
-  const filteredFoods = foods.filter(f => 
-    f.name.toLowerCase().includes(search.toLowerCase()) || 
-    f.category.toLowerCase().includes(search.toLowerCase())
+  const query = search.toLowerCase();
+  const filteredFoods = foods.filter(
+    (f) => f.name.toLowerCase().includes(query) || f.category.toLowerCase().includes(query),
   );
 
   return (
-    <Card className="p-5 flex flex-col gap-4 group border-primary/30">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl pointer-events-none"></div>
-      
-      {/* Header */}
-      <div 
-        className="flex items-center gap-4 cursor-pointer z-10" 
+    <Card padding="default" className="flex flex-col">
+      <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-controls={panelId}
+        className="flex w-full items-center gap-4 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-teal rounded-[var(--radius-control)]"
       >
-        <div className="w-16 h-16 rounded-xl shrink-0 border border-white/10 bg-gradient-to-br from-surface-variant to-surface flex items-center justify-center shadow-inner relative overflow-hidden ring-1 ring-primary/20">
-          <div className="absolute inset-0 bg-primary/20 blur-xl"></div>
-          <span className="material-symbols-outlined text-primary z-10 drop-shadow-lg text-3xl font-light">
-            {icon}
-          </span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start mb-1">
-            <h4 className="font-headline font-bold text-lg leading-tight text-primary text-white">{title}</h4>
-            <div className="flex items-center gap-2">
-              <span className={`material-symbols-outlined text-on-surface-variant transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}>expand_more</span>
-            </div>
-          </div>
-          <p className="text-on-surface-variant text-sm truncate font-light italic">{description}</p>
-          <div className="flex gap-3 mt-2">
-            <span className="text-[10px] font-bold text-primary/80">{totalWeight} Total</span>
-            <span className="text-[10px] font-bold text-tertiary/80">{totalProtein} Protein</span>
-          </div>
-        </div>
-      </div>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border border-border bg-bg text-text-muted">
+          <Icon size={20} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-semibold leading-tight text-text-primary">{title}</span>
+          <span className="mt-0.5 block truncate text-[13px] text-text-muted">{description}</span>
+        </span>
+        <span className="font-mono text-xs font-semibold text-text-faint">{totalWeight}</span>
+        <span className={`text-text-faint transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}>
+          <ChevronDownIcon size={18} />
+        </span>
+      </button>
 
-      {/* Expanded Content */}
-      <div 
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'opacity-100 mt-2' : 'max-h-0 opacity-0'}`} 
-        style={{ maxHeight: expanded ? '1000px' : '0px' }}
+      <div
+        id={panelId}
+        hidden={!expanded}
+        className="mt-4 flex flex-col gap-3 border-t border-row-border pt-4"
       >
-        <div className="pt-4 border-t border-white/10 space-y-4">
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm flex">search</span>
-            <input 
-              className="w-full bg-surface-container/50 border border-white/10 rounded-lg py-2.5 pl-10 pr-4 text-xs focus:ring-1 focus:ring-primary focus:border-primary outline-none placeholder:text-on-surface-variant/50 text-white" 
-              placeholder="Filtrar ingredientes..." 
+        {foods.length > 4 && (
+          <label className="relative block">
+            <span className="sr-only">Filtrar ingredientes</span>
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-faint">
+              <SearchIcon size={14} />
+            </span>
+            <input
+              className="w-full rounded-[var(--radius-control)] border border-border bg-bg py-2 pl-9 pr-3 text-xs text-text-primary outline-none placeholder:text-text-faint focus:border-accent-teal"
+              placeholder="Filtrar ingredientes…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              type="text"
+              type="search"
             />
-          </div>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-            {filteredFoods.map(food => (
-              <div key={food.id} className={`flex items-center justify-between p-3 rounded-xl bg-white/5 border-l-4 ${food.colorClass} hover:bg-white/10 transition-colors`}>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold tracking-wide text-white">{food.name}</span>
-                  <span className="text-[10px] text-on-surface-variant">{food.category}</span>
-                </div>
-                <span className="text-sm font-black font-headline text-white">{food.amount}</span>
-              </div>
-            ))}
-            {filteredFoods.length === 0 && (
-              <p className="text-center text-xs text-on-surface-variant py-4">No se encontraron ingredientes</p>
-            )}
-          </div>
-        </div>
+          </label>
+        )}
+        <ul className="flex max-h-64 flex-col overflow-y-auto">
+          {filteredFoods.map((food) => (
+            <li
+              key={food.id}
+              className="flex items-center justify-between gap-3 border-b border-row-border py-2.5 last:border-b-0"
+            >
+              <span className="flex min-w-0 flex-col">
+                <span className="text-sm font-medium text-text-primary">{food.name}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-text-faint">
+                  {food.category}
+                </span>
+              </span>
+              <span className="shrink-0 text-right font-mono text-sm font-semibold text-text-primary">
+                {food.amount}
+              </span>
+            </li>
+          ))}
+          {filteredFoods.length === 0 && (
+            <li className="py-4 text-center text-xs text-text-muted">No se encontraron ingredientes</li>
+          )}
+        </ul>
       </div>
     </Card>
   );

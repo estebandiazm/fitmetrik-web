@@ -100,3 +100,20 @@ export function findEntryForDate<T extends DatedEntry>(entries: T[], date: Date)
   const target = startOfDay(date);
   return entries.find((entry) => isSameCalendarDay(startOfDay(toDate(entry.date)), target));
 }
+
+/**
+ * Whole calendar days between the most recent entry and `today` (0 = logged
+ * today, 1 = yesterday, …). `undefined` when there are no entries at all.
+ * Feeds the roster's "Último registro: hace N días" line. Entries dated in
+ * the future (clock skew) clamp to 0 rather than going negative.
+ */
+export function daysSinceLastEntry(entries: DatedEntry[], today: Date = new Date()): number | undefined {
+  if (entries.length === 0) return undefined;
+  const todayStart = startOfDay(today);
+  const latest = entries
+    .map((entry) => startOfDay(toDate(entry.date)))
+    .reduce((max, date) => (date.getTime() > max.getTime() ? date : max));
+  const msPerDay = 24 * 60 * 60 * 1000;
+  // Math.round absorbs the ±1h DST shift between two local midnights.
+  return Math.max(0, Math.round((todayStart.getTime() - latest.getTime()) / msPerDay));
+}

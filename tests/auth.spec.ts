@@ -6,36 +6,36 @@ test.describe('Authentication Flows', () => {
     // 1. Navigate to the login page
     await page.goto('/login');
 
-    // 2. Verify URL and page heading (brand title after UI refactor)
+    // 2. Verify URL and page heading
     await expect(page).toHaveURL(/.*\/login/);
-    await expect(page.getByRole('heading', { name: 'FitMetrik' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Hola de nuevo' })).toBeVisible();
 
     // 3. Verify the subtitle
-    await expect(page.getByText('Sign in to your account')).toBeVisible();
+    await expect(page.getByText('Inicia sesión para registrar tu día.')).toBeVisible();
 
     // 4. Verify password tab form fields (default tab)
-    await expect(page.getByLabel('Email')).toBeVisible();
-    await expect(page.getByLabel('Password')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
+    await expect(page.getByLabel('Correo electrónico')).toBeVisible();
+    await expect(page.getByLabel('Contraseña', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
   });
 
   test('should show both login tabs', async ({ page }) => {
     await page.goto('/login');
 
-    await expect(page.getByRole('button', { name: 'Password' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Magic Link' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Contraseña', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Enlace mágico' })).toBeVisible();
   });
 
   test('should show error on invalid credentials', async ({ page }) => {
     await page.goto('/login');
 
     // Attempt login with fake credentials (password tab is the default)
-    await page.getByLabel('Email').fill('test@example.com');
-    await page.getByLabel('Password').fill('wrongpassword123');
-    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.getByLabel('Correo electrónico').fill('test@example.com');
+    await page.getByLabel('Contraseña', { exact: true }).fill('wrongpassword123');
+    await page.getByRole('button', { name: 'Entrar' }).click();
 
     // The action redirects to /login?error=... which shows a styled Alert
-    await expect(page.getByText('Invalid email or password')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Correo o contraseña incorrectos')).toBeVisible({ timeout: 10000 });
   });
 
   test('should not flicker when loading login page', async ({ page }) => {
@@ -50,8 +50,8 @@ test.describe('Authentication Flows', () => {
 
     // Verify login UI is rendered without flickering
     // If there was flickering, we'd see multiple renders or rapid redirects
-    await expect(page.getByRole('heading', { name: 'Welcome Back' })).toBeVisible();
-    await expect(page.getByLabel('Email')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Hola de nuevo' })).toBeVisible();
+    await expect(page.getByLabel('Correo electrónico')).toBeVisible();
 
     // Verify we're still on the login page (not redirected)
     await expect(page).toHaveURL(/.*\/login/);

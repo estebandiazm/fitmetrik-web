@@ -1,58 +1,269 @@
 .page {
+  position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+}
+
+/* ── Animated blister sheet (decorative backdrop) ───────────────────── */
+
+.sheetWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Fade the sheet out toward the form so it never competes with it. */
+  mask-image: radial-gradient(ellipse 55% 45% at 22% 12%, #000 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 55% 45% at 22% 12%, #000 0%, transparent 70%);
+  opacity: 0.7;
+}
+
+.sheet {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  display: grid;
+  grid-template-columns: repeat(10, 44px);
+  gap: 18px;
+  animation: auth-sheet-drift 18s ease-in-out infinite alternate;
+}
+
+.sheetCell {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-cell-pending-bg);
+  box-shadow: var(--shadow-dome);
+  animation: auth-cell-pop 9s ease-in-out infinite;
+}
+
+/* ── Brand panel (wide screens only) ─────────────────────────────────── */
+
+.brand {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 56px;
+}
+
+@media (min-width: 1024px) {
+  .brand {
+    display: flex;
+  }
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brandBody {
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.headline {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.headlineMuted {
+  color: var(--color-text-faint);
+}
+
+.strip {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stripDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text-faint);
+}
+
+.stripCell {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-cell-pending-bg);
+  box-shadow: var(--shadow-dome);
+  color: #ffffff;
+}
+
+.stripCellFill {
+  animation: strip-fill 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.stripCellFill svg {
+  animation: strip-check 260ms ease-out both;
+  animation-delay: inherit;
+}
+
+.stripCellLocked {
+  background: var(--color-locked-bg);
+  border-color: var(--color-locked-border);
+  box-shadow: none;
+  color: var(--color-text-faint);
+}
+
+.count {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+}
+
+.countValue {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.countRest {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-faint);
+}
+
+.brandFoot {
+  font-size: 12px;
+  color: var(--color-text-faint);
+}
+
+@keyframes strip-fill {
+  0% {
+    transform: scale(1);
+    background: var(--color-cell-pending-bg);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-dome);
+  }
+  45% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+    background: var(--color-accent-teal);
+    border-color: var(--color-accent-teal);
+    box-shadow: var(--shadow-popped);
+  }
+}
+
+@keyframes strip-check {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Form column ─────────────────────────────────────────────────────── */
+
+.formColumn {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
+  padding: 32px 16px;
 }
 
-/* Background Elements */
-.bgElements {
-  position: fixed;
-  top: 0;
-  left: 0;
+@media (min-width: 1024px) {
+  .formColumn {
+    padding: 48px;
+  }
+}
+
+.card {
   width: 100%;
-  height: 100%;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
+  max-width: 420px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.04),
+    0 24px 48px -24px rgba(16, 24, 40, 0.18);
 }
 
-.blobTeal {
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 50%;
-  height: 50%;
-  background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
-  border-radius: 50%;
-  filter: blur(120px);
-}
-
-.blobBlue {
-  position: absolute;
-  bottom: -10%;
-  right: -10%;
-  width: 50%;
-  height: 50%;
-  background-color: color-mix(in srgb, var(--color-tertiary) 25%, transparent);
-  border-radius: 50%;
-  filter: blur(120px);
-}
-
-.mainContent {
-  width: 100%;
-  max-width: 28rem;
-  position: relative;
-  z-index: 10;
+@media (min-width: 640px) {
+  .card {
+    padding: 40px 36px;
+  }
 }
 
 .pageFooter {
-  margin-top: 2rem;
+  margin-top: 24px;
   text-align: center;
-  font-size: 0.75rem;
-  color: var(--color-on-surface-muted);
+  font-size: 12px;
+  color: var(--color-text-faint);
+}
+
+/* Backdrop: a slowly drifting blister sheet whose cells pop in turn (same
+   punch-through language as `.blister-cell-popping`), so the auth screens
+   preview the product's signature interaction. Keyframes live in this
+   module so CSS-modules name localisation stays consistent. */
+@keyframes auth-cell-pop {
+  0%, 62%, 100% {
+    background: var(--color-cell-pending-bg);
+    box-shadow: var(--shadow-dome);
+    transform: scale(1);
+  }
+  68% {
+    background: var(--color-accent-teal);
+    box-shadow: var(--shadow-popped);
+    transform: scale(1.12);
+  }
+  74%, 92% {
+    background: var(--color-accent-teal);
+    box-shadow: var(--shadow-popped);
+    transform: scale(1);
+  }
+}
+
+@keyframes auth-sheet-drift {
+  from {
+    transform: translate3d(0, 0, 0) rotate(-8deg);
+  }
+  to {
+    transform: translate3d(-40px, -24px, 0) rotate(-8deg);
+  }
 }

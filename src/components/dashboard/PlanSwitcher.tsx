@@ -17,10 +17,9 @@ export function PlanSwitcher({ plans, activeIndex }: PlanSwitcherProps) {
   }
 
   return (
-    <div className="flex p-1 bg-white/5 rounded-2xl border border-white/10 lg:w-auto w-full">
+    <nav aria-label="Planes" className="flex w-full gap-1 rounded-xl border border-border bg-panel p-1 lg:w-auto">
       {plans.map((plan, index) => {
         const isActive = index === activeIndex;
-        // fallback to "Plan X" and "(N Days)"
         const label = plan.label || `Plan ${index + 1}`;
         const days = plan.days ? `(${plan.days})` : '';
 
@@ -29,16 +28,17 @@ export function PlanSwitcher({ plans, activeIndex }: PlanSwitcherProps) {
             key={index}
             href={`?planIndex=${index}`}
             scroll={false}
-            className={`flex-1 flex text-center justify-center items-center px-4 lg:px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all ${
+            aria-current={isActive ? 'page' : undefined}
+            className={`flex flex-1 items-center justify-center rounded-lg px-4 py-2 text-center text-xs font-semibold transition-colors lg:px-5 ${
               isActive
-                ? 'bg-primary text-on-primary'
-                : 'text-on-surface-variant hover:text-white'
+                ? 'bg-accent-teal text-accent-teal-ink'
+                : 'text-text-muted hover:bg-locked-bg hover:text-text-primary'
             }`}
           >
             {label} {days}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

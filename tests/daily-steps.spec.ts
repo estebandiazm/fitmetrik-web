@@ -16,9 +16,9 @@ test.describe('Daily Steps Tracking', () => {
     test('7.1: should open and close daily steps modal', async ({ page }) => {
       // Login as client
       await page.goto('/login');
-      await page.getByLabel('Email').fill(testEmail);
-      await page.getByLabel('Password').fill(testPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(testEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(testPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       // Navigate to activity page
       await page.goto('/activity');
@@ -41,9 +41,9 @@ test.describe('Daily Steps Tracking', () => {
 
     test('7.2: should validate step entry form', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(testEmail);
-      await page.getByLabel('Password').fill(testPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(testEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(testPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -86,9 +86,9 @@ test.describe('Daily Steps Tracking', () => {
 
     test('7.3: should successfully save daily step record', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(testEmail);
-      await page.getByLabel('Password').fill(testPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(testEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(testPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -115,9 +115,9 @@ test.describe('Daily Steps Tracking', () => {
 
     test('7.4: should paginate recent records', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(testEmail);
-      await page.getByLabel('Password').fill(testPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(testEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(testPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity');
 
@@ -145,9 +145,9 @@ test.describe('Daily Steps Tracking', () => {
 
     test('7.5: should toggle trends chart between week and month', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(testEmail);
-      await page.getByLabel('Password').fill(testPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(testEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(testPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity');
 
@@ -172,9 +172,9 @@ test.describe('Daily Steps Tracking', () => {
 
     test('7.6: should display status badges based on step goal', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(testEmail);
-      await page.getByLabel('Password').fill(testPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(testEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(testPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity');
 
@@ -201,15 +201,15 @@ test.describe('Daily Steps Tracking', () => {
     test('7.7: should display client activity and allow setting step goal', async ({ page }) => {
       // Login as coach
       await page.goto('/login');
-      await page.getByLabel('Email').fill(coachEmail);
-      await page.getByLabel('Password').fill(coachPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(coachEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       // Navigate to clients list
       await page.goto('/clients');
 
       // Find and click on a client (assuming at least one exists)
-      const viewLink = page.locator('a:has-text("View →")').first();
+      const viewLink = page.getByRole("link", { name: /^Ver a / }).first();
       const clientExists = await viewLink.isVisible().catch(() => false);
 
       if (clientExists) {

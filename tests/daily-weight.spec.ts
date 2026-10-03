@@ -15,9 +15,9 @@ test.describe('Daily Weight Tracking', () => {
   test.describe('Client Portal - Weight Tracking', () => {
     test('DWT-E2E-01: should display weight tab on activity page', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity');
 
@@ -27,9 +27,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-02: should open and close weight modal', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
 
@@ -49,9 +49,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-03: should validate future date', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -69,9 +69,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-04: should validate weight below minimum (0.1 kg)', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -86,9 +86,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-05: should validate weight above maximum (500 kg)', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -103,9 +103,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-06: Save button should be disabled when weight is empty', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -116,9 +116,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-07: should successfully save a weight record', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
       await page.getByRole('button', { name: /Add Record/i }).click();
@@ -138,9 +138,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-08: should display weight history table after logging', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
 
@@ -157,9 +157,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-09: should render weight trend chart when data exists', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
 
@@ -179,9 +179,9 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-10: should toggle weight chart between Week and Month', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/activity?tab=weight');
 
@@ -203,15 +203,15 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-11: should display the weight blister widget on client dashboard', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(clientEmail);
-      await page.getByLabel('Password').fill(clientPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(clientEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(clientPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       // Navigate to dashboard (default after login)
       await page.goto('/dashboard');
 
-      // WeightBlisterWidget shows the "Peso" heading and a "X/7 esta semana" summary
-      const weightWidget = page.getByRole('heading', { name: 'Peso' });
+      // WeightBlisterWidget is the "Hoy" region with a "X/7 esta semana" summary
+      const weightWidget = page.getByRole('region', { name: 'Hoy' });
       await expect(weightWidget).toBeVisible();
       await expect(page.getByText(/\d\/7/)).toBeVisible();
 
@@ -228,13 +228,13 @@ test.describe('Daily Weight Tracking', () => {
   test.describe('Coach Portal - Weight Management', () => {
     test('DWT-E2E-12: should display Target Weight editor on client detail page', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(coachEmail);
-      await page.getByLabel('Password').fill(coachPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(coachEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/clients');
 
-      const viewLink = page.locator('a:has-text("View →")').first();
+      const viewLink = page.getByRole("link", { name: /^Ver a / }).first();
       const clientExists = await viewLink.isVisible().catch(() => false);
 
       if (clientExists) {
@@ -254,13 +254,13 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-13: should save target weight and show success message', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(coachEmail);
-      await page.getByLabel('Password').fill(coachPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(coachEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/clients');
 
-      const viewLink = page.locator('a:has-text("View →")').first();
+      const viewLink = page.getByRole("link", { name: /^Ver a / }).first();
       const clientExists = await viewLink.isVisible().catch(() => false);
 
       if (clientExists) {
@@ -276,13 +276,13 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-14: should display weight metrics cards when client has weight data', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(coachEmail);
-      await page.getByLabel('Password').fill(coachPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(coachEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/clients');
 
-      const viewLink = page.locator('a:has-text("View →")').first();
+      const viewLink = page.getByRole("link", { name: /^Ver a / }).first();
       const clientExists = await viewLink.isVisible().catch(() => false);
 
       if (clientExists) {
@@ -304,13 +304,13 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-15: should display weight history table when client has weight data', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(coachEmail);
-      await page.getByLabel('Password').fill(coachPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(coachEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/clients');
 
-      const viewLink = page.locator('a:has-text("View →")').first();
+      const viewLink = page.getByRole("link", { name: /^Ver a / }).first();
       const clientExists = await viewLink.isVisible().catch(() => false);
 
       if (clientExists) {
@@ -328,13 +328,13 @@ test.describe('Daily Weight Tracking', () => {
 
     test('DWT-E2E-16: should display Weight Tracking section heading on coach client page', async ({ page }) => {
       await page.goto('/login');
-      await page.getByLabel('Email').fill(coachEmail);
-      await page.getByLabel('Password').fill(coachPassword);
-      await page.getByRole('button', { name: 'Sign In' }).click();
+      await page.getByLabel('Correo electrónico').fill(coachEmail);
+      await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
+      await page.getByRole('button', { name: 'Entrar' }).click();
 
       await page.goto('/clients');
 
-      const viewLink = page.locator('a:has-text("View →")').first();
+      const viewLink = page.getByRole("link", { name: /^Ver a / }).first();
       const clientExists = await viewLink.isVisible().catch(() => false);
 
       if (clientExists) {

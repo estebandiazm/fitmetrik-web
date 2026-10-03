@@ -10,9 +10,8 @@ interface TopAppBarProps {
 }
 
 const navItems = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Activity', href: '/activity' },
-  { label: 'My Plans', href: '#' },
+  { label: 'Hoy', href: '/dashboard' },
+  { label: 'Actividad', href: '/activity' },
 ];
 
 function ClientPortalNav() {
@@ -21,15 +20,16 @@ function ClientPortalNav() {
   return (
     <nav className="hidden items-center gap-8 md:flex">
       {navItems.map((item) => {
-        const isActive = item.href !== '#' && pathname === item.href;
+        const isActive = pathname === item.href;
         return (
           <Link
             key={item.label}
             href={item.href}
+            aria-current={isActive ? 'page' : undefined}
             className={`border-b-2 pb-1 text-sm font-semibold transition-colors ${
               isActive
-                ? 'border-primary text-primary'
-                : 'border-transparent text-on-surface-muted hover:text-on-surface'
+                ? 'border-accent-teal text-text-primary'
+                : 'border-transparent text-text-muted hover:text-text-primary'
             }`}
           >
             {item.label}
@@ -40,6 +40,6 @@ function ClientPortalNav() {
   );
 }
 
-export function TopAppBar({ clientName = 'Client User' }: TopAppBarProps) {
+export function TopAppBar({ clientName = 'Cliente' }: TopAppBarProps) {
   return <AppHeader userName={clientName} center={<ClientPortalNav />} />;
 }

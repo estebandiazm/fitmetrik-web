@@ -6,7 +6,6 @@ import { WeightBlisterWidget } from '@/components/dashboard/weight-blister-widge
 import { HydrationTracker } from '@/components/dashboard/HydrationTracker';
 import { MacrosHUD } from '@/components/dashboard/MacrosHUD';
 import { PlanSectionCard, PlanSectionCardProps } from '@/components/dashboard/PlanSectionCard';
-import { Card } from '@/components/ui/Card';
 import { PlanSwitcher } from '@/components/dashboard/PlanSwitcher';
 
 import { DietPlan } from '@/domain/types/DietPlan';
@@ -101,113 +100,88 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
   // Map plans for switcher
   const switcherPlans = plans.map(p => ({ label: p.label, days: p.days }));
 
-  const mealCardsData = activePlan.meals.map((meal) => {
-    const foods = meal.blocks.flatMap(block => 
-      block.options.map(opt => ({
-        id: `${meal.mealName}-${opt.foodName}`,
+  const mealCardsData: PlanSectionCardProps[] = activePlan.meals.map((meal) => {
+    const foods = meal.blocks.flatMap((block) =>
+      block.options.map((opt) => ({
+        id: `${meal.mealName}-${block.blockType}-${opt.foodName}`,
         name: opt.foodName,
         category: block.blockType,
-        amount: `${opt.grams}${opt.measureUnit}`,
-        colorClass: block.blockType === 'BASE' ? 'border-primary' : block.blockType === 'GRASA' ? 'border-tertiary' : 'border-secondary'
-      }))
+        amount: `${opt.grams} ${opt.measureUnit}`,
+      })),
     );
     return {
       title: meal.mealName,
-      description: `${meal.blocks.length} bloques nutricionales`,
-      totalWeight: foods.reduce((acc, f) => acc + (parseInt(f.amount) || 0), 0) + 'g',
-      totalProtein: 'Calculado',
+      description: foods.map((food) => food.name).join(' · '),
+      totalWeight: `${meal.blocks.length} bloques`,
       foods,
-      icon: 'restaurant_menu',
-      defaultExpanded: false
     };
   });
 
-  const snacksCardData = {
-    title: "Snacks",
-    description: "Elige una opción por día",
-    totalWeight: activePlan.snacks?.length + " opciones",
-    totalProtein: "-",
-    foods: activePlan.snacks?.map(snack => ({
-      id: `snack-${snack.optionNumber}`,
-      name: `Opción ${snack.optionNumber}`,
-      category: "Snack",
-      amount: snack.description,
-      colorClass: "border-primary"
-    })) || [],
-    icon: 'cookie',
-    defaultExpanded: false
-  };
-
-  // Only add snacks if the plan has them
   const allCards: PlanSectionCardProps[] = [...mealCardsData];
   if (activePlan.snacks && activePlan.snacks.length > 0) {
-    allCards.push(snacksCardData);
+    allCards.push({
+      title: 'Snacks',
+      description: 'Elige una opción por día',
+      totalWeight: `${activePlan.snacks.length} opciones`,
+      variant: 'snack',
+      foods: activePlan.snacks.map((snack) => ({
+        id: `snack-${snack.optionNumber}`,
+        name: snack.description,
+        category: `Opción ${snack.optionNumber}`,
+        amount: '',
+      })),
+    });
   }
 
   return (
-    <div className="font-display bg-surface-dim text-slate-100 min-h-screen pb-32 lg:pb-0 relative overflow-x-hidden w-full">
-      {/* Background Elements */}
-      <div className="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/30 rounded-full blur-[120px] animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cyan-900/20 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
-      </div>
+    <div className="min-h-screen w-full overflow-x-hidden bg-bg pb-32 text-text-primary lg:pb-0">
+      <TopAppBar clientName={clientRecord?.name || 'Cliente'} />
 
-      <TopAppBar clientName={clientRecord?.name || "Client User"} />
+      <main className="mx-auto flex w-full max-w-[1120px] flex-col gap-10 px-6 pb-12 pt-8 lg:px-8">
+        {isMock && (
+          <p className="rounded-[var(--radius-control)] border border-border bg-panel px-4 py-3 text-[13px] text-text-muted">
+            Mostrando datos de demostración — tu coach aún no te asignó un plan.
+          </p>
+        )}
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full p-6 lg:p-10 flex flex-col gap-8 mt-4">
-        {/* Page Header & Plan Switcher */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <div>
-            <h1 className="text-4xl font-black text-white tracking-tight">Planes Activos</h1>
-            <p className="text-on-surface-variant mt-2 font-medium">
-              {isMock ? "Mostrando datos de demostración" : `Estrategia nutricional de ${activePlan.label || 'Plan Personalizado'}`}
-            </p>
-          </div>
-          <PlanSwitcher plans={switcherPlans} activeIndex={activeIndex} />
-        </div>
+        {/* Hoy: today's dose cell is the single focal action, with the
+            supporting metrics beside it on wide screens and below on phones. */}
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+          <WeightBlisterWidget
+            clientId={clientRecord?.id ?? ''}
+            cells={weeklyWeightCells}
+            count={weeklyWeightCount}
+            todayEntry={todayWeightEntry}
+            targetWeight={targetWeight}
+          />
 
-        <div className="flex flex-col gap-8">
-          {/* TOP SECTION: Summary Widgets row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <MacrosHUD />
+          <div className="animate-enter grid grid-cols-1 gap-4 sm:grid-cols-2" style={{ '--enter-delay': '240ms' } as React.CSSProperties}>
             <StepsCounter current={dailyAverage} goal={stepGoal} />
             <HydrationTracker current={3.5} />
-            <WeightBlisterWidget
-              clientId={clientRecord?.id ?? ''}
-              cells={weeklyWeightCells}
-              count={weeklyWeightCount}
-              todayEntry={todayWeightEntry}
-              targetWeight={targetWeight}
-            />
-          </div>
-
-          {/* Snacks count — now below the main widget row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="rounded-3xl p-6 border-b-4 lg:border-l-4 lg:border-b-0 border-tertiary">
-              <h3 className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-4">Snacks per Day</h3>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center text-tertiary shadow-inner">
-                  <span className="material-symbols-outlined text-3xl">cookie</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">{activePlan.snacks?.length || 0}</p>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* BOTTOM SECTION: Full width Meals/Snacks grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start w-full">
-            {allCards.map((card, idx) => {
-              const isLastAndOdd = allCards.length % 2 !== 0 && idx === allCards.length - 1;
-              return (
-                <div key={idx} className={isLastAndOdd ? "md:col-span-2" : ""}>
-                  <PlanSectionCard {...card} />
-                </div>
-              );
-            })}
+            <div className="sm:col-span-2">
+              <MacrosHUD />
+            </div>
           </div>
         </div>
+
+        <section aria-labelledby="plan-heading" className="flex flex-col gap-5">
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-text-faint">Tu plan</p>
+              <h2 id="plan-heading" className="mt-1 text-2xl font-bold text-text-primary">
+                {activePlan.label || 'Plan personalizado'}
+              </h2>
+              {activePlan.days && <p className="mt-1 text-[13px] text-text-muted">{activePlan.days}</p>}
+            </div>
+            <PlanSwitcher plans={switcherPlans} activeIndex={activeIndex} />
+          </div>
+
+          <div className="grid w-full grid-cols-1 items-start gap-4 md:grid-cols-2">
+            {allCards.map((card) => (
+              <PlanSectionCard key={card.title} {...card} />
+            ))}
+          </div>
+        </section>
       </main>
 
       <BottomNavBar />

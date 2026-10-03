@@ -87,7 +87,7 @@ A nutrition plan is not a document to read — it's a dose to take. Every day is
 
 The palette reads clinical-trustworthy, not sterile-cold: a pale foil-grey base (`#F4F6F8`) with silver divider lines (`#C7CCD1`), one accent color per tracked metric rather than per client (teal for weight, amber for steps/activity). Numerals are tabular and set in a monospace face everywhere a count or dose matters ("4/7 esta semana"), while UI labels stay in a compact sans. The system is fully theme-aware (light + dark via a `data-theme` attribute), with dark mode built from the same material logic as light — a blister foil under dim light, not a generic inverted theme.
 
-This system currently covers exactly two surfaces: the client dashboard weight-tracking widget and the coach client roster table, plus the shared `BlisterCell` primitive and the re-skinned atomic layer (`Button`, `Card`, `Input`, `Badge`, `StatusPill`, `Modal`, `Table`) that both surfaces sit on. Auth pages, `/activity`, `/creator`, `/coaches`, and individual client detail pages remain on the prior visual system and are out of scope for this document.
+This system covers the client "Hoy" dashboard (today's dose cell as the focal action, then steps/hydration/macros and the plan), the coach roster (one row per client with its week strip, most-empty-first), the auth screens (animated blister-sheet backdrop, brand panel that fills a week strip, form card), the shared `AppHeader`/nav chrome, the `BlisterCell` primitive, inline stroke icons (`components/ui/icons.tsx`) and the re-skinned atomic layer (`Button`, `Card`, `Input`, `Badge`, `StatusPill`, `Modal`, `Table`, `Alert`). `/activity`, `/creator`, `/coaches` and the client detail page have not been redesigned yet, but the legacy Material token names (`surface-*`, `on-surface*`, `primary`, `error`…) are now aliases of the blister tokens, so they follow light/dark theming too.
 
 **Key Characteristics:**
 - One structural atom (the blister cell) with four named, unambiguous states — never a bare empty box standing in for "missed"
@@ -104,7 +104,7 @@ The palette is a quiet clinical neutral with exactly two metric accents; it is n
 - **Blíster Teal** (`#2dd4bf`, dark-theme variant `#34e6cf`): the weight-tracking accent — popped `BlisterCell` fill, the client dashboard's hero interaction, active-state badges, links, and focus rings across both surfaces.
 
 ### Secondary
-- **Dosage Amber** (`#f59e0b`, dark-theme variant `#ffb020`): reserved for the steps/activity metric track, parallel to teal's role for weight. Declared as a theme token but not yet consumed by a shipped component in these two surfaces — carried here because it's part of the same metric-accent system, not a one-off.
+- **Dosage Amber** (`#f59e0b`, dark-theme variant `#ffb020`): reserved for the steps/activity metric track, parallel to teal's role for weight — the dashboard's steps card (icon + progress bar) is its first consumer.
 
 ### Neutral
 - **Foil Grey** (`#f4f6f8`, background): the page/app background, read as the blister pack's foil sheet.
@@ -183,8 +183,11 @@ Three corner languages coexist by role: `BlisterCell` is either a rounded square
 ### BlisterCell (signature component)
 The structural atom of the entire system: a single day's dose. Four states — `pending` (domed, empty, awaiting action), `popped` (teal-filled, concave, white check icon), `missed` (same box as pending, faint-slate X icon — explicitly skipped, never bare-empty), `locked` (recessed grey fill, faint-slate padlock icon, future/unavailable). Three sizes: `sm` (22px, rounded-square, roster mini-strips), `md` (36px, rounded-square, week strips), `lg` (168px, true circle, the tappable dashboard hero). A state transition from `pending`/`missed` into `popped` triggers a 480ms cubic-bezier punch-through scale animation (`blister-pop` keyframe: 1 → 1.22 → 0.94 → 1.05 → 1) — fired only on a genuine transition, never on initial mount, so pages that render already-popped cells (e.g. roster strips) stay still.
 
-### Navigation / Table
-Coach roster uses a dense desktop `Table` with sortable column headers (▲/▼ teal indicator when active, faint ↕ otherwise), zebra-free rows separated by the row-hairline token, and inline per-row `BlisterCell` week strips. No distinct top-nav pattern is part of this system's two documented surfaces.
+### Navigation / Roster
+The coach roster (`ClientRosterTable`) is a list, not a table: one row per client inside a single panel (16px radius, row-hairline separators) with a neutral initial avatar, name plus "Último registro: …" line, a `sm` `BlisterCell` week strip, the adherence % in mono (danger <50%, faint <85%, primary otherwise) and the row action isolated behind a divider. Rows are sorted by adherence ascending (most-empty-first). Both portals share `AppHeader`: popped-cell wordmark, a small text nav (teal underline marks the active section), avatar, theme toggle and sign-out; the client portal adds a mobile `BottomNavBar`.
+
+### Motion
+Entrances use `.animate-enter` (560ms rise + fade, staggered via `--enter-delay`). The auth screens add a slowly drifting blister sheet whose cells pop in turn, and a brand-panel week strip that fills cell by cell; errors shake once (`shake-x`). Every animation collapses under `prefers-reduced-motion: reduce`.
 
 ## Do's and Don'ts
 
@@ -197,5 +200,5 @@ Coach roster uses a dense desktop `Table` with sortable column headers (▲/▼ 
 ### Don't:
 - **Don't** represent a missed/skipped day as a bare empty cell — it must carry the explicit missed-state icon and border treatment so it's never confused with "not yet due."
 - **Don't** add hard offset drop-shadows (flat, non-inset, high-contrast) anywhere in this system — elevation here is soft dual-direction neumorphic lift or concave/convex insets, never a hard neobrutalist-style offset shadow.
-- **Don't** add kickers, eyebrows, glyph-icon-font labels, or a system display face — none of these exist anywhere in the shipped build; they are not part of this system's vocabulary.
+- **Don't** use glyph icon fonts (Material Symbols) or emoji on redesigned surfaces — icons are the inline stroke SVGs in `components/ui/icons.tsx`. The only eyebrow style is the artboards' small uppercase faint label (12–13px, 600, 0.08em tracking) above a heading.
 - **Don't** treat `--shadow-dome`'s light-theme subtlety as something to "fix" with higher contrast — it is a known, accepted finish-polish characteristic of the white-dome-on-white-card material, not a broken token.
