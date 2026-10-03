@@ -271,6 +271,47 @@ para una siguiente ronda sobre la misma base ya sentada.
       `cubic-bezier(0.34, 1.56, 0.64, 1)` marcada como intencional
       (`.impeccable/config.json`, `ignore-value`) — es el overshoot de
       la interacción de firma, no un rebote genérico.
+    - `DESIGN.md` + `.impeccable/design.json` escritos por el
+      documentador desde el build real (primer `DESIGN.md` del
+      proyecto). `PRODUCT.md`, `.impeccable/config.json` y este mismo
+      doc commiteados junto. **DONE — commit `efdf5e8`.**
+
+## Cierre
+
+**T1→T5 completas.** 7 commits en `redesign/blister-adherence` (ninguno
+pusheado/mergeado — queda a decisión del usuario):
+
+1. `bd93c5e` — tokens + dark mode + IBM Plex
+2. `8933340` — BlisterCell + re-skin de primitivos
+3. `bd6f288` — dashboard cliente cableado real
+4. `217a1da` — roster coach con tiras reales
+5. `833cc55` — copy en español (hallado en inspección visual)
+6. `c90f160` — lote de fixes del finish-review (pop real, cita de dark
+   mode, ícono SVG, deferral, bug de timezone real)
+7. `efdf5e8` — `DESIGN.md` + cierre de tracking
+
+**Verificación final** (estado completo de la rama): `yarn lint`
+1200/17/1183 (baseline idéntico, sin issues nuevos), `yarn tsc --noEmit`
+limpio, `yarn test:unit` 157/157 verde. Playwright E2E real
+(`tests/daily-weight.spec.ts`) **no verificado en este sandbox** — sin
+red a Supabase; confirmado que no es regresión (snapshot del propio
+error muestra la app renderizando bien, solo el login contra Supabase
+cuelga) pero falta correrlo en un entorno con acceso real antes de
+darlo por definitivamente verde.
+
+**Fuera de alcance de esta iteración** (explícito desde el inicio, no
+silencioso): auth, `/activity`, `/creator`, `/coaches`, detalle de
+cliente individual — quedan sobre la misma base de tokens/tema/
+primitivos ya sentada, listos para una próxima ronda sin re-derivar la
+dirección.
+
+**Deuda preexistente señalada, no tocada** (confirmada por múltiples
+pasadas independientes como fuera de alcance de un pase visual):
+`DailyWeightModal.tsx` importa una Server Action directo desde
+`app/actions/` (viola la regla de dependencias de `AGENTS.md`),
+validación de negocio inline en el componente, nombre de archivo
+PascalCase vs. convención kebab-case nominal del repo (inconsistente
+en todo el repo, no solo acá).
 
 ## Criterios de aceptación
 
