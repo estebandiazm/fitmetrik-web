@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { addDailyWeight } from '../../app/actions/clientActions';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { todayLocalISO, parseLocalDate } from '@/lib/utils/local-date';
 
 interface DailyWeightModalProps {
   open: boolean;
@@ -18,20 +19,25 @@ export default function DailyWeightModal({
   clientId,
   onSuccess,
 }: DailyWeightModalProps) {
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(todayLocalISO());
   const [weight, setWeight] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    };
+  }, []);
 
   const handleSubmit = async () => {
     setError(null);
 
-    const selectedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    selectedDate.setHours(0, 0, 0, 0);
+    const selectedDate = parseLocalDate(date);
+    const today = parseLocalDate(todayLocalISO());
 
     if (selectedDate > today) {
       setError('Date cannot be in the future');
@@ -49,8 +55,8 @@ export default function DailyWeightModal({
     try {
       await addDailyWeight(clientId, selectedDate, weightNum, notes || undefined);
       setSuccess(true);
-      setTimeout(() => {
-        setDate(new Date().toISOString().split('T')[0]);
+      resetTimeoutRef.current = setTimeout(() => {
+        setDate(todayLocalISO());
         setWeight('');
         setNotes('');
         setSuccess(false);
@@ -91,7 +97,7 @@ export default function DailyWeightModal({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
+                  max={todayLocalISO()}
                   className="w-full"
                 />
               </div>
@@ -149,9 +155,26 @@ export default function DailyWeightModal({
               className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading && (
-                <span className="material-symbols-outlined text-base animate-spin">
-                  progress_activity
-                </span>
+                <svg
+                  className="animate-spin"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeDasharray="42"
+                    strokeDashoffset="14"
+                    opacity="0.9"
+                  />
+                </svg>
               )}
               Save
             </Button>

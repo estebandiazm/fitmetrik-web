@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 
 export type BlisterCellState = 'pending' | 'popped' | 'missed' | 'locked';
 export type BlisterCellSize = 'sm' | 'md' | 'lg';
@@ -148,15 +150,46 @@ function buildCellStyle(state: BlisterCellState, size: BlisterCellSize): React.C
   return style;
 }
 
-function buildCellClassName(state: BlisterCellState, interactive: boolean, className: string): string {
+function buildCellClassName(
+  state: BlisterCellState,
+  interactive: boolean,
+  isPopping: boolean,
+  className: string,
+): string {
   return [
     STATE_BASE_CLASS[state],
     'inline-flex shrink-0 items-center justify-center',
     interactive ? 'cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-teal' : '',
+    isPopping ? 'blister-cell-popping' : '',
     className,
   ]
     .filter(Boolean)
     .join(' ');
+}
+
+// The direction contract's named "signature interaction": tap → pop. Fires
+// only on a genuine pending/missed→popped transition (never on mount, so a
+// page that loads already-popped cells — e.g. the roster's mini strips —
+// stays still). A plain color/shadow fade alone was judged by finish review
+// as not satisfying "la interacción de firma"; this adds the authored
+// punch-through motion the contract names.
+const POP_ANIMATION_MS = 480;
+
+function usePopAnimation(state: BlisterCellState): boolean {
+  const prevStateRef = useRef(state);
+  const [isPopping, setIsPopping] = useState(false);
+
+  useEffect(() => {
+    const prev = prevStateRef.current;
+    prevStateRef.current = state;
+    if (prev !== 'popped' && state === 'popped') {
+      setIsPopping(true);
+      const timeout = setTimeout(() => setIsPopping(false), POP_ANIMATION_MS);
+      return () => clearTimeout(timeout);
+    }
+  }, [state]);
+
+  return isPopping;
 }
 
 /**
@@ -168,8 +201,9 @@ function buildCellClassName(state: BlisterCellState, interactive: boolean, class
  * consuming page (e.g. the `lg` hero "toca para loguear" prompt) owns that.
  */
 export function BlisterCell({ state, size = 'md', onClick, ariaLabel, className = '' }: BlisterCellProps) {
+  const isPopping = usePopAnimation(state);
   const style = buildCellStyle(state, size);
-  const sharedClassName = buildCellClassName(state, Boolean(onClick), className);
+  const sharedClassName = buildCellClassName(state, Boolean(onClick), isPopping, className);
   const icon = renderIcon(state, SIZE_ICON_PX[size], SIZE_STROKE_WIDTH[size]);
 
   if (onClick) {
