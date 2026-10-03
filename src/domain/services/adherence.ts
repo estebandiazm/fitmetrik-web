@@ -79,6 +79,19 @@ export function countPopped(cells: WeekCell[]): number {
 }
 
 /**
+ * Adherence percentage for a weekly strip: popped cells divided by
+ * "trackable" cells (every cell except `locked` future days), rounded to the
+ * nearest whole percent. `locked` cells are excluded from the denominator —
+ * a client isn't penalized for days that haven't happened yet. Returns 0
+ * when there is nothing trackable yet (e.g. the very start of the week).
+ */
+export function calculateAdherencePct(cells: WeekCell[]): number {
+  const trackable = cells.filter((cell) => cell.state !== 'locked').length;
+  if (trackable === 0) return 0;
+  return Math.round((countPopped(cells) / trackable) * 100);
+}
+
+/**
  * Finds the entry (if any) landing on the same calendar day as `date`,
  * ignoring time-of-day. Lets consumers (e.g. a "today's logged weight"
  * label) read the underlying value without re-implementing date comparison.

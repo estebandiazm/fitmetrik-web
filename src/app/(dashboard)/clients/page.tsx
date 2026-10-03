@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { authProvider } from '@/lib/registry';
 import { getCoachByAuthId } from '@/app/actions/coachActions';
 import { getClientsByCoachId } from '@/app/actions/clientActions';
+import { buildWeeklyStrip, calculateAdherencePct } from '@/domain/services/adherence';
 import { CoachHeader } from '@/components/coach/CoachHeader';
 import { CoachSidebar } from '@/components/coach/CoachSidebar';
 import { MetricsSection } from '@/components/coach/MetricsSection';
@@ -20,6 +21,16 @@ export default async function ClientsPage() {
   }
 
   const clients = await getClientsByCoachId(coach.id);
+
+  // Weekly adherence strip — bucketed here (the Server Component), not inside
+  // ClientRosterTable, so the client component never needs its own
+  // domain/services import (AGENTS.md forbids components/ importing
+  // domain/services/ directly; same pattern T3 used for the client dashboard).
+  const clientsWithAdherence = clients.map((client) => {
+    const weekCells = buildWeeklyStrip(client.dailyWeights ?? []);
+    const adherencePct = calculateAdherencePct(weekCells);
+    return { ...client, weekCells, adherencePct };
+  });
 
   return (
     <div className="min-h-screen bg-surface-dim flex flex-col">
@@ -39,7 +50,7 @@ export default async function ClientsPage() {
           <MetricsSection clients={clients} />
 
           <div className="mt-6">
-            <ClientRosterTable clients={clients} />
+            <ClientRosterTable clients={clientsWithAdherence} />
           </div>
         </main>
       </div>

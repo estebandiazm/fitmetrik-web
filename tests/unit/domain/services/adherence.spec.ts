@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { buildWeeklyStrip, countPopped, findEntryForDate } from '@/domain/services/adherence';
+import {
+  buildWeeklyStrip,
+  countPopped,
+  findEntryForDate,
+  calculateAdherencePct,
+} from '@/domain/services/adherence';
 
 // Jan 1 2024 is a Monday, so these fixtures land on known weekdays without
 // relying on `Date.prototype.getDay()` quirks across locales/timezones.
@@ -94,6 +99,40 @@ describe('countPopped', () => {
 
   it('returns 0 when nothing is popped', () => {
     expect(countPopped(buildWeeklyStrip([], MONDAY))).toBe(0);
+  });
+});
+
+describe('calculateAdherencePct', () => {
+  it('returns the percentage of trackable cells that are popped, rounded', () => {
+    // Mon+Tue popped, Wed pending (today, untouched), Thu-Sun locked =>
+    // 3 trackable (Mon/Tue/Wed), 2 popped => 66.67% rounds to 67.
+    const entries = [{ date: new Date(2024, 0, 8) }, { date: new Date(2024, 0, 9) }];
+    const cells = buildWeeklyStrip(entries, WEDNESDAY);
+    expect(calculateAdherencePct(cells)).toBe(67);
+  });
+
+  it('rounds to the nearest whole percent', () => {
+    // Sunday "today": all 7 days trackable, 5 popped => 71.428...% rounds to 71.
+    const SUNDAY = new Date(2024, 0, 14);
+    const entries = [1, 2, 3, 4, 5].map((day) => ({ date: new Date(2024, 0, day + 7) }));
+    const cells = buildWeeklyStrip(entries, SUNDAY);
+    expect(calculateAdherencePct(cells)).toBe(71);
+  });
+
+  it('returns 0 when nothing is trackable yet (locked-only week, e.g. Monday with no entries excluded)', () => {
+    // On Monday only today (pending) is trackable and nothing is popped.
+    expect(calculateAdherencePct(buildWeeklyStrip([], MONDAY))).toBe(0);
+  });
+
+  it('returns 0 for an all-locked week (defensive — buildWeeklyStrip never actually produces one)', () => {
+    const allLocked = buildWeeklyStrip([], MONDAY).map((cell) => ({ ...cell, state: 'locked' as const }));
+    expect(calculateAdherencePct(allLocked)).toBe(0);
+  });
+
+  it('returns 100 when every trackable cell is popped', () => {
+    const entries = [{ date: new Date(2024, 0, 8) }, { date: new Date(2024, 0, 9) }, { date: new Date(2024, 0, 10) }];
+    const cells = buildWeeklyStrip(entries, WEDNESDAY);
+    expect(calculateAdherencePct(cells)).toBe(100);
   });
 });
 
