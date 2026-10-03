@@ -201,7 +201,7 @@ test.describe('Daily Weight Tracking', () => {
       }
     });
 
-    test('DWT-E2E-11: should display WeightCounter widget on client dashboard', async ({ page }) => {
+    test('DWT-E2E-11: should display the weight blister widget on client dashboard', async ({ page }) => {
       await page.goto('/login');
       await page.getByLabel('Email').fill(clientEmail);
       await page.getByLabel('Password').fill(clientPassword);
@@ -210,14 +210,16 @@ test.describe('Daily Weight Tracking', () => {
       // Navigate to dashboard (default after login)
       await page.goto('/dashboard');
 
-      // WeightCounter shows the "Weight" heading and either a value or "No weight logged yet"
-      const weightWidget = page.getByRole('heading', { name: 'Weight' });
+      // WeightBlisterWidget shows the "Peso" heading and a "X/7 esta semana" summary
+      const weightWidget = page.getByRole('heading', { name: 'Peso' });
       await expect(weightWidget).toBeVisible();
+      await expect(page.getByText(/\d\/7/)).toBeVisible();
 
-      const hasWeight = await page.getByText(/\d+(\.\d+)? kg/).isVisible().catch(() => false);
-      const isEmpty = await page.getByText('No weight logged yet').isVisible().catch(() => false);
+      // Today's hero cell prompts either to log (pending) or shows today's value (popped)
+      const hasPrompt = await page.getByText('Toca para loguear').isVisible().catch(() => false);
+      const hasLogged = await page.getByText('Peso de hoy').isVisible().catch(() => false);
 
-      expect(hasWeight || isEmpty).toBe(true);
+      expect(hasPrompt || hasLogged).toBe(true);
     });
   });
 

@@ -57,3 +57,19 @@ dist-ssr
 # Local tooling caches
 .codegraph/
 .atl/.skill-registry.cache.json
+
+# design-sync (claude.ai/design) — staged converter + generated output
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+
+# impeccable — review/verification evidence and build scratch, not durable
+# design decisions (.impeccable/surfaces/, PRODUCT.md, DESIGN.md stay tracked)
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/build/
+.impeccable/decision-payload.json
+.impeccable/direction-contract-body.md
+.impeccable/surface-brief-addendum.md

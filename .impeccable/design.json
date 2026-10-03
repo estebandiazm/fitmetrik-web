@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-03T00:00:00Z",
+  "title": "Design System: FitMetrik — Blíster de Adherencia",
+  "extensions": {
+    "colorMeta": {
+      "bg": { "role": "neutral", "displayName": "Foil Grey", "canonical": "#f4f6f8", "tonalRamp": ["#1c2733", "#2a3440", "#424d58", "#6b7680", "#9aa3ac", "#c7ccd1", "#e1e4e7", "#f4f6f8"] },
+      "panel": { "role": "neutral", "displayName": "Panel White", "canonical": "#ffffff", "tonalRamp": ["#1c2733", "#3d4751", "#6b7680", "#9aa3ac", "#c7ccd1", "#e1e4e7", "#f4f6f8", "#ffffff"] },
+      "accent-teal": { "role": "primary", "displayName": "Blíster Teal", "canonical": "#2dd4bf", "tonalRamp": ["#063d38", "#0c5a52", "#13786d", "#1a9688", "#2dd4bf", "#5fe0d0", "#91ece1", "#c3f7f0"] },
+      "accent-amber": { "role": "secondary", "displayName": "Dosage Amber", "canonical": "#f59e0b", "tonalRamp": ["#4a2f02", "#704604", "#976006", "#bd7a08", "#f59e0b", "#f8b648", "#fbce85", "#fde6c2"] },
+      "danger": { "role": "error", "displayName": "Danger Clay", "canonical": "#dc6a4a", "tonalRamp": ["#3f1509", "#631f0e", "#8a2c14", "#b1451f", "#dc6a4a", "#e68f74", "#f0b49f", "#f9d9ca"] },
+      "text-primary": { "role": "neutral", "displayName": "Ink", "canonical": "#1c2733" },
+      "text-muted": { "role": "neutral", "displayName": "Muted Slate", "canonical": "#6b7680" },
+      "text-faint": { "role": "neutral", "displayName": "Faint Slate", "canonical": "#9aa3ac" },
+      "border-strong": { "role": "neutral", "displayName": "Silver Divider", "canonical": "#c7ccd1" },
+      "locked-bg": { "role": "neutral", "displayName": "Locked Grey", "canonical": "#eceef0" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Dose Display", "purpose": "The 'X/7 esta semana' weekly summary numeral only." },
+      "mono-data": { "displayName": "Mono Data", "purpose": "Tracked metric values: weight (kg), adherence %, dates in table cells." },
+      "label": { "displayName": "Section Label", "purpose": "Uppercase micro-headers like 'Peso' above the hero cell." }
+    },
+    "shadows": [
+      { "name": "card-elevation", "value": "6px 6px 20px rgba(0,0,0,0.35), -6px -6px 20px rgba(255,255,255,0.02)", "purpose": "Ambient soft lift for Card, Modal, and surface/accent Button variants." },
+      { "name": "shadow-dome", "value": "0 1px 3px rgba(0,0,0,0.08), inset 0 2px 5px rgba(255,255,255,1), inset 0 -4px 8px rgba(0,0,0,0.09)", "purpose": "BlisterCell pending state — convex undomed blister bubble. Known subtle-in-light-theme finish characteristic, not a defect to amplify." },
+      { "name": "shadow-popped", "value": "inset 0 3px 8px rgba(0,0,0,0.18)", "purpose": "BlisterCell popped state and Button :active — concave punched-through look." }
+    ],
+    "motion": [
+      { "name": "blister-pop", "value": "480ms cubic-bezier(0.34, 1.56, 0.64, 1); scale 1 -> 1.22 -> 0.94 -> 1.05 -> 1", "purpose": "Signature punch-through interaction on a genuine pending/missed -> popped transition only (never on mount)." },
+      { "name": "transition-standard", "value": "220ms ease (200ms coach surface, 280ms client surface)", "purpose": "Default state-change transition for background/border/box-shadow across cards, buttons, inputs, and cells." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "BlisterCell — Popped (lg hero)",
+      "kind": "custom",
+      "refersTo": "blister-cell",
+      "description": "The tappable circular hero dose cell on the client dashboard, logged state.",
+      "html": "<button type=\"button\" class=\"ds-blister-cell ds-blister-cell-popped ds-blister-cell-lg\" aria-pressed=\"true\" aria-label=\"Peso de hoy ya registrado\"><svg width=\"56\" height=\"56\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"/></svg></button>",
+      "css": ".ds-blister-cell { display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: background 220ms ease, box-shadow 220ms ease; } .ds-blister-cell-lg { width: 168px; height: 168px; border-radius: 50%; } .ds-blister-cell-popped { background: #2dd4bf; box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); } .ds-blister-cell:focus-visible { outline: 2px solid #2dd4bf; outline-offset: 2px; }"
+    },
+    {
+      "name": "BlisterCell — Pending (md strip)",
+      "kind": "custom",
+      "refersTo": "blister-cell",
+      "description": "A single awaiting-action day cell in a 7-cell week strip.",
+      "html": "<div role=\"img\" aria-label=\"L — pending\" class=\"ds-blister-cell ds-blister-cell-pending ds-blister-cell-md\"></div>",
+      "css": ".ds-blister-cell-md { width: 36px; height: 36px; border-radius: 10px; border-width: 1.5px; box-sizing: border-box; } .ds-blister-cell-pending { background: #ffffff; border: 1.5px solid #c7ccd1; box-shadow: 0 1px 3px rgba(0,0,0,0.08), inset 0 2px 5px rgba(255,255,255,1), inset 0 -4px 8px rgba(0,0,0,0.09); }"
+    },
+    {
+      "name": "BlisterCell — Missed (md strip)",
+      "kind": "custom",
+      "refersTo": "blister-cell",
+      "description": "An explicitly-skipped day — same box as pending, with an X icon, never a bare empty cell.",
+      "html": "<div role=\"img\" aria-label=\"M — missed\" class=\"ds-blister-cell ds-blister-cell-pending ds-blister-cell-md\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#9aa3ac\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"/><path d=\"M6 6l12 12\"/></svg></div>",
+      "css": ".ds-blister-cell-md { width: 36px; height: 36px; border-radius: 10px; border-width: 1.5px; box-sizing: border-box; } .ds-blister-cell-pending { background: #ffffff; border: 1.5px solid #c7ccd1; box-shadow: 0 1px 3px rgba(0,0,0,0.08), inset 0 2px 5px rgba(255,255,255,1), inset 0 -4px 8px rgba(0,0,0,0.09); }"
+    },
+    {
+      "name": "BlisterCell — Locked (md strip)",
+      "kind": "custom",
+      "refersTo": "blister-cell",
+      "description": "A future/unavailable day cell, recessed grey with a padlock icon.",
+      "html": "<div role=\"img\" aria-label=\"D — locked\" class=\"ds-blister-cell ds-blister-cell-locked ds-blister-cell-md\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#9aa3ac\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"9\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 0 1 8 0v4\"/></svg></div>",
+      "css": ".ds-blister-cell-md { width: 36px; height: 36px; border-radius: 10px; border-width: 1.5px; box-sizing: border-box; } .ds-blister-cell-locked { background: #eceef0; border: 1.5px solid #e1e4e7; }"
+    },
+    {
+      "name": "Button — Primary (accent)",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "Default call-to-action button, teal fill with punch-in active state.",
+      "html": "<button class=\"ds-btn-accent\">Guardar</button>",
+      "css": ".ds-btn-accent { background: #2dd4bf; color: #063d38; border: 1px solid #e1e4e7; border-radius: 8px; padding: 10px 24px; font-weight: 700; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; transition: transform 150ms ease, box-shadow 220ms ease; } .ds-btn-accent:active { box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); transform: scale(0.98); }"
+    },
+    {
+      "name": "Card — Default",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Base elevated panel used for the dashboard widget and roster table container.",
+      "html": "<div class=\"ds-card\">Contenido</div>",
+      "css": ".ds-card { background: #ffffff; border: 1px solid #e1e4e7; border-radius: 12px; padding: 1rem; box-shadow: 6px 6px 20px rgba(0,0,0,0.35), -6px -6px 20px rgba(255,255,255,0.02); transition: box-shadow 220ms ease; }"
+    },
+    {
+      "name": "Input — Default",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Concave text field with teal focus border.",
+      "html": "<input class=\"ds-input\" placeholder=\"0.0\" />",
+      "css": ".ds-input { background: #f4f6f8; border-radius: 8px; border: 1px solid transparent; padding: 8px 16px; font-size: 0.875rem; color: #1c2733; box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); } .ds-input:focus { outline: none; border-color: #2dd4bf; } .ds-input::placeholder { color: #6b7680; }"
+    },
+    {
+      "name": "Badge — Status (Activo / Sin plan)",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Roster plan-status pill, success (teal) or error (clay) tone.",
+      "html": "<span class=\"ds-badge-success\">Activo</span>",
+      "css": ".ds-badge-success { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; color: #2dd4bf; background: rgba(45,212,191,0.1); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Pharmacy Blister Pack",
+    "overview": "A nutrition plan is not a document to read — it's a dose to take. Every day is a cell in a blister pack that the client \"pops\" or leaves un-popped, and the coach's job is to scan a roster for cells that went un-popped. This world explicitly refuses the generic fitness/SaaS dashboard of flat cards and stat-tile grids: its structural atom is not a stat card, it's a single dosing cell with exactly four legible states (domed/pending, punched/popped, crossed-out/missed, locked/future). The palette reads clinical-trustworthy, not sterile-cold: a pale foil-grey base (#F4F6F8) with silver divider lines (#C7CCD1), one accent color per tracked metric rather than per client (teal for weight, amber for steps/activity). Numerals are tabular and set in a monospace face everywhere a count or dose matters (\"4/7 esta semana\"), while UI labels stay in a compact sans. The system is fully theme-aware (light + dark via a data-theme attribute), with dark mode built from the same material logic as light — a blister foil under dim light, not a generic inverted theme. This system currently covers exactly two surfaces: the client dashboard weight-tracking widget and the coach client roster table, plus the shared BlisterCell primitive and the re-skinned atomic layer (Button, Card, Input, Badge, StatusPill, Modal, Table) that both surfaces sit on. Auth pages, /activity, /creator, /coaches, and individual client detail pages remain on the prior visual system and are out of scope for this document.",
+    "keyCharacteristics": [
+      "One structural atom (the blister cell) with four named, unambiguous states — never a bare empty box standing in for \"missed\"",
+      "One accent per tracked metric, not per client or per brand mood",
+      "Tabular, monospace numerals for every count/dose value",
+      "Light and dark are both first-class, generated from the same \"foil under light\" material logic",
+      "Soft, embossed/debossed shadow language (dome-out for pending, punch-in for popped) rather than flat fills or hard offset shadows"
+    ],
+    "rules": [
+      { "name": "The Metric-Not-Client Rule", "body": "Accent color is assigned per tracked metric (teal = weight, amber = steps), never per client or arbitrary UI mood. A new tracked metric earns its own accent; an existing metric's accent does not vary by client or context.", "section": "colors" },
+      { "name": "The Never-Ambiguous-Empty Rule", "body": "A missed day renders with the same bordered box as pending plus an explicit faint-slate X icon — it is never represented as a bare empty cell indistinguishable from \"not yet due.\"", "section": "colors" },
+      { "name": "The Tabular Numeral Rule", "body": "Any number representing a tracked metric or count (weight, adherence %, \"X/7\") renders in IBM Plex Mono, never the sans face — numerals must align visually across rows and states.", "section": "typography" },
+      { "name": "The Structural-Not-Decorative Shadow Rule", "body": "BlisterCell's dome/popped shadows encode state, not ambiance — don't apply this shadow pair to anything that isn't a dosing cell, and don't restyle it to chase extra contrast at the cost of the dome-under-foil material logic.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use BlisterCell's four states exactly as named (pending/popped/missed/locked) — never introduce a fifth ad hoc state or repurpose an existing one for a different meaning.",
+      "Do keep numerals in IBM Plex Mono wherever a tracked metric or count is displayed.",
+      "Do assign accent color per metric (teal/weight, amber/steps), not per client, theme mood, or decoration.",
+      "Do theme every new color token through both :root[data-theme=\"light\"] and :root[data-theme=\"dark\"] selectors, following the existing dark-mode derivation logic (same material, dimmer light) rather than a generic inverted palette."
+    ],
+    "donts": [
+      "Don't represent a missed/skipped day as a bare empty cell — it must carry the explicit missed-state icon and border treatment so it's never confused with \"not yet due.\"",
+      "Don't add hard offset drop-shadows (flat, non-inset, high-contrast) anywhere in this system — elevation here is soft dual-direction neumorphic lift or concave/convex insets, never a hard neobrutalist-style offset shadow.",
+      "Don't add kickers, eyebrows, glyph-icon-font labels, or a system display face — none of these exist anywhere in the shipped build; they are not part of this system's vocabulary.",
+      "Don't treat --shadow-dome's light-theme subtlety as something to \"fix\" with higher contrast — it is a known, accepted finish-polish characteristic of the white-dome-on-white-card material, not a broken token."
+    ]
+  }
+}

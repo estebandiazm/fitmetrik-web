@@ -7,8 +7,14 @@ interface BadgeProps {
 }
 
 const TONE_CLASSES: Record<NonNullable<BadgeProps['tone']>, string> = {
-  neutral: 'text-on-surface-muted bg-surface-container-high',
-  success: 'text-success bg-success/10',
+  neutral: 'text-text-muted bg-locked-bg',
+  // Brand-accent touchpoint (StatusPill's "has a plan" state renders through
+  // this tone) — uses the new theme-aware accent-teal token, not the old
+  // non-theme-aware --color-success, so dark mode theming works correctly.
+  success: 'text-accent-teal bg-accent-teal/10',
+  // True negative/error semantic (unrelated to brand accent) — kept on the
+  // old Material --color-error token; still theme-coherent against the new
+  // neutral chrome.
   error: 'text-error bg-error/10',
 };
 

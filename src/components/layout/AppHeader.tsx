@@ -3,6 +3,7 @@
 import { useTransition, type ReactNode } from 'react';
 
 import { logout } from '@/app/actions/authActions';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 interface AppHeaderProps {
   /** Display name shown next to the avatar. */
@@ -48,6 +49,7 @@ export function AppHeader({ userName, userSubtitle, center }: AppHeaderProps) {
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-on-primary">
           {userName.charAt(0).toUpperCase()}
         </div>
+        <ThemeToggle />
         <button
           type="button"
           onClick={() => startSignOut(() => logout())}

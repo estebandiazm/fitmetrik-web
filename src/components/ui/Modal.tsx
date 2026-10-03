@@ -215,8 +215,8 @@ export function Modal({
               onKeyDown={handlePanelKeyDown}
               className={panelClassName}
             >
-              <div className="border-b border-[var(--surface-border)] p-[var(--space-card-p)]">
-                <h2 id={titleId} className="text-lg font-bold text-on-surface">
+              <div className="border-b border-border p-[var(--space-card-p)]">
+                <h2 id={titleId} className="text-lg font-bold text-text-primary">
                   {title}
                 </h2>
               </div>
@@ -224,7 +224,7 @@ export function Modal({
               <div className="flex-1 overflow-y-auto p-[var(--space-card-p)]">{children}</div>
 
               {footer ? (
-                <div className="border-t border-[var(--surface-border)] p-[var(--space-card-p)]">
+                <div className="border-t border-border p-[var(--space-card-p)]">
                   {footer}
                 </div>
               ) : null}

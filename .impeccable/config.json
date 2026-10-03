@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "createdAt": "2026-10-03T16:34:20.243Z",
+        "reason": "intentional overshoot for BlisterCell's 'pop' signature interaction (direction contract's named motion, requested explicitly by finish-reviewer fix #1) — a smooth exponential ease would read as a fade, not a punch-through pop"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "material symbols outlined",
+        "createdAt": "2026-10-03T16:43:31.655Z",
+        "reason": "pre-existing icon-glyph font serving the rest of the app (StepsCounter, HydrationTracker, MacrosHUD, not-found page, etc.) outside this redesign's two-surface scope — DESIGN.md correctly documents only the new Blister Adherence typography (IBM Plex), not this unrelated legacy dependency"
+      }
+    ]
+  }
+}

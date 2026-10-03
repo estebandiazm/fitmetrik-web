@@ -13,7 +13,11 @@ export function Table({ children, className = '' }: TableProps) {
   );
 }
 
-export function TableHead({ children }: { children: React.ReactNode }) {
+interface TableHeadProps {
+  children: React.ReactNode;
+}
+
+export function TableHead({ children }: TableHeadProps) {
   return <thead>{children}</thead>;
 }
 
@@ -25,9 +29,9 @@ interface TableRowProps {
 
 export function TableRow({ children, className = '', header = false }: TableRowProps) {
   const base = header
-    ? 'text-on-surface-muted text-xs uppercase tracking-wider'
-    : 'hover:bg-surface-container-high/40 transition-colors';
-  return <tr className={`border-b border-[var(--surface-border)] ${base} ${className}`}>{children}</tr>;
+    ? 'text-text-muted text-xs uppercase tracking-wider'
+    : 'hover:bg-row-border transition-colors';
+  return <tr className={`border-b border-border ${base} ${className}`}>{children}</tr>;
 }
 
 interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {

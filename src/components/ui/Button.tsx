@@ -11,8 +11,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<NonNullable<ButtonProps['variant']>, string> = {
   accent: 'neu-btn-accent',
-  surface: 'neu-btn text-on-surface',
-  ghost: 'bg-transparent text-on-surface-muted hover:text-on-surface',
+  surface: 'neu-btn text-text-primary',
+  ghost: 'bg-transparent text-text-muted hover:text-text-primary',
 };
 
 const SIZE_CLASSES: Record<NonNullable<ButtonProps['size']>, string> = {

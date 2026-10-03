@@ -2,7 +2,7 @@ import React from 'react';
 import { TopAppBar } from '@/components/layout/TopAppBar';
 import { BottomNavBar } from '@/components/layout/BottomNavBar';
 import { StepsCounter } from '@/components/dashboard/StepsCounter';
-import { WeightCounter } from '@/components/dashboard/WeightCounter';
+import { WeightBlisterWidget } from '@/components/dashboard/weight-blister-widget';
 import { HydrationTracker } from '@/components/dashboard/HydrationTracker';
 import { MacrosHUD } from '@/components/dashboard/MacrosHUD';
 import { PlanSectionCard, PlanSectionCardProps } from '@/components/dashboard/PlanSectionCard';
@@ -12,6 +12,7 @@ import { PlanSwitcher } from '@/components/dashboard/PlanSwitcher';
 import { DietPlan } from '@/domain/types/DietPlan';
 import { createClient } from '@/infrastructure/adapters/supabase/server';
 import { getClientByAuthId } from '@/app/actions/clientActions';
+import { buildWeeklyStrip, countPopped, findEntryForDate } from '@/domain/services/adherence';
 import { redirect } from 'next/navigation';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -70,9 +71,16 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
     : 0;
   const stepGoal = clientRecord?.stepGoal || 10000;
 
-  // Weight data
+  // Weight data — bucketed into the blister-adherence weekly strip here (the
+  // Server Component), not inside WeightBlisterWidget, so the client
+  // component never needs its own `new Date()` / domain-service import
+  // (keeps the components/ → domain/services dependency rule intact and
+  // avoids any server/client clock or timezone skew across the RSC boundary).
   const dailyWeights = clientRecord?.dailyWeights || [];
   const targetWeight = clientRecord?.targetWeight || undefined;
+  const weeklyWeightCells = buildWeeklyStrip(dailyWeights);
+  const weeklyWeightCount = countPopped(weeklyWeightCells);
+  const todayWeightEntry = findEntryForDate(dailyWeights, new Date());
 
   // Determine active plan
   const plans = isMock ? [mockPlan] : clientRecord.plans;
@@ -164,7 +172,13 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
             <MacrosHUD />
             <StepsCounter current={dailyAverage} goal={stepGoal} />
             <HydrationTracker current={3.5} />
-            <WeightCounter weights={dailyWeights} targetWeight={targetWeight} />
+            <WeightBlisterWidget
+              clientId={clientRecord?.id ?? ''}
+              cells={weeklyWeightCells}
+              count={weeklyWeightCount}
+              todayEntry={todayWeightEntry}
+              targetWeight={targetWeight}
+            />
           </div>
 
           {/* Snacks count — now below the main widget row */}
