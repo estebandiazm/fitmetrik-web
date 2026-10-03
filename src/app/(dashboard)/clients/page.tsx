@@ -41,9 +41,9 @@ export default async function ClientsPage() {
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-on-surface">Clients</h1>
-            <p className="text-on-surface-muted text-sm mt-1">
-              Manage your client roster and track their progress.
+            <h1 className="text-2xl font-bold text-text-primary">Clientes</h1>
+            <p className="text-text-muted text-sm mt-1">
+              Gestioná tu cartera de clientes y seguí su progreso.
             </p>
           </div>
 

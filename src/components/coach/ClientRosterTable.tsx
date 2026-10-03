@@ -37,8 +37,15 @@ type SortKey = 'name' | 'lastUpdate' | 'adherence';
 function formatDate(date: Date | string | undefined): string {
   if (!date) return '—';
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString('es-AR', { month: 'short', day: 'numeric', year: 'numeric' });
 }
+
+const STATE_LABEL_ES: Record<RosterWeekCellState, string> = {
+  popped: 'registrado',
+  missed: 'saltado',
+  pending: 'pendiente',
+  locked: 'bloqueado',
+};
 
 // Thresholds are a judgment call (no exact figures in the direction
 // contract): <50% reads as needing attention (danger), 50–79% is adequate but
@@ -103,7 +110,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
   return (
     <Card padding="none" className="overflow-hidden">
       <div className="px-5 py-4 border-b border-border">
-        <h2 className="text-base font-semibold text-text-primary">Active Client Roster</h2>
+        <h2 className="text-base font-semibold text-text-primary">Clientes activos</h2>
       </div>
 
       <Table>
@@ -114,29 +121,29 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
               className="cursor-pointer hover:text-text-primary transition-colors"
               onClick={() => toggleSort('name')}
             >
-              Client
+              Cliente
               <SortIndicator active={sortKey === 'name'} direction={sortDir} />
             </TableCell>
-            <TableCell as="th">Goal</TableCell>
-            <TableCell as="th">Weight Progress</TableCell>
+            <TableCell as="th">Meta</TableCell>
+            <TableCell as="th">Semana</TableCell>
             <TableCell
               as="th"
               className="cursor-pointer hover:text-text-primary transition-colors"
               onClick={() => toggleSort('adherence')}
             >
-              Adherence
+              Adherencia
               <SortIndicator active={sortKey === 'adherence'} direction={sortDir} />
             </TableCell>
-            <TableCell as="th">Plan Status</TableCell>
+            <TableCell as="th">Plan</TableCell>
             <TableCell
               as="th"
               className="cursor-pointer hover:text-text-primary transition-colors"
               onClick={() => toggleSort('lastUpdate')}
             >
-              Last Update
+              Última actualización
               <SortIndicator active={sortKey === 'lastUpdate'} direction={sortDir} />
             </TableCell>
-            <TableCell as="th">Actions</TableCell>
+            <TableCell as="th">Acciones</TableCell>
           </TableRow>
         </TableHead>
         <tbody>
@@ -169,7 +176,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
                       key={index}
                       size="sm"
                       state={cell.state}
-                      ariaLabel={`Día ${index + 1} — ${cell.state}`}
+                      ariaLabel={`Día ${index + 1} — ${STATE_LABEL_ES[cell.state]}`}
                     />
                   ))}
                 </div>
@@ -186,7 +193,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
                   href={`/clients/${client.id}`}
                   className="text-accent-teal hover:text-accent-teal/80 text-xs font-medium transition-colors"
                 >
-                  View →
+                  Ver →
                 </Link>
               </TableCell>
             </TableRow>

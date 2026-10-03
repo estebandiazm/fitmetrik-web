@@ -7,5 +7,5 @@ interface StatusPillProps {
 }
 
 export function StatusPill({ hasPlan }: StatusPillProps) {
-  return <Badge tone={hasPlan ? 'success' : 'error'}>{hasPlan ? 'Active' : 'No Plan'}</Badge>;
+  return <Badge tone={hasPlan ? 'success' : 'error'}>{hasPlan ? 'Activo' : 'Sin plan'}</Badge>;
 }
