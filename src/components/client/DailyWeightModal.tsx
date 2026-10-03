@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { addDailyWeight } from '../../app/actions/clientActions';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 interface DailyWeightModalProps {
   open: boolean;
@@ -68,32 +70,38 @@ export default function DailyWeightModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 rounded-2xl w-full max-w-sm mx-4">
-        <div className="p-6 border-b border-white/5">
-          <h2 className="text-white font-bold text-lg">Log Weight</h2>
+      <div className="neu-card w-full max-w-sm mx-4">
+        <div className="p-[var(--space-card-p)] border-b border-border">
+          <h2 className="text-text-primary font-bold text-lg">Log Weight</h2>
         </div>
 
-        <div className="p-6">
+        <div className="p-[var(--space-card-p)]">
           {success ? (
-            <div className="bg-green-500/10 border border-green-500/30 text-green-300 rounded-lg p-3">
+            <div className="bg-success/10 border border-success/30 text-success rounded-[var(--radius-control)] p-3">
               Weight recorded successfully!
             </div>
           ) : (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Date</label>
-                <input
+                <label htmlFor="daily-weight-date" className="block text-sm text-text-muted mb-2">
+                  Date
+                </label>
+                <Input
+                  id="daily-weight-date"
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   max={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Weight (kg)</label>
-                <input
+                <label htmlFor="daily-weight-value" className="block text-sm text-text-muted mb-2">
+                  Weight (kg)
+                </label>
+                <Input
+                  id="daily-weight-value"
                   type="number"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
@@ -101,23 +109,26 @@ export default function DailyWeightModal({
                   step="0.1"
                   min="0.1"
                   max="500"
-                  className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                  className="w-full"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Notes (optional)</label>
+                <label htmlFor="daily-weight-notes" className="block text-sm text-text-muted mb-2">
+                  Notes (optional)
+                </label>
                 <textarea
+                  id="daily-weight-notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g., After breakfast"
                   rows={2}
-                  className="w-full px-4 py-2 rounded-2xl neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none resize-none"
+                  className="w-full px-4 py-2 rounded-[var(--radius-control)] neu-inset border border-transparent text-text-primary placeholder-text-muted focus:border-accent-teal focus:outline-none resize-none"
                 />
               </div>
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3 text-sm">
+                <div className="bg-danger/10 border border-danger/30 text-danger rounded-[var(--radius-control)] p-3 text-sm">
                   {error}
                 </div>
               )}
@@ -126,17 +137,16 @@ export default function DailyWeightModal({
         </div>
 
         {!success && (
-          <div className="p-6 border-t border-white/5 flex gap-3 justify-end">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-gray-400 hover:text-white transition"
-            >
+          <div className="p-[var(--space-card-p)] border-t border-border flex gap-3 justify-end">
+            <Button variant="ghost" size="sm" onClick={onClose}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="accent"
+              size="sm"
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className="px-4 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+              className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading && (
                 <span className="material-symbols-outlined text-base animate-spin">
@@ -144,7 +154,7 @@ export default function DailyWeightModal({
                 </span>
               )}
               Save
-            </button>
+            </Button>
           </div>
         )}
       </div>
