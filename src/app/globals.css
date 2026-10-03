@@ -48,12 +48,40 @@
   --color-measurement-accent-dark: #064e3b;
   --color-measurement-accent-dim: #065f46;
 
-  --font-display: "Public Sans", sans-serif;
-  --font-headline: "Manrope", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-label: "Inter", sans-serif;
-  --font-manrope: "Manrope", sans-serif;
-  --font-inter: "Inter", sans-serif;
+  /* Typography — IBM Plex Sans/Mono (blister-adherence redesign). Replaces
+     the old Manrope/Inter/Public Sans set: Public Sans and Inter were never
+     actually loaded via @fontsource (dead tokens), and Manrope is dropped as
+     the primary UI face in favor of IBM Plex Sans. IBM Plex Mono is new —
+     reserved for tabular numerals (weight/step counts, "X/7" dosage-style
+     big numbers). */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Blister-adherence theme tokens (T1 foundation) — light values; dark
+     overrides live in :root[data-theme="dark"] below. Declared inside
+     @theme so Tailwind v4 also generates utility classes (bg-bg, bg-panel,
+     border-border, border-border-strong, border-row-border, text-text-primary,
+     text-text-muted, text-text-faint, bg-accent-teal, text-accent-teal-ink,
+     bg-accent-amber, bg-locked-bg, border-locked-border, bg-danger/text-danger,
+     bg-cell-pending-bg) for later tasks (T2+) to consume instead of raw
+     var(...) in className. Every utility still resolves at paint time off the
+     underlying CSS custom property, so the runtime theme overrides below work
+     correctly through Tailwind's generated classes too. */
+  --color-bg: #f4f6f8;
+  --color-panel: #ffffff;
+  --color-border: #e1e4e7;
+  --color-border-strong: #c7ccd1;
+  --color-row-border: #eef0f2;
+  --color-text-primary: #1c2733;
+  --color-text-muted: #6b7680;
+  --color-text-faint: #9aa3ac;
+  --color-accent-teal: #2dd4bf;
+  --color-accent-teal-ink: #063d38;
+  --color-accent-amber: #f59e0b;
+  --color-locked-bg: #eceef0;
+  --color-locked-border: #e1e4e7;
+  --color-danger: #dc6a4a;
+  --color-cell-pending-bg: #ffffff;
 }
 
 :root {
@@ -70,6 +98,16 @@
   --space-card-p: 1rem;
   --transition-standard: 220ms ease;
   --surface-border: rgba(255, 255, 255, 0.05);
+
+  /* BlisterCell shadows (T2 primitive) — plain custom properties (only ever
+     consumed via var(...) in the .blister-cell-* classes below, so they do
+     not need a Tailwind utility-generating @theme entry). Light defaults;
+     dark overrides live in :root[data-theme="dark"]. */
+  --shadow-dome:
+    0 2px 0 rgba(0, 0, 0, 0.04),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.045);
+  --shadow-popped: inset 0 3px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* Coach dashboard scope — denser, flatter (Evolution) */
@@ -96,6 +134,61 @@
   --surface-border: rgba(255, 255, 255, 0.04);
 }
 
+/* Explicit light theme — same values as the @theme defaults above. Declared
+   so ThemeProvider setting data-theme="light" explicitly (rather than
+   leaving the attribute unset) resolves identically to the unattributed
+   default. Unlayered (not inside @theme/@layer), so it still wins over
+   Tailwind's generated theme-layer declarations regardless of source order. */
+:root[data-theme="light"] {
+  --color-bg: #f4f6f8;
+  --color-panel: #ffffff;
+  --color-border: #e1e4e7;
+  --color-border-strong: #c7ccd1;
+  --color-row-border: #eef0f2;
+  --color-text-primary: #1c2733;
+  --color-text-muted: #6b7680;
+  --color-text-faint: #9aa3ac;
+  --color-accent-teal: #2dd4bf;
+  --color-accent-teal-ink: #063d38;
+  --color-accent-amber: #f59e0b;
+  --color-locked-bg: #eceef0;
+  --color-locked-border: #e1e4e7;
+  --color-danger: #dc6a4a;
+  --color-cell-pending-bg: #ffffff;
+  --shadow-dome:
+    0 2px 0 rgba(0, 0, 0, 0.04),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.045);
+  --shadow-popped: inset 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+/* Dark theme overrides. Set via ThemeProvider (src/components/theme) and,
+   before first paint, via the inline script in src/app/layout.tsx — both set
+   document.documentElement.dataset.theme. Unlayered, so it wins over the
+   @theme defaults regardless of selector specificity or source order. */
+:root[data-theme="dark"] {
+  --color-bg: #12151b;
+  --color-panel: #1b1f27;
+  --color-border: #333945;
+  --color-border-strong: #333945;
+  --color-row-border: #262b34;
+  --color-text-primary: #eceef2;
+  --color-text-muted: #8a93a0;
+  --color-text-faint: #5c6470;
+  --color-accent-teal: #34e6cf;
+  --color-accent-teal-ink: #06332d;
+  --color-accent-amber: #ffb020;
+  --color-locked-bg: #1e222b;
+  --color-locked-border: #2b303b;
+  --color-danger: #e88968;
+  --color-cell-pending-bg: #191d24;
+  --shadow-dome:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.05),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35);
+  --shadow-popped: inset 0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -103,7 +196,7 @@ body {
   background: var(--color-background-dark);
   background-attachment: fixed;
   min-height: 100vh;
-  font-family: "Manrope", "Inter", "Geist", "Roboto", "Helvetica", "Arial", sans-serif;
+  font-family: var(--font-sans);
   color: var(--color-on-background);
 }
 
@@ -125,56 +218,86 @@ body {
 
 @layer components {
   .neu-surface {
-    background: var(--color-surface-dim);
+    background: var(--color-bg);
   }
 
   .neu-card {
-    background: var(--color-surface-container);
+    background: var(--color-panel);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    border: 1px solid var(--surface-border);
+    border: 1px solid var(--color-border);
     transition: var(--transition-standard);
   }
 
   .neu-inset {
-    background: var(--color-surface-dim);
+    background: var(--color-bg);
     border-radius: var(--radius-card);
-    box-shadow:
-      inset 3px 3px 10px rgba(0, 0, 0, 0.35),
-      inset -3px -3px 10px rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-popped);
+    border: 1px solid var(--color-border);
     transition: var(--transition-standard);
   }
 
   .neu-btn {
-    background: var(--color-surface-container);
+    background: var(--color-panel);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    border: 1px solid var(--surface-border);
+    border: 1px solid var(--color-border);
     transition: var(--transition-standard);
   }
 
   .neu-btn:active {
-    box-shadow:
-      inset 3px 3px 8px rgba(0, 0, 0, 0.35),
-      inset -3px -3px 8px rgba(255, 255, 255, 0.02);
+    box-shadow: var(--shadow-popped);
     transform: scale(0.98);
   }
 
   .neu-btn-accent {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--color-accent-teal);
+    color: var(--color-accent-teal-ink);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    border: 1px solid var(--surface-border);
+    border: 1px solid var(--color-border);
     transition: var(--transition-standard);
   }
 
   .neu-btn-accent:active {
-    box-shadow:
-      inset 3px 3px 8px rgba(0, 0, 0, 0.35),
-      inset -3px -3px 8px rgba(255, 255, 255, 0.02);
+    box-shadow: var(--shadow-popped);
     transform: scale(0.98);
+  }
+
+  /* BlisterCell primitive (T2 consumes these — defined here since they are
+     pure CSS with no component logic). Missed/skipped state reuses
+     .blister-cell-pending's box with an icon swap handled by the component. */
+  .blister-cell-pending {
+    background: var(--color-cell-pending-bg);
+    border: 2px solid var(--color-border-strong);
+    box-shadow: var(--shadow-dome);
+  }
+
+  .blister-cell-popped {
+    background: var(--color-accent-teal);
+    box-shadow: var(--shadow-popped);
+  }
+
+  .blister-cell-locked {
+    background: var(--color-locked-bg);
+    border: 2px solid var(--color-locked-border);
+  }
+
+  /* ThemeToggle icon swap — both SVGs always render (deterministic markup,
+     no server/client mismatch); plain CSS off the already-applied
+     data-theme attribute decides which one is visible, so the correct icon
+     shows before any JS runs, with zero flash. */
+  .theme-toggle-icon[data-icon="sun"] {
+    display: none;
+  }
+  .theme-toggle-icon[data-icon="moon"] {
+    display: block;
+  }
+  :root[data-theme="dark"] .theme-toggle-icon[data-icon="sun"] {
+    display: block;
+  }
+  :root[data-theme="dark"] .theme-toggle-icon[data-icon="moon"] {
+    display: none;
   }
 }
 
