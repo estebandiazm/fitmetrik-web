@@ -16,13 +16,13 @@ export async function loginWithPassword(formData: FormData) {
   const password = formData.get('password') as string;
 
   if (!email || !password) {
-    redirect('/login?error=Email and password are required');
+    redirect(`/login?error=${encodeURIComponent('Ingresa tu correo y contraseña')}`);
   }
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent('Invalid email or password')}`);
+    redirect(`/login?error=${encodeURIComponent('Correo o contraseña incorrectos')}`);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -37,7 +37,7 @@ export async function loginWithMagicLink(formData: FormData) {
   const email = formData.get('email') as string;
 
   if (!email) {
-    redirect('/login?error=Email is required');
+    redirect(`/login?error=${encodeURIComponent('Ingresa tu correo')}`);
   }
 
   const { error } = await supabase.auth.signInWithOtp({
@@ -52,5 +52,5 @@ export async function loginWithMagicLink(formData: FormData) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect('/login?message=Check your email for the magic link!');
+  redirect(`/login?message=${encodeURIComponent('Revisa tu correo: te enviamos el enlace de acceso.')}`);
 }

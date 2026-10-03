@@ -6,7 +6,6 @@ import { authProvider } from '@/lib/registry';
 import { getCoachByAuthId } from '@/app/actions/coachActions';
 import { getClientById, getDailyWeights } from '@/app/actions/clientActions';
 import { CoachHeader } from '@/components/coach/CoachHeader';
-import { CoachSidebar } from '@/components/coach/CoachSidebar';
 import { Card } from '@/components/ui/Card';
 import TrendsChart from '@/components/activity/TrendsChart';
 import RecentRecords from '@/components/activity/RecentRecords';
@@ -54,12 +53,10 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
     : 0;
 
   return (
-    <div className="min-h-screen bg-surface-dim flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       <CoachHeader coachName={coach.name} coachEmail={coach.email} />
 
       <div className="flex flex-1">
-        <CoachSidebar />
-
         <main className="flex-1 p-6 overflow-auto">
           {/* Back Link */}
           <Link

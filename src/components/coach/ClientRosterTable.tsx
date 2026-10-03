@@ -1,22 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Client } from '@/domain/types/Client';
 import { TablePagination } from './TablePagination';
-import { Card } from '../ui/Card';
-import { Table, TableHead, TableRow, TableCell } from '../ui/Table';
 import { StatusPill } from '../ui/StatusPill';
 import { BlisterCell } from '../ui/blister-cell';
+import { ArrowRightIcon } from '../ui/icons';
 
 const PAGE_SIZE = 10;
 
 // Structurally matches `domain/services/adherence`'s `WeekCell` without
 // importing it — components may only depend on `domain/types/`, so the
-// Server Component page (`(dashboard)/clients/page.tsx`) computes the actual
-// weekly strip + adherence % (via `buildWeeklyStrip`/`countPopped`) and hands
-// the result down as plain props. Same pattern T3 used for the client
-// dashboard's `WeightBlisterWidget`.
+// Server Component page (`(dashboard)/clients/page.tsx`) computes the weekly
+// strip, adherence % and days since the last log, and hands them down as
+// plain props.
 type RosterWeekCellState = 'popped' | 'missed' | 'pending' | 'locked';
 interface RosterWeekCell {
   date: Date;
@@ -26,19 +24,13 @@ interface RosterWeekCell {
 interface ClientRosterTableProps {
   clients: (Client & {
     id: string;
-    updatedAt: Date;
     weekCells: RosterWeekCell[];
     adherencePct: number;
+    daysSinceLastLog?: number;
   })[];
 }
 
-type SortKey = 'name' | 'lastUpdate' | 'adherence';
-
-function formatDate(date: Date | string | undefined): string {
-  if (!date) return '—';
-  const d = new Date(date);
-  return d.toLocaleDateString('es-AR', { month: 'short', day: 'numeric', year: 'numeric' });
-}
+const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 const STATE_LABEL_ES: Record<RosterWeekCellState, string> = {
   popped: 'registrado',
@@ -47,165 +39,117 @@ const STATE_LABEL_ES: Record<RosterWeekCellState, string> = {
   locked: 'bloqueado',
 };
 
-// Thresholds are a judgment call (no exact figures in the direction
-// contract): <50% reads as needing attention (danger), 50–79% is adequate but
-// unremarkable (de-emphasized via the faint token), 80%+ is the full-contrast
-// "going well" read.
+// Thresholds from the "Coach — Roster" artboard: <50% needs attention
+// (danger), 50–84% is adequate but unremarkable (faint), 85%+ reads at full
+// contrast as "going well".
 function adherenceColorClass(pct: number): string {
   if (pct < 50) return 'text-danger';
-  if (pct < 80) return 'text-text-faint';
+  if (pct < 85) return 'text-text-faint';
   return 'text-text-primary';
 }
 
-function SortIndicator({ active, direction }: { active: boolean; direction?: 'asc' | 'desc' }) {
-  if (!active) return <span className="text-text-faint ml-1">↕</span>;
-  return <span className="text-accent-teal ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
+function lastLogLabel(days: number | undefined): string {
+  if (days === undefined) return 'Sin registros todavía';
+  if (days === 0) return 'Último registro: hoy';
+  if (days === 1) return 'Último registro: ayer';
+  return `Último registro: hace ${days} días`;
 }
 
+/**
+ * The coach roster — one row per client with their week's blister strip,
+ * sorted most-empty-first so whoever needs attention sits at the top.
+ */
 export function ClientRosterTable({ clients }: ClientRosterTableProps) {
   const [page, setPage] = useState(0);
-  // Default sort is adherence ascending — most-empty-first, per the direction
-  // contract ("ordenados por celdas vacías primero... lo que necesita
-  // atención está arriba"). `name`/`lastUpdate` stay available via their
-  // column headers exactly as before.
-  const [sortKey, setSortKey] = useState<SortKey>('adherence');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
-  // Sort and paginate
-  const sorted = useMemo(() => {
-    const copy = [...clients];
-    copy.sort((a, b) => {
-      if (sortKey === 'name') {
-        const aName = a.name.toLowerCase();
-        const bName = b.name.toLowerCase();
-        return sortDir === 'asc' ? (aName > bName ? 1 : -1) : (aName < bName ? 1 : -1);
-      }
-
-      if (sortKey === 'adherence') {
-        return sortDir === 'asc'
-          ? a.adherencePct - b.adherencePct
-          : b.adherencePct - a.adherencePct;
-      }
-
-      const aTime = new Date(a.updatedAt).getTime();
-      const bTime = new Date(b.updatedAt).getTime();
-      return sortDir === 'asc' ? (aTime > bTime ? 1 : -1) : (aTime < bTime ? 1 : -1);
-    });
-    return copy;
-  }, [clients, sortKey, sortDir]);
+  // Most-empty-first per the direction contract ("ordenados por celdas
+  // vacías primero… lo que necesita atención está arriba"); name breaks ties
+  // so the order is stable across renders.
+  const sorted = [...clients].sort(
+    (a, b) => a.adherencePct - b.adherencePct || a.name.localeCompare(b.name, 'es'),
+  );
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paginated = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortDir('asc');
-    }
-    setPage(0); // Reset to first page on sort change
-  };
+  if (clients.length === 0) {
+    return (
+      <div className="rounded-2xl border border-border bg-panel px-6 py-12 text-center">
+        <p className="text-[15px] font-semibold text-text-primary">Aún no tenés clientes</p>
+        <p className="mt-1 text-[13px] text-text-muted">Invitá a tu primer cliente para empezar a ver su blíster.</p>
+      </div>
+    );
+  }
 
   return (
-    <Card padding="none" className="overflow-hidden">
-      <div className="px-5 py-4 border-b border-border">
-        <h2 className="text-base font-semibold text-text-primary">Clientes activos</h2>
-      </div>
+    <div className="overflow-hidden rounded-2xl border border-border bg-panel">
+      <ul aria-label="Clientes">
+        {paginated.map((client, rowIndex) => (
+          <li
+            key={client.id}
+            data-testid="client-row"
+            className="animate-enter flex flex-wrap items-center gap-x-5 gap-y-3 border-b border-row-border px-6 py-5 last:border-b-0"
+            style={{ '--enter-delay': `${Math.min(rowIndex, 8) * 40}ms` } as React.CSSProperties}
+          >
+            <div
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-locked-bg text-sm font-bold text-text-muted"
+            >
+              {client.name.charAt(0).toUpperCase()}
+            </div>
 
-      <Table>
-        <TableHead>
-          <TableRow header>
-            <TableCell
-              as="th"
-              className="cursor-pointer hover:text-text-primary transition-colors"
-              onClick={() => toggleSort('name')}
+            <div className="min-w-[140px] flex-[1_1_140px]">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[15px] font-semibold text-text-primary">{client.name}</span>
+                {client.plans.length === 0 && <StatusPill hasPlan={false} />}
+              </div>
+              <p className="mt-px text-xs text-text-faint">
+                {lastLogLabel(client.daysSinceLastLog)}
+                {client.targetWeight ? ` · meta ${client.targetWeight} kg` : ''}
+              </p>
+            </div>
+
+            <ol className="flex shrink-0 gap-1" aria-label={`Semana de ${client.name}`}>
+              {client.weekCells.map((cell, index) => (
+                // Fixed-length (7), fixed-order week grid — index is a
+                // stable key (same convention as WeightBlisterWidget).
+                <li key={index}>
+                  <BlisterCell
+                    size="sm"
+                    state={cell.state}
+                    ariaLabel={`${DAY_LABELS[index]} — ${STATE_LABEL_ES[cell.state]}`}
+                  />
+                </li>
+              ))}
+            </ol>
+
+            <p
+              className={`w-11 shrink-0 text-right font-mono text-[15px] font-bold ${adherenceColorClass(client.adherencePct)}`}
+              aria-label={`Adherencia ${client.adherencePct}%`}
             >
-              Cliente
-              <SortIndicator active={sortKey === 'name'} direction={sortDir} />
-            </TableCell>
-            <TableCell as="th">Meta</TableCell>
-            <TableCell as="th">Semana</TableCell>
-            <TableCell
-              as="th"
-              className="cursor-pointer hover:text-text-primary transition-colors"
-              onClick={() => toggleSort('adherence')}
-            >
-              Adherencia
-              <SortIndicator active={sortKey === 'adherence'} direction={sortDir} />
-            </TableCell>
-            <TableCell as="th">Plan</TableCell>
-            <TableCell
-              as="th"
-              className="cursor-pointer hover:text-text-primary transition-colors"
-              onClick={() => toggleSort('lastUpdate')}
-            >
-              Última actualización
-              <SortIndicator active={sortKey === 'lastUpdate'} direction={sortDir} />
-            </TableCell>
-            <TableCell as="th">Acciones</TableCell>
-          </TableRow>
-        </TableHead>
-        <tbody>
-          {paginated.length === 0 && (
-            <tr>
-              <TableCell colSpan={7} className="py-10 text-center text-text-muted">
-                Aún no hay clientes. Invita a tu primer cliente para empezar.
-              </TableCell>
-            </tr>
-          )}
-          {paginated.map((client) => (
-            <TableRow key={client.id}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent-teal/20 flex items-center justify-center text-accent-teal font-semibold text-xs">
-                    {client.name.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="font-medium text-text-primary">{client.name}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-text-muted">
-                {client.targetWeight ? `${client.targetWeight} kg` : '—'}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1">
-                  {client.weekCells.map((cell, index) => (
-                    // Fixed-length (7), fixed-order week grid — index is a
-                    // stable key (same convention as WeightBlisterWidget).
-                    <BlisterCell
-                      key={index}
-                      size="sm"
-                      state={cell.state}
-                      ariaLabel={`Día ${index + 1} — ${STATE_LABEL_ES[cell.state]}`}
-                    />
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell className={`font-mono text-sm font-semibold ${adherenceColorClass(client.adherencePct)}`}>
-                {client.adherencePct}%
-              </TableCell>
-              <TableCell>
-                <StatusPill hasPlan={client.plans.length > 0} />
-              </TableCell>
-              <TableCell className="text-text-muted text-xs">{formatDate(client.updatedAt)}</TableCell>
-              <TableCell>
-                <Link
-                  href={`/clients/${client.id}`}
-                  className="text-accent-teal hover:text-accent-teal/80 text-xs font-medium transition-colors"
-                >
-                  Ver →
-                </Link>
-              </TableCell>
-            </TableRow>
-          ))}
-        </tbody>
-      </Table>
+              {client.adherencePct}%
+            </p>
+
+            {/* Row action, isolated by distance + a divider from the row's
+                primary content (same placement as the artboard). */}
+            <div className="ml-1 shrink-0 border-l border-row-border pl-5">
+              <Link
+                href={`/clients/${client.id}`}
+                aria-label={`Ver a ${client.name}`}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-text-faint transition-colors hover:bg-locked-bg hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent-teal"
+              >
+                <ArrowRightIcon size={16} />
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
 
       {totalPages > 1 && (
-        <div className="px-5 py-3 border-t border-border">
+        <div className="border-t border-row-border px-6 py-3">
           <TablePagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       )}
-    </Card>
+    </div>
   );
 }

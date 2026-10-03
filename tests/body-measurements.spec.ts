@@ -18,17 +18,17 @@ class AuthPage {
 
   async loginAsCoach() {
     await this.page.goto('/login');
-    await this.page.getByLabel('Email').fill('coach@example.com');
-    await this.page.getByLabel('Password').fill('CoachPass123!');
-    await this.page.getByRole('button', { name: 'Sign In' }).click();
+    await this.page.getByLabel('Correo electrónico').fill('coach@example.com');
+    await this.page.getByLabel('Contraseña', { exact: true }).fill('CoachPass123!');
+    await this.page.getByRole('button', { name: 'Entrar' }).click();
     await this.page.waitForURL('/clients');
   }
 
   async loginAsClient() {
     await this.page.goto('/login');
-    await this.page.getByLabel('Email').fill('client@example.com');
-    await this.page.getByLabel('Password').fill('TestPassword123!');
-    await this.page.getByRole('button', { name: 'Sign In' }).click();
+    await this.page.getByLabel('Correo electrónico').fill('client@example.com');
+    await this.page.getByLabel('Contraseña', { exact: true }).fill('TestPassword123!');
+    await this.page.getByRole('button', { name: 'Entrar' }).click();
     await this.page.waitForURL('/activity');
   }
 }

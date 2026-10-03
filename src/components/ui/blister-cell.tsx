@@ -12,6 +12,12 @@ interface BlisterCellProps {
   onClick?: () => void;
   ariaLabel?: string;
   className?: string;
+  /**
+   * Shown inside the cell only while it is `pending` — e.g. the `lg` hero's
+   * "Toca para loguear" prompt. Ignored for every other state, whose icon
+   * is the whole message.
+   */
+  pendingContent?: React.ReactNode;
 }
 
 const SIZE_DIMENSION_PX: Record<BlisterCellSize, number> = {
@@ -158,7 +164,7 @@ function buildCellClassName(
 ): string {
   return [
     STATE_BASE_CLASS[state],
-    'inline-flex shrink-0 items-center justify-center',
+    'inline-flex shrink-0 items-center justify-center align-middle',
     interactive ? 'cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-teal' : '',
     isPopping ? 'blister-cell-popping' : '',
     className,
@@ -197,14 +203,25 @@ function usePopAnimation(state: BlisterCellState): boolean {
  * dose cell. `pending` = empty dome, `popped` = logged (check), `missed` =
  * explicitly skipped (X, never ambiguous-empty), `locked` = future/blocked.
  *
- * Pure visual primitive — it never renders its own hint/caption text. A
- * consuming page (e.g. the `lg` hero "toca para loguear" prompt) owns that.
+ * Pure visual primitive — it never invents its own hint/caption text. A
+ * consuming page (e.g. the `lg` hero "toca para loguear" prompt) passes it
+ * in via `pendingContent`.
  */
-export function BlisterCell({ state, size = 'md', onClick, ariaLabel, className = '' }: BlisterCellProps) {
+export function BlisterCell({
+  state,
+  size = 'md',
+  onClick,
+  ariaLabel,
+  className = '',
+  pendingContent,
+}: BlisterCellProps) {
   const isPopping = usePopAnimation(state);
   const style = buildCellStyle(state, size);
   const sharedClassName = buildCellClassName(state, Boolean(onClick), isPopping, className);
-  const icon = renderIcon(state, SIZE_ICON_PX[size], SIZE_STROKE_WIDTH[size]);
+  const icon =
+    state === 'pending' && pendingContent
+      ? pendingContent
+      : renderIcon(state, SIZE_ICON_PX[size], SIZE_STROKE_WIDTH[size]);
 
   if (onClick) {
     return (

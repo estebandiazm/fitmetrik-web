@@ -4,6 +4,7 @@ import {
   countPopped,
   findEntryForDate,
   calculateAdherencePct,
+  daysSinceLastEntry,
 } from '@/domain/services/adherence';
 
 // Jan 1 2024 is a Monday, so these fixtures land on known weekdays without
@@ -154,5 +155,34 @@ describe('findEntryForDate', () => {
   it('matches string dates too', () => {
     const entries = [{ date: '2024-01-10T08:00:00', weight: 79.5 }];
     expect(findEntryForDate(entries, WEDNESDAY)?.weight).toBe(79.5);
+  });
+});
+
+describe('daysSinceLastEntry', () => {
+  it('returns undefined when there are no entries', () => {
+    expect(daysSinceLastEntry([], WEDNESDAY)).toBeUndefined();
+  });
+
+  it('returns 0 when the latest entry is today, ignoring time-of-day', () => {
+    const entries = [{ date: new Date(2024, 0, 10, 21, 30) }];
+    expect(daysSinceLastEntry(entries, new Date(2024, 0, 10, 7, 0))).toBe(0);
+  });
+
+  it('measures from the most recent entry regardless of order', () => {
+    const entries = [
+      { date: new Date(2024, 0, 3) },
+      { date: new Date(2024, 0, 8) },
+      { date: '2024-01-05T10:00:00' },
+    ];
+    expect(daysSinceLastEntry(entries, WEDNESDAY)).toBe(2);
+  });
+
+  it('clamps future-dated entries to 0', () => {
+    const entries = [{ date: new Date(2024, 0, 12) }];
+    expect(daysSinceLastEntry(entries, WEDNESDAY)).toBe(0);
+  });
+
+  it('counts across a week boundary', () => {
+    expect(daysSinceLastEntry([{ date: MONDAY }], new Date(2024, 0, 15))).toBe(7);
   });
 });

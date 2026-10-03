@@ -1,14 +1,16 @@
 import { redirect } from 'next/navigation';
 import { authProvider } from '@/lib/registry';
-import styles from './login.module.css';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Alert } from '@/components/ui/Alert';
 import { LoginForm } from './_LoginForm';
 
-/** Translate raw error codes from the auth callback into user-friendly messages. */
+/** Translate raw error codes / legacy English messages from redirects into Spanish copy. */
 function resolveErrorMessage(error: string): string {
   const errorMessages: Record<string, string> = {
-    expired_link: 'Your magic link has expired or is invalid. Please request a new one.',
+    expired_link: 'Tu enlace de acceso expiró o no es válido. Pide uno nuevo.',
+    'Coach profile not found': 'No encontramos tu perfil de coach.',
+    'Client profile not found': 'No encontramos tu perfil de cliente.',
+    'Unknown role. Contact your administrator.': 'Tu cuenta no tiene un rol asignado. Contacta a tu administrador.',
   };
   return errorMessages[error] ?? error;
 }
@@ -27,39 +29,38 @@ export default async function LoginPage(props: {
 
   return (
     <AuthShell>
-      {/* Brand header */}
-      <div className={styles.brandHeader}>
-        <div className={styles.logoIcon}>
-          <svg className="h-8 w-8 text-white" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+      <div className="mb-7 flex flex-col items-start gap-4">
+        {/* Logo: a single popped blister cell that punches in on load. */}
+        <span
+          aria-hidden="true"
+          className="blister-cell-popped blister-cell-popping flex h-11 w-11 items-center justify-center rounded-xl text-white"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 13l4 4L19 7" />
           </svg>
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold tracking-[-0.01em] text-text-primary">Hola de nuevo</h1>
+          <p className="mt-1 text-sm text-text-muted">Inicia sesión para registrar tu día.</p>
         </div>
-        <h1 className={styles.brandTitle}>Welcome Back</h1>
-        <p className={styles.brandSubtitle}>Track your progress and stay on diet.</p>
       </div>
 
-      {/* Alerts */}
       {searchParams.error && (
-        <div className={styles.alertWrap}>
+        <div className="mb-5 animate-[shake-x_420ms_ease-in-out]" role="alert">
           <Alert type="error" message={resolveErrorMessage(searchParams.error)} />
         </div>
       )}
       {searchParams.message && (
-        <div className={styles.alertWrap}>
+        <div className="animate-enter mb-5" role="status">
           <Alert type="success" message={searchParams.message} />
         </div>
       )}
 
-      {/* Login form with tab switcher */}
       <LoginForm />
 
-      {/* Footer Links (Stitch Design) */}
-      <div className={styles.footerArea}>
-        <p className={styles.footerLinkText}>
-          Don&apos;t have an account?{' '}
-          <a href="#" className={styles.footerAccent}>Create Account</a>
-        </p>
-      </div>
+      <p className="mt-7 border-t border-row-border pt-5 text-center text-[13px] text-text-muted">
+        ¿No tienes cuenta? Tu coach te envía la invitación por correo.
+      </p>
     </AuthShell>
   );
 }

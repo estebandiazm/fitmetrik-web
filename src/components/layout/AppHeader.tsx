@@ -4,6 +4,7 @@ import { useTransition, type ReactNode } from 'react';
 
 import { logout } from '@/app/actions/authActions';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { LogoutIcon } from '@/components/ui/icons';
 
 interface AppHeaderProps {
   /** Display name shown next to the avatar. */
@@ -23,11 +24,12 @@ export function AppHeader({ userName, userSubtitle, center }: AppHeaderProps) {
   const [isSigningOut, startSignOut] = useTransition();
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-[var(--surface-border)] bg-surface-container px-6 py-4">
+    <header className="sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-border bg-panel/90 px-6 py-3.5 backdrop-blur-sm">
       {/* Wordmark */}
       <div className="flex shrink-0 items-center gap-2">
-        <span className="text-xl font-bold tracking-tight text-on-surface">
-          Fit<span className="text-primary">Metrik</span>
+        <span aria-hidden="true" className="blister-cell-popped h-5 w-5 rounded-[6px]" />
+        <span className="hidden text-[15px] font-semibold uppercase tracking-[0.08em] text-text-primary sm:inline">
+          FitMetrik
         </span>
       </div>
 
@@ -41,12 +43,12 @@ export function AppHeader({ userName, userSubtitle, center }: AppHeaderProps) {
       {/* Profile */}
       <div className="flex shrink-0 items-center gap-3">
         <div className="hidden text-right sm:block">
-          <p className="text-sm font-medium text-on-surface">{userName}</p>
+          <p className="text-sm font-medium text-text-primary">{userName}</p>
           {userSubtitle && (
-            <p className="text-xs text-on-surface-muted">{userSubtitle}</p>
+            <p className="text-xs text-text-faint">{userSubtitle}</p>
           )}
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-on-primary">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-locked-bg text-sm font-bold text-text-muted">
           {userName.charAt(0).toUpperCase()}
         </div>
         <ThemeToggle />
@@ -54,13 +56,13 @@ export function AppHeader({ userName, userSubtitle, center }: AppHeaderProps) {
           type="button"
           onClick={() => startSignOut(() => logout())}
           disabled={isSigningOut}
-          aria-label="Sign out"
-          title="Sign out"
-          className="flex items-center gap-1.5 rounded-[var(--radius-control)] border border-[var(--surface-border)] px-3 py-1.5 text-sm font-medium text-on-surface-muted transition-colors hover:bg-surface-container-high hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
+          className="flex items-center gap-1.5 h-9 rounded-[var(--radius-control)] border border-border-strong px-3 text-sm font-medium text-text-faint transition-colors hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span className="material-symbols-outlined text-[18px]">logout</span>
+          <LogoutIcon size={16} />
           <span className="hidden sm:inline">
-            {isSigningOut ? 'Signing out…' : 'Sign out'}
+            {isSigningOut ? 'Saliendo…' : 'Salir'}
           </span>
         </button>
       </div>

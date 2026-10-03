@@ -1,43 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface-dim: #0a0e1a;
-  --color-surface-variant: #202537;
-  --color-background-dark: #0a0f1e;
-  --color-surface-container-lowest: #000000;
-  --color-error: #ff716c;
-  --color-surface-bright: #252b3f;
+  /* Legacy Material token names, kept as aliases of the blister-adherence
+     theme tokens below so every surface not yet migrated to the new utility
+     names still follows light/dark theming instead of painting the old fixed
+     navy palette. New code should use the blister tokens directly. */
+  --color-surface-dim: var(--color-bg);
+  --color-surface-variant: var(--color-locked-bg);
+  --color-background-dark: var(--color-bg);
+  --color-surface-container-lowest: var(--color-bg);
+  --color-error: var(--color-danger);
+  --color-surface-bright: var(--color-panel);
   --color-secondary-container: #006970;
-  --color-surface-container-high: #1a1f2f;
+  --color-surface-container-high: var(--color-locked-bg);
   --color-secondary: #22d3ee;
   --color-on-error: #490006;
   --color-on-secondary-fixed: #003f43;
-  --color-surface: #0a0e1a;
-  --color-surface-container: #141928;
+  --color-surface: var(--color-bg);
+  --color-surface-container: var(--color-panel);
   --color-secondary-fixed-dim: #00deec;
   --color-on-secondary: #005359;
-  --color-outline: #717584;
+  --color-outline: var(--color-text-faint);
   --color-error-container: #9f0519;
   --color-secondary-dim: #00deec;
   --color-tertiary-dim: #22d3ee;
-  --color-on-background: #e2e4f6;
+  --color-on-background: var(--color-text-primary);
   --color-on-primary-container: #4b0027;
-  --color-on-surface: #e2e4f6;
+  --color-on-surface: var(--color-text-primary);
   --color-secondary-fixed: #00eefc;
   --color-inverse-on-surface: #515463;
   --color-inverse-surface: #faf8ff;
-  --color-surface-container-highest: #202537;
+  --color-surface-container-highest: var(--color-locked-bg);
   --color-on-secondary-fixed-variant: #005e64;
   --color-on-error-container: #ffa8a3;
   --color-tertiary: #3b82f6;
   --color-on-secondary-container: #e3fdff;
-  --color-primary: #2dd4bf;
-  --color-on-primary: #0a0e1a;
-  --color-accent: #2dd4bf;
+  --color-primary: var(--color-accent-teal);
+  --color-on-primary: var(--color-accent-teal-ink);
+  --color-accent: var(--color-accent-teal);
   --color-accent-purple: #3b82f6;
   --color-success: #46d17f;
   --color-on-success: #00391c;
-  --color-on-surface-muted: #94a3b8;
+  --color-on-surface-muted: var(--color-text-muted);
+  --color-on-surface-variant: var(--color-text-muted);
 
   /* Chart accent tokens — deliberately distinct semantic colors, not aliases
      of the brand primary/secondary/tertiary hues (Phase 5.8 hex sweep). */
@@ -86,15 +91,13 @@
 
 :root {
   /* Global Application Colors */
-  --scrollbar-thumb: #cbd5e1;
-  --scrollbar-hover: #94a3b8;
+  --scrollbar-thumb: var(--color-border-strong);
+  --scrollbar-hover: var(--color-text-faint);
 
   /* Semantic intensity tokens (base — overridden per .surface-* scope) */
   --radius-card: 12px;
   --radius-control: 8px;
-  --shadow-card:
-    6px 6px 20px rgba(0, 0, 0, 0.35),
-    -6px -6px 20px rgba(255, 255, 255, 0.02);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
   --space-card-p: 1rem;
   --transition-standard: 220ms ease;
   --surface-border: rgba(255, 255, 255, 0.05);
@@ -104,9 +107,9 @@
      not need a Tailwind utility-generating @theme entry). Light defaults;
      dark overrides live in :root[data-theme="dark"]. */
   --shadow-dome:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    inset 0 2px 5px rgba(255, 255, 255, 1),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.09);
+    0 2px 0 rgba(0, 0, 0, 0.04),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.045);
   --shadow-popped: inset 0 3px 8px rgba(0, 0, 0, 0.18);
 }
 
@@ -114,9 +117,7 @@
 .surface-coach {
   --radius-card: 10px;
   --radius-control: 8px;
-  --shadow-card:
-    4px 4px 12px rgba(0, 0, 0, 0.5),
-    -1px -1px 2px rgba(255, 255, 255, 0.03);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
   --space-card-p: 0.75rem;
   --transition-standard: 200ms ease;
   --surface-border: rgba(255, 255, 255, 0.06);
@@ -126,9 +127,7 @@
 .surface-client {
   --radius-card: 16px;
   --radius-control: 12px;
-  --shadow-card:
-    -5px -5px 15px rgba(255, 255, 255, 0.03),
-    5px 5px 15px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
   --space-card-p: 1.5rem;
   --transition-standard: 280ms ease;
   --surface-border: rgba(255, 255, 255, 0.04);
@@ -156,9 +155,9 @@
   --color-danger: #dc6a4a;
   --color-cell-pending-bg: #ffffff;
   --shadow-dome:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    inset 0 2px 5px rgba(255, 255, 255, 1),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.09);
+    0 2px 0 rgba(0, 0, 0, 0.04),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.045);
   --shadow-popped: inset 0 3px 8px rgba(0, 0, 0, 0.18);
 }
 
@@ -183,9 +182,9 @@
   --color-danger: #e88968;
   --color-cell-pending-bg: #191d24;
   --shadow-dome:
-    0 1px 3px rgba(0, 0, 0, 0.45),
-    inset 0 1px 3px rgba(255, 255, 255, 0.08),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.05),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35);
   --shadow-popped: inset 0 3px 10px rgba(0, 0, 0, 0.45);
 }
 
@@ -193,11 +192,11 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: var(--color-background-dark);
-  background-attachment: fixed;
+  background: var(--color-bg);
   min-height: 100vh;
   font-family: var(--font-sans);
-  color: var(--color-on-background);
+  color: var(--color-text-primary);
+  transition: background 180ms ease, color 180ms ease;
 }
 
 /* Base scrollbar styling for modern feel */
@@ -254,9 +253,12 @@ body {
     background: var(--color-accent-teal);
     color: var(--color-accent-teal-ink);
     border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
+    border: 1px solid transparent;
     transition: var(--transition-standard);
+  }
+
+  .neu-btn-accent:hover {
+    filter: brightness(0.96);
   }
 
   .neu-btn-accent:active {
@@ -335,4 +337,41 @@ body {
 
 .animate-pulse-slow {
   animation: pulse-slow 8s ease-in-out infinite;
+}
+
+/* Entrance motion — staggered fade/rise used by the auth screens and the
+   client "Hoy" hero. Delay is set per element via `--enter-delay`. */
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-enter {
+  animation: enter-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
 }

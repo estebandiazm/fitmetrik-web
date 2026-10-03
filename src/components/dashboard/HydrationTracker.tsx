@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '../ui/Card';
+import { DropletIcon } from '../ui/icons';
 
 interface HydrationTrackerProps {
   current?: number;
@@ -7,17 +8,18 @@ interface HydrationTrackerProps {
 
 export function HydrationTracker({ current = 3.5 }: HydrationTrackerProps) {
   return (
-    <Card className="rounded-3xl p-6">
-      <h3 className="text-text-muted text-xs font-bold uppercase tracking-widest mb-4">Hydration Goal</h3>
-      <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-secondary shadow-inner">
-          <span className="material-symbols-outlined text-3xl">water_drop</span>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-text-primary">{current}L</p>
-          <p className="text-xs text-text-muted font-medium">Daily Target</p>
-        </div>
+    <Card padding="default" className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-text-faint">Hidratación</h2>
+        <span className="text-text-faint">
+          <DropletIcon size={18} />
+        </span>
       </div>
+      <p className="flex items-baseline gap-1">
+        <span className="font-mono text-2xl font-bold text-text-primary">{current}</span>
+        <span className="font-mono text-xs font-medium text-text-faint">L</span>
+      </p>
+      <p className="text-xs text-text-muted">Meta diaria</p>
     </Card>
   );
 }

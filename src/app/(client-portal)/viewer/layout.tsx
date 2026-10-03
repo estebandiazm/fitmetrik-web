@@ -21,7 +21,7 @@ export default async function ViewerLayout({
   const clientRecord = user ? await getClientByAuthId(user.id) : null;
 
   return (
-    <div className="min-h-screen bg-surface-dim">
+    <div className="min-h-screen bg-bg text-text-primary">
       <TopAppBar clientName={clientRecord?.name} />
       {children}
       <BottomNavBar />

@@ -1,37 +1,34 @@
 import React from 'react';
 import { Card } from '../ui/Card';
 
+const MACROS = [
+  { label: 'Proteína', current: 180, goal: 200 },
+  { label: 'Carbohidratos', current: 250, goal: 300 },
+  { label: 'Grasas', current: 65, goal: 75 },
+];
+
 export function MacrosHUD() {
   return (
-    <Card className="rounded-3xl p-6 relative overflow-hidden">
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-tertiary/10 blur-3xl"></div>
-      <h3 className="text-text-muted text-xs font-bold uppercase tracking-widest mb-4">Macro Distribution</h3>
-      <div className="space-y-5">
-        <div>
-          <div className="flex justify-between text-[10px] font-bold mb-1.5 tracking-wider uppercase text-text-muted">
-            <span>Protein</span><span className="text-text-primary">180g / 200g</span>
-          </div>
-          <div className="w-full neu-inset h-2 rounded-full overflow-hidden">
-            <div className="bg-primary h-full" style={{ width: '90%' }}></div>
-          </div>
-        </div>
-        <div>
-          <div className="flex justify-between text-[10px] font-bold mb-1.5 tracking-wider uppercase text-text-muted">
-            <span>Carbs</span><span className="text-text-primary">250g / 300g</span>
-          </div>
-          <div className="w-full neu-inset h-2 rounded-full overflow-hidden">
-            <div className="bg-tertiary h-full" style={{ width: '83%' }}></div>
-          </div>
-        </div>
-        <div>
-          <div className="flex justify-between text-[10px] font-bold mb-1.5 tracking-wider uppercase text-text-muted">
-            <span>Fats</span><span className="text-text-primary">65g / 75g</span>
-          </div>
-          <div className="w-full neu-inset h-2 rounded-full overflow-hidden">
-            <div className="bg-text-faint h-full" style={{ width: '86%' }}></div>
-          </div>
-        </div>
-      </div>
+    <Card padding="default" className="flex flex-col gap-4">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-text-faint">Macros</h2>
+      <ul className="flex flex-col gap-3.5">
+        {MACROS.map((macro) => (
+          <li key={macro.label}>
+            <div className="mb-1.5 flex justify-between text-xs">
+              <span className="font-medium text-text-muted">{macro.label}</span>
+              <span className="font-mono font-semibold text-text-primary">
+                {macro.current}g <span className="text-text-faint">/ {macro.goal}g</span>
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-locked-bg">
+              <div
+                className="h-full rounded-full bg-text-muted"
+                style={{ width: `${Math.min((macro.current / macro.goal) * 100, 100)}%` }}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
     </Card>
   );
 }
