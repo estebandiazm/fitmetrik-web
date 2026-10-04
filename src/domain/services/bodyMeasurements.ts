@@ -1,5 +1,6 @@
 import type { MeasurementPoint } from "../types/MeasurementPoint";
 import type { BodyMeasurement } from "../types/BodyMeasurement";
+import { toLocalISODate } from "./localDates";
 
 // ── Catalog ───────────────────────────────────────────────────────────────────
 
@@ -307,7 +308,8 @@ export interface MeasurementSeriesPoint {
 }
 
 // Daily chart series for one point over the last `daysBack` days (oldest
-// first, ending today). Days without an entry carry a null value.
+// first, ending today), keyed by local calendar day. Days without an entry
+// carry a null value.
 export function buildMeasurementSeries(
   measurements: BodyMeasurement[],
   pointSlug: string,
@@ -320,9 +322,9 @@ export function buildMeasurementSeries(
     day.setDate(day.getDate() - i);
     day.setHours(0, 0, 0, 0);
 
-    const dayISO = day.toISOString().split("T")[0];
+    const dayISO = toLocalISODate(day);
     const entry = measurements.find(
-      (m) => m.pointSlug === pointSlug && new Date(m.date).toISOString().split("T")[0] === dayISO
+      (m) => m.pointSlug === pointSlug && toLocalISODate(new Date(m.date)) === dayISO
     );
 
     series.push({
