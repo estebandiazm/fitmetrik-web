@@ -41,7 +41,7 @@ export default function WeightGoalEditor({
         onSaved?.();
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error saving target weight');
+      setError(err instanceof Error ? err.message : 'No se pudo guardar el peso objetivo');
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function WeightGoalEditor({
           max="500"
           value={target}
           onChange={(e) => setTarget(e.target.value)}
-          placeholder="e.g., 70.5"
+          placeholder="ej. 70.5"
           className="w-full"
         />
         {error && (
@@ -69,13 +69,13 @@ export default function WeightGoalEditor({
         )}
         {success && (
           <div className="mt-2 text-sm bg-success/10 border border-success/30 text-success-text rounded-lg p-2">
-            Target weight saved!
+            ¡Peso objetivo guardado!
           </div>
         )}
       </div>
       <span className="py-2 text-text-muted text-sm">kg</span>
       <Button onClick={handleSave} disabled={!canSave} className="mt-1">
-        {loading ? '⏳' : 'Save'}
+        {loading ? 'Guardando…' : 'Guardar'}
       </Button>
     </div>
   );

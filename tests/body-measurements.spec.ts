@@ -37,7 +37,7 @@ class CoachClientDetailPage {
   constructor(private page: Page) {}
 
   async goto(clientId: string) {
-    await this.page.goto(`/clients/${clientId}`);
+    await this.page.goto(`/clients/${clientId}?tab=medidas`);
   }
 
   async toggleMeasurementPoint(slug: string) {
@@ -56,6 +56,10 @@ class CoachClientDetailPage {
   async expectPointActive(slug: string) {
     const toggle = this.page.getByTestId(`measurement-point-toggle-${slug}`);
     await expect(toggle).toBeChecked();
+  }
+
+  async openMeasurementsTab() {
+    await this.page.getByRole('link', { name: 'Medidas' }).click();
   }
 
   async expectEditorVisible() {
@@ -143,6 +147,7 @@ test.describe('Coach: Measurement Points Configuration (REQ-BMT-01)', () => {
     await firstClientLink.click();
 
     const coachPage = new CoachClientDetailPage(page);
+    await coachPage.openMeasurementsTab();
     await coachPage.expectEditorVisible();
   });
 
@@ -156,6 +161,7 @@ test.describe('Coach: Measurement Points Configuration (REQ-BMT-01)', () => {
     await firstClientLink.click();
 
     const coachPage = new CoachClientDetailPage(page);
+    await coachPage.openMeasurementsTab();
     await coachPage.expectEditorVisible();
 
     // Toggle cintura ON

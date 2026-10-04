@@ -5,12 +5,13 @@ import { StepsCounter } from '@/components/dashboard/StepsCounter';
 import { WeightBlisterWidget } from '@/components/dashboard/weight-blister-widget';
 import { HydrationTracker } from '@/components/dashboard/HydrationTracker';
 import { MacrosHUD } from '@/components/dashboard/MacrosHUD';
-import { PlanSectionCard, PlanSectionCardProps } from '@/components/dashboard/PlanSectionCard';
+import { PlanSectionCard } from '@/components/dashboard/PlanSectionCard';
 import { PlanSwitcher } from '@/components/dashboard/PlanSwitcher';
 
 import { DietPlan } from '@/domain/types/DietPlan';
 import { createClient } from '@/infrastructure/adapters/supabase/server';
 import { getClientByAuthId } from '@/app/actions/clientActions';
+import { buildPlanCards, resolveActivePlanIndex } from '@/domain/services/planView';
 import { buildWeeklyStrip, countPopped, findEntryForDate } from '@/domain/services/adherence';
 import { redirect } from 'next/navigation';
 
@@ -84,54 +85,13 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
   // Determine active plan
   const plans = isMock ? [mockPlan] : clientRecord.plans;
   
-  // Parse planIndex from search params
-  const qsIndex = searchParams?.planIndex;
-  let activeIndex = plans.length - 1; // default to the latest plan
-
-  if (qsIndex && typeof qsIndex === 'string') {
-    const parsed = parseInt(qsIndex, 10);
-    if (!isNaN(parsed) && parsed >= 0 && parsed < plans.length) {
-      activeIndex = parsed;
-    }
-  }
-
+  const activeIndex = resolveActivePlanIndex(plans.length, searchParams?.planIndex);
   const activePlan = plans[activeIndex];
 
   // Map plans for switcher
   const switcherPlans = plans.map(p => ({ label: p.label, days: p.days }));
 
-  const mealCardsData: PlanSectionCardProps[] = activePlan.meals.map((meal) => {
-    const foods = meal.blocks.flatMap((block) =>
-      block.options.map((opt) => ({
-        id: `${meal.mealName}-${block.blockType}-${opt.foodName}`,
-        name: opt.foodName,
-        category: block.blockType,
-        amount: `${opt.grams} ${opt.measureUnit}`,
-      })),
-    );
-    return {
-      title: meal.mealName,
-      description: foods.map((food) => food.name).join(' · '),
-      totalWeight: `${meal.blocks.length} bloques`,
-      foods,
-    };
-  });
-
-  const allCards: PlanSectionCardProps[] = [...mealCardsData];
-  if (activePlan.snacks && activePlan.snacks.length > 0) {
-    allCards.push({
-      title: 'Snacks',
-      description: 'Elige una opción por día',
-      totalWeight: `${activePlan.snacks.length} opciones`,
-      variant: 'snack',
-      foods: activePlan.snacks.map((snack) => ({
-        id: `snack-${snack.optionNumber}`,
-        name: snack.description,
-        category: `Opción ${snack.optionNumber}`,
-        amount: '',
-      })),
-    });
-  }
+  const allCards = buildPlanCards(activePlan);
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-bg pb-32 text-text-primary lg:pb-0">
