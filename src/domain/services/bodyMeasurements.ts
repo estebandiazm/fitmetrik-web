@@ -65,11 +65,11 @@ export function validateMeasurement(
 
 // Client-side pre-check mirroring BodyMeasurementSchema's future-date refine —
 // gives immediate UI feedback before the round trip. Compares calendar days,
-// ignoring time-of-day.
-export function isFutureDate(date: Date): boolean {
+// ignoring time-of-day. `now` is injectable for deterministic tests.
+export function isFutureDate(date: Date, now: Date = new Date()): boolean {
   const day = new Date(date);
   day.setHours(0, 0, 0, 0);
-  const today = new Date();
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   return day > today;
 }
@@ -284,4 +284,51 @@ export function formatMeasurementDate(date: Date | string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+// ── mergeWithCatalog ──────────────────────────────────────────────────────────
+
+// Coach editor rows: every catalog point in catalog order, using the stored
+// point when the client has one, else an inactive catalog copy.
+export function mergeWithCatalog(currentPoints: MeasurementPoint[]): MeasurementPoint[] {
+  const storedBySlug = new Map(currentPoints.map((p) => [p.slug, p]));
+  return MEASUREMENT_POINTS_CATALOG.map((catalogEntry) => {
+    const stored = storedBySlug.get(catalogEntry.slug);
+    return stored ?? { ...catalogEntry, active: false };
+  });
+}
+
+// ── buildMeasurementSeries ────────────────────────────────────────────────────
+
+export interface MeasurementSeriesPoint {
+  /** Short es-AR day label, e.g. "15 abr" */
+  date: string;
+  value: number | null;
+}
+
+// Daily chart series for one point over the last `daysBack` days (oldest
+// first, ending today). Days without an entry carry a null value.
+export function buildMeasurementSeries(
+  measurements: BodyMeasurement[],
+  pointSlug: string,
+  daysBack: number,
+  now: Date = new Date()
+): MeasurementSeriesPoint[] {
+  const series: MeasurementSeriesPoint[] = [];
+  for (let i = daysBack - 1; i >= 0; i--) {
+    const day = new Date(now);
+    day.setDate(day.getDate() - i);
+    day.setHours(0, 0, 0, 0);
+
+    const dayISO = day.toISOString().split("T")[0];
+    const entry = measurements.find(
+      (m) => m.pointSlug === pointSlug && new Date(m.date).toISOString().split("T")[0] === dayISO
+    );
+
+    series.push({
+      date: day.toLocaleDateString("es-AR", { month: "short", day: "numeric" }),
+      value: entry?.valueCm ?? null,
+    });
+  }
+  return series;
 }

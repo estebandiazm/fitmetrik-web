@@ -17,6 +17,8 @@ import {
   isNoDataValue,
   buildMeasurementHistory,
   formatMeasurementDate,
+  mergeWithCatalog,
+  buildMeasurementSeries,
 } from '@/domain/services/bodyMeasurements';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
@@ -520,5 +522,61 @@ describe('formatMeasurementDate', () => {
   it('accepts a date string', () => {
     const iso = new Date(2026, 2, 15, 12).toISOString();
     expect(formatMeasurementDate(iso)).toBe(formatMeasurementDate(new Date(iso)));
+  });
+});
+
+// ── mergeWithCatalog ──────────────────────────────────────────────────────────
+
+describe('mergeWithCatalog', () => {
+  it('returns every catalog point, inactive when not stored', () => {
+    const merged = mergeWithCatalog([]);
+    expect(merged.map((p) => p.slug)).toEqual(MEASUREMENT_POINTS_CATALOG.map((p) => p.slug));
+    expect(merged.every((p) => p.active === false)).toBe(true);
+  });
+
+  it('prefers the stored point over the catalog entry', () => {
+    const stored: MeasurementPoint = {
+      ...MEASUREMENT_POINTS_CATALOG[1],
+      label: 'Cintura custom',
+      active: true,
+    };
+    const merged = mergeWithCatalog([stored]);
+    expect(merged[1]).toBe(stored);
+    expect(merged).toHaveLength(MEASUREMENT_POINTS_CATALOG.length);
+  });
+
+  it('drops stored points that are not in the catalog', () => {
+    const unknown = { ...MEASUREMENT_POINTS_CATALOG[0], slug: 'unknown', active: true };
+    expect(mergeWithCatalog([unknown]).some((p) => p.slug === 'unknown')).toBe(false);
+  });
+});
+
+// ── buildMeasurementSeries ────────────────────────────────────────────────────
+
+describe('buildMeasurementSeries', () => {
+  const now = new Date(2026, 3, 15, 10, 30);
+  const daysAgo = (n: number) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - n);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  it('returns one point per day, oldest first, ending today', () => {
+    const series = buildMeasurementSeries([], 'cintura', 7, now);
+    expect(series).toHaveLength(7);
+    expect(series[6].date).toBe(daysAgo(0).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }));
+    expect(series[0].date).toBe(daysAgo(6).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }));
+    expect(series.every((p) => p.value === null)).toBe(true);
+  });
+
+  it('fills the value for days with a measurement of the selected point', () => {
+    const data: BodyMeasurement[] = [
+      { date: daysAgo(2), pointSlug: 'cintura', valueCm: 80 },
+      { date: daysAgo(1), pointSlug: 'pecho', valueCm: 99 },
+    ];
+    const series = buildMeasurementSeries(data, 'cintura', 7, now);
+    expect(series[4].value).toBe(80);
+    expect(series[5].value).toBeNull();
   });
 });
