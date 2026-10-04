@@ -18,8 +18,8 @@ interface RecentRecordsProps {
 const PAGE_SIZE = 10;
 
 const STATUS_BADGES: Record<StepGoalStatus, { label: string; className: string }> = {
-  [STEP_GOAL_STATUS.GOAL_MET]: { label: 'Goal Met', className: 'bg-accent-teal/20 text-text-primary' },
-  [STEP_GOAL_STATUS.GOOD]: { label: 'Good', className: 'bg-accent-amber/20 text-text-primary' },
+  [STEP_GOAL_STATUS.GOAL_MET]: { label: 'Goal Met', className: 'bg-accent-teal/15 text-accent-teal-text' },
+  [STEP_GOAL_STATUS.GOOD]: { label: 'Good', className: 'bg-accent-amber/10 text-accent-amber-text' },
   [STEP_GOAL_STATUS.LOW]: { label: 'Low Activity', className: 'bg-danger/10 text-danger-text' },
 };
 
