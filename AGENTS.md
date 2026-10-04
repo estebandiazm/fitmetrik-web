@@ -95,6 +95,8 @@ src/
 │   ├── progress/                 # Domain components: tracking
 │   └── layout/                   # Shell, navigation, sidebars
 │
+├── context/                      # React client-state providers (no data access)
+│
 ├── hooks/                        # Shared custom hooks
 │   ├── usePlan.ts
 │   └── useProgress.ts
@@ -110,8 +112,9 @@ src/
 ### 2.3 Dependency Rules
 
 ```
-app/ → components/, hooks/, domain/, infrastructure/ports/
-components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions), hooks/
+app/ → components/, hooks/, context/, domain/, infrastructure/ports/
+components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions), hooks/, context/
+context/ → domain/types/ (client-side UI state only, e.g. a localStorage draft)
 hooks/ → infrastructure/ports/, domain/
 domain/ → NOTHING (pure, no imports from infra or UI)
 infrastructure/adapters/ → infrastructure/ports/, domain/types/

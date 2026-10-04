@@ -44,8 +44,9 @@ Unit tests use **Vitest** (not yet configured — target `domain/services/`).
 ### Dependency rule (strict)
 
 ```
-app/ → components/, domain/, infrastructure/ports/
-components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions)
+app/ → components/, context/, domain/, infrastructure/ports/
+components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions), context/
+context/ → domain/types/ (React client-state providers only)
 domain/ → NOTHING (pure TypeScript only)
 infrastructure/adapters/ → infrastructure/ports/, domain/types/
 ```
