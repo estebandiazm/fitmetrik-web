@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import SummaryCard from '@/components/activity/SummaryCard';
 import TrendsChart from '@/components/activity/TrendsChart';
 import RecentRecords from '@/components/activity/RecentRecords';
@@ -93,7 +94,7 @@ export function ActivityPageClient({
               : 'Track your weight and progress toward your target'}
           </p>
         </div>
-        <button
+        <Button
           onClick={() => {
             if (activeTab === 'steps') setIsStepsModalOpen(true);
             else if (activeTab === 'weight') setIsWeightModalOpen(true);
@@ -108,10 +109,10 @@ export function ActivityPageClient({
               ? 'Tu coach aún no configuró puntos de medición'
               : undefined
           }
-          className="px-6 py-3 rounded-full neu-btn-accent font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition w-full lg:w-auto"
+          className="w-full lg:w-auto"
         >
           + Add Record
-        </button>
+        </Button>
       </div>
 
       {/* Tabs */}
