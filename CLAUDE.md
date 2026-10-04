@@ -45,12 +45,12 @@ Unit tests use **Vitest** (not yet configured — target `domain/services/`).
 
 ```
 app/ → components/, domain/, infrastructure/ports/
-components/ → domain/types/
+components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions)
 domain/ → NOTHING (pure TypeScript only)
 infrastructure/adapters/ → infrastructure/ports/, domain/types/
 ```
 
-`domain/` is the heart of the system. It must never import from `infrastructure/`, `components/`, or `app/`.
+`domain/` is the heart of the system. It must never import from `infrastructure/`, `components/`, or `app/`. `components/` must never import from `infrastructure/`.
 
 ### Route groups
 
