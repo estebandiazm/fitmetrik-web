@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateWeeklyAverage,
   getWeightMetrics,
+  summarizeWeights,
 } from '@/domain/services/weightAverageService';
 import type { DailyWeight } from '@/domain/types/DailyWeight';
 
@@ -124,5 +125,21 @@ describe('getWeightMetrics', () => {
     expect(metrics.min).toBe(72.5);
     expect(metrics.max).toBe(72.5);
     expect(metrics.avg).toBeCloseTo(72.5, 1);
+  });
+});
+
+describe('summarizeWeights', () => {
+  const at = (day: number, weight: number) => ({ date: new Date(2026, 3, day), weight });
+
+  it('returns the latest (last recorded), lightest and heaviest weights', () => {
+    expect(summarizeWeights([at(1, 80), at(2, 78.5), at(3, 79)])).toEqual({
+      latest: 79,
+      lightest: 78.5,
+      heaviest: 80,
+    });
+  });
+
+  it('returns null when there are no weights', () => {
+    expect(summarizeWeights([])).toBeNull();
   });
 });

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
+import { calculateGoalProgressPercent } from '@/domain/services/stepsAverageService';
 
 interface SummaryCardProps {
   dailyAverage: number;
@@ -9,7 +10,7 @@ interface SummaryCardProps {
 }
 
 export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps) {
-  const progressPercent = stepGoal ? Math.min((dailyAverage / stepGoal) * 100, 100) : null;
+  const progressPercent = calculateGoalProgressPercent(dailyAverage, stepGoal);
 
   return (
     <Card className="p-6 mb-6">
@@ -18,14 +19,14 @@ export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps
           <span className="material-symbols-outlined text-primary text-2xl">directions_run</span>
         </div>
         <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase">Daily Average</p>
-          <p className="text-3xl font-bold text-white">{dailyAverage.toLocaleString()}</p>
+          <p className="text-xs font-semibold text-text-muted uppercase">Daily Average</p>
+          <p className="text-3xl font-bold text-text-primary">{dailyAverage.toLocaleString()}</p>
         </div>
       </div>
 
       {stepGoal ? (
         <>
-          <p className="text-xs text-gray-400 mb-2">
+          <p className="text-xs text-text-muted mb-2">
             Progress to Goal ({stepGoal.toLocaleString()})
           </p>
           <div className="flex items-center gap-3">
@@ -35,13 +36,13 @@ export default function SummaryCard({ dailyAverage, stepGoal }: SummaryCardProps
                 style={{ width: `${progressPercent || 0}%` }}
               />
             </div>
-            <span className="text-sm font-semibold text-primary min-w-fit">
+            <span className="text-sm font-semibold text-accent-teal-text min-w-fit">
               {Math.round(progressPercent || 0)}%
             </span>
           </div>
         </>
       ) : (
-        <p className="text-sm text-gray-400 italic">
+        <p className="text-sm text-text-muted italic">
           Goal not set — contact your coach
         </p>
       )}

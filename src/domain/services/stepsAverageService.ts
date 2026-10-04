@@ -9,3 +9,12 @@ export function calculateDailyAverage(entries: DailyStep[]): number {
   const sum = entries.reduce((acc, entry) => acc + entry.steps, 0);
   return Math.round(sum / entries.length);
 }
+
+/**
+ * Average as a percentage of the step goal, capped at 100. Returns null when
+ * no goal is set.
+ */
+export function calculateGoalProgressPercent(average: number, goal?: number): number | null {
+  if (!goal) return null;
+  return Math.min((average / goal) * 100, 100);
+}
