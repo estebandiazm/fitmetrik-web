@@ -73,3 +73,5 @@ ds-bundle/
 .impeccable/decision-payload.json
 .impeccable/direction-contract-body.md
 .impeccable/surface-brief-addendum.md
+.impeccable/hook.cache.json
+.impeccable/questions/
