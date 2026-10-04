@@ -1,0 +1,56 @@
+{
+  "projectId": "79346ed3-3bc3-4b3c-a772-31013ac5e17b",
+  "shape": "package",
+  "pkg": "fitmetrik-web",
+  "globalName": "FitmetrikUI",
+  "entry": ".design-sync/entry.mjs",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".design-sync/.cache/tailwind-build.css",
+  "buildCmd": "npx --yes @tailwindcss/cli@4.3.2 -i src/app/globals.css -o .design-sync/.cache/tailwind-build.css --cwd .",
+  "extraFonts": [
+    "node_modules/@fontsource/manrope/400.css",
+    "node_modules/@fontsource/manrope/500.css",
+    "node_modules/@fontsource/manrope/600.css",
+    "node_modules/@fontsource/manrope/700.css",
+    "node_modules/@fontsource/manrope/800.css"
+  ],
+  "runtimeFontPrefixes": ["Material Symbols"],
+  "readmeHeader": ".design-sync/conventions.md",
+  "overrides": {
+    "Modal": { "cardMode": "single", "viewport": "480x420" }
+  },
+  "componentSrcMap": {
+    "Alert": "src/components/ui/Alert.tsx",
+    "Badge": "src/components/ui/Badge.tsx",
+    "Button": "src/components/ui/Button.tsx",
+    "Card": "src/components/ui/Card.tsx",
+    "Input": "src/components/ui/Input.tsx",
+    "Modal": "src/components/ui/Modal.tsx",
+    "StatusPill": "src/components/ui/StatusPill.tsx",
+    "Table": "src/components/ui/Table.tsx",
+    "TableHead": "src/components/ui/Table.tsx",
+    "TableRow": "src/components/ui/Table.tsx",
+    "TableCell": "src/components/ui/Table.tsx",
+    "MetricCard": "src/components/coach/MetricCard.tsx",
+    "SummaryCard": "src/components/activity/SummaryCard.tsx",
+    "PlanCard": "src/components/creator/PlanCard.tsx",
+    "TablePagination": "src/components/coach/TablePagination.tsx"
+  },
+  "dtsPropsFor": {
+    "Alert": "type?: 'error' | 'success' | 'info';\n  message: string;",
+    "Badge": "children: React.ReactNode;\n  className?: string;\n  tone?: 'neutral' | 'success' | 'error';",
+    "Button": "children: React.ReactNode;\n  className?: string;\n  variant?: 'accent' | 'surface' | 'ghost';\n  size?: 'sm' | 'md';\n  disabled?: boolean;\n  type?: 'button' | 'submit' | 'reset';\n  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;",
+    "Card": "children: React.ReactNode;\n  className?: string;\n  id?: string;\n  padding?: 'default' | 'none';\n  as?: 'div' | 'section' | 'article';",
+    "Input": "className?: string;\n  value?: string;\n  defaultValue?: string;\n  placeholder?: string;\n  type?: string;\n  disabled?: boolean;\n  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;",
+    "Modal": "open: boolean;\n  onClose: () => void;\n  title: string;\n  children: React.ReactNode;\n  footer?: React.ReactNode;\n  surfaceScope?: 'surface-client' | 'surface-coach';\n  closeOnBackdrop?: boolean;\n  closeOnEscape?: boolean;\n  size?: 'sm' | 'md' | 'lg';\n  testId?: string;",
+    "StatusPill": "hasPlan: boolean;",
+    "Table": "children: React.ReactNode;\n  className?: string;",
+    "TableHead": "children: React.ReactNode;",
+    "TableRow": "children: React.ReactNode;\n  className?: string;\n  header?: boolean;",
+    "TableCell": "children: React.ReactNode;\n  className?: string;\n  as?: 'td' | 'th';",
+    "MetricCard": "label: string;\n  value: number | string;\n  icon: string;\n  trend: { value: number; direction: 'up' | 'down' } | null;",
+    "SummaryCard": "dailyAverage: number;\n  stepGoal?: number;",
+    "PlanCard": "plan: {\n    id: string;\n    label: string;\n    days: string;\n    proteins: number;\n    carbs: number;\n    fruits: number;\n    fats: number;\n    foods: { name: string; grams: number; category: 'FRUIT' | 'BASE' | 'COMPLEMENT'; totalGrams?: number }[];\n  };\n  index: number;\n  onUpdate: (index: number, updatedPlan: { id: string; label: string; days: string; proteins: number; carbs: number; fruits: number; fats: number; foods: { name: string; grams: number; category: 'FRUIT' | 'BASE' | 'COMPLEMENT'; totalGrams?: number }[] }) => void;",
+    "TablePagination": "page: number;\n  totalPages: number;\n  onPageChange: (page: number) => void;"
+  }
+}
