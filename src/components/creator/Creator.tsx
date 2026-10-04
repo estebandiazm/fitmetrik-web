@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useContext, useState } from 'react';
-import { ClientContext } from '../../context/ClientContext';
-import { ClientContextType } from '../../context/ClientContextType';
+import { ClientContext } from '@/context/ClientContext';
+import { ClientContextType } from '@/context/ClientContextType';
 import {
   buildDietPlansFromDrafts,
   createDefaultPlanDraft,
@@ -11,7 +11,8 @@ import {
 import { useRouter } from 'next/navigation';
 import PlanCard from './PlanCard';
 import SavePlanModal from './SavePlanModal';
-import { DietPlan } from '../../domain/types/DietPlan';
+import { DietPlan } from '@/domain/types/DietPlan';
+import { Button } from '@/components/ui/Button';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -113,23 +114,20 @@ const Creator = ({ coachId }: CreatorProps) => {
         {/* ── Add Another Plan ── */}
         <button
           onClick={handleAddPlan}
-          className="w-full px-6 py-3 mb-4 rounded-[var(--radius-control)] border border-border-strong text-text-primary font-semibold hover:border-tertiary hover:text-tertiary hover:bg-tertiary/8 transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-4 rounded-[var(--radius-control)] border border-border-strong text-text-primary font-semibold hover:border-accent-teal hover:text-accent-teal-text hover:bg-accent-teal/8 transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">add_circle</span> Add Another Plan
         </button>
 
         {/* ── Save All Plans ── */}
-        <button
-          onClick={handleSaveAll}
-          className="w-full px-6 py-3 mb-6 rounded-[var(--radius-control)] neu-btn-accent font-bold transition flex items-center justify-center gap-2"
-        >
+        <Button onClick={handleSaveAll} className="w-full mb-6">
           <span className="material-symbols-outlined">save</span> Guardar Planes
-        </button>
+        </Button>
 
         {/* ── Save to Database ── */}
         <button
           onClick={handleSaveToDB}
-          className="w-full px-6 py-3 mb-8 rounded-[var(--radius-control)] border border-tertiary/40 text-tertiary font-semibold hover:border-tertiary hover:bg-tertiary/8 transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-8 rounded-[var(--radius-control)] border border-accent-teal/40 text-accent-teal-text font-semibold hover:border-accent-teal hover:bg-accent-teal/8 transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">cloud_upload</span> Guardar en Base de Datos
         </button>

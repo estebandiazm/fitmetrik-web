@@ -2,8 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { getClients, createClient, addDietPlanToClient } from '@/app/actions/clientActions';
-import { Client } from '../../domain/types/Client';
-import { DietPlan } from '../../domain/types/DietPlan';
+import { Client } from '@/domain/types/Client';
+import { DietPlan } from '@/domain/types/DietPlan';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/Button';
 
 // ─── types ──────────────────────────────────────────────────────────────────
 
@@ -101,14 +104,14 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
       <div className="neu-card w-full max-w-sm mx-4">
         {/* Header */}
         <div className="border-b border-border px-6 py-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-tertiary">save</span>
+          <span className="material-symbols-outlined text-accent-teal-text">save</span>
           <h2 className="text-text-primary font-bold">Guardar en Base de Datos</h2>
         </div>
 
         {/* Content */}
         <div className="px-6 py-6">
           {success ? (
-            <div className="bg-success/10 border border-success/30 rounded-lg p-3 text-success">
+            <div className="bg-success/10 border border-success/30 rounded-lg p-3 text-success-text">
               ✓ ¡Planes guardados exitosamente!
             </div>
           ) : (
@@ -119,19 +122,19 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
 
               {fetchingClients ? (
                 <div className="flex justify-center py-6">
-                  <span className="material-symbols-outlined text-tertiary text-2xl animate-spin">hourglass_empty</span>
+                  <span className="material-symbols-outlined text-accent-teal-text text-2xl animate-spin">hourglass_empty</span>
                 </div>
               ) : (
                 <>
                   {!isNewClient && clients.length > 0 && (
                     <>
-                      <select
+                      <Select
                         value={selectedClient?.id ?? ''}
                         onChange={(e) => {
                           const client = clients.find((c) => c.id === e.target.value);
                           setSelectedClient(client || null);
                         }}
-                        className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
+                        className="w-full"
                       >
                         <option value="">Seleccionar Cliente</option>
                         {clients.map((client) => (
@@ -139,10 +142,10 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
                             {client.name}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                       <button
                         onClick={() => setIsNewClient(true)}
-                        className="text-xs text-text-muted hover:text-tertiary transition flex items-center gap-1"
+                        className="text-xs text-text-muted hover:text-accent-teal-text transition flex items-center gap-1"
                       >
                         <span className="material-symbols-outlined text-sm">add_circle</span> Crear nuevo cliente
                       </button>
@@ -151,18 +154,18 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
 
                   {isNewClient && (
                     <>
-                      <input
+                      <Input
                         type="text"
                         placeholder="Nombre del Cliente"
                         value={newClientName}
                         onChange={(e) => setNewClientName(e.target.value)}
                         autoFocus
-                        className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
+                        className="w-full"
                       />
                       {clients.length > 0 && (
                         <button
                           onClick={() => setIsNewClient(false)}
-                          className="text-xs text-text-muted hover:text-tertiary transition"
+                          className="text-xs text-text-muted hover:text-accent-teal-text transition"
                         >
                           ← Seleccionar cliente existente
                         </button>
@@ -173,7 +176,7 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
               )}
 
               {error && (
-                <div className="bg-danger/10 border border-danger/30 rounded-lg p-3 text-danger text-sm">
+                <div className="bg-danger/10 border border-danger/30 rounded-lg p-3 text-danger-text text-sm">
                   ❌ {error}
                 </div>
               )}
@@ -184,24 +187,17 @@ export default function SavePlanModal({ open, onClose, plans, coachId }: SavePla
         {/* Actions */}
         {!success && (
           <div className="border-t border-border px-6 py-4 flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-text-muted hover:text-text-primary transition text-sm font-semibold"
-            >
+            <Button variant="ghost" size="sm" onClick={onClose}>
               Cancelar
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={!canSave || loading}
-              className="px-6 py-2 rounded-[var(--radius-control)] neu-btn-accent font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2"
-            >
+            </Button>
+            <Button variant="accent" size="sm" onClick={handleSave} disabled={!canSave || loading}>
               {loading ? (
                 <span className="material-symbols-outlined text-sm animate-spin">hourglass_empty</span>
               ) : (
                 <span className="material-symbols-outlined text-sm">save</span>
               )}
               Guardar
-            </button>
+            </Button>
           </div>
         )}
       </div>

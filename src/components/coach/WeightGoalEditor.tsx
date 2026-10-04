@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { setTargetWeight } from '@/app/actions/clientActions';
 import { parseTargetWeight } from '@/domain/services/activityInputs';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 interface WeightGoalEditorProps {
   clientId: string;
@@ -50,7 +52,7 @@ export default function WeightGoalEditor({
   return (
     <div className="flex gap-3 items-start">
       <div className="flex-1">
-        <input
+        <Input
           type="number"
           step="0.1"
           min="0.1"
@@ -58,27 +60,23 @@ export default function WeightGoalEditor({
           value={target}
           onChange={(e) => setTarget(e.target.value)}
           placeholder="e.g., 70.5"
-          className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
+          className="w-full"
         />
         {error && (
-          <div className="mt-2 text-sm bg-danger/10 border border-danger/30 text-danger rounded-lg p-2">
+          <div className="mt-2 text-sm bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-2">
             {error}
           </div>
         )}
         {success && (
-          <div className="mt-2 text-sm bg-success/10 border border-success/30 text-success rounded-lg p-2">
+          <div className="mt-2 text-sm bg-success/10 border border-success/30 text-success-text rounded-lg p-2">
             Target weight saved!
           </div>
         )}
       </div>
       <span className="py-2 text-text-muted text-sm">kg</span>
-      <button
-        onClick={handleSave}
-        disabled={!canSave}
-        className="px-4 py-2 mt-1 rounded-[var(--radius-control)] neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
-      >
+      <Button onClick={handleSave} disabled={!canSave} className="mt-1">
         {loading ? '⏳' : 'Save'}
-      </button>
+      </Button>
     </div>
   );
 }

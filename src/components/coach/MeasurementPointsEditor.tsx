@@ -9,6 +9,7 @@ import {
 } from '@/domain/services/bodyMeasurements';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
+import { Button } from '@/components/ui/Button';
 
 interface MeasurementPointsEditorProps {
   clientId: string;
@@ -96,7 +97,7 @@ export default function MeasurementPointsEditor({
                     data-testid={`measurement-point-toggle-${point.slug}`}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-border-strong peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-teal" />
+                  <div className="w-11 h-6 bg-border-strong peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-panel after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-panel after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-teal" />
                 </label>
               </div>
 
@@ -113,12 +114,9 @@ export default function MeasurementPointsEditor({
                     >
                       Sí, desactivar
                     </button>
-                    <button
-                      onClick={() => setPendingDeactivateSlug(null)}
-                      className="px-3 py-1 rounded-[var(--radius-control)] bg-locked-bg text-text-muted hover:bg-border text-xs font-medium transition"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setPendingDeactivateSlug(null)}>
                       Cancelar
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -128,24 +126,20 @@ export default function MeasurementPointsEditor({
       </div>
 
       {error && (
-        <div className="text-sm bg-danger/10 border border-danger/30 text-danger rounded-lg p-3">
+        <div className="text-sm bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-3">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="text-sm bg-success/10 border border-success/30 text-success rounded-lg p-3">
+        <div className="text-sm bg-success/10 border border-success/30 text-success-text rounded-lg p-3">
           Puntos de medición guardados.
         </div>
       )}
 
-      <button
-        onClick={handleSave}
-        disabled={loading}
-        className="px-4 py-2 rounded-[var(--radius-control)] neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
-      >
+      <Button onClick={handleSave} disabled={loading} className="self-start">
         {loading ? '⏳' : 'Save'}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import { addDailyStep } from '@/app/actions/clientActions';
 import { parseDailyStepInput } from '@/domain/services/activityInputs';
 import { toLocalISODate } from '@/domain/services/localDates';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/Button';
 
 interface DailyStepsModalProps {
   open: boolean;
@@ -69,47 +72,47 @@ export default function DailyStepsModal({
 
         <div className="p-6">
           {success ? (
-            <div className="bg-success/10 border border-success/30 text-success rounded-lg p-3">
+            <div className="bg-success/10 border border-success/30 text-success-text rounded-lg p-3">
               Steps recorded successfully!
             </div>
           ) : (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm text-text-muted mb-2">Date</label>
-                <input
+                <Input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
+                  className="w-full"
                 />
               </div>
 
               <div>
                 <label className="block text-sm text-text-muted mb-2">Steps</label>
-                <input
+                <Input
                   type="number"
                   value={steps}
                   onChange={(e) => setSteps(e.target.value)}
                   placeholder="0"
                   min="0"
                   max="100000"
-                  className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
+                  className="w-full"
                 />
               </div>
 
               <div>
                 <label className="block text-sm text-text-muted mb-2">Notes (optional)</label>
-                <textarea
+                <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g., Morning run"
                   rows={2}
-                  className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 resize-none"
+                  className="w-full"
                 />
               </div>
 
               {error && (
-                <div className="bg-danger/10 border border-danger/30 text-danger rounded-lg p-3 text-sm">
+                <div className="bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-3 text-sm">
                   {error}
                 </div>
               )}
@@ -119,20 +122,13 @@ export default function DailyStepsModal({
 
         {!success && (
           <div className="p-6 border-t border-border flex gap-3 justify-end">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-text-muted hover:text-text-primary transition"
-            >
+            <Button variant="ghost" size="sm" onClick={onClose}>
               Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="px-4 py-2 rounded-[var(--radius-control)] neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-            >
+            </Button>
+            <Button variant="accent" size="sm" onClick={handleSubmit} disabled={!canSubmit}>
               {loading && <span className="animate-spin">⏳</span>}
               Save
-            </button>
+            </Button>
           </div>
         )}
       </div>

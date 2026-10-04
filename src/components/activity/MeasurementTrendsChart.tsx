@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Card } from '@/components/ui/Card';
+import { Select } from '@/components/ui/select';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
 import { buildMeasurementSeries } from '@/domain/services/bodyMeasurements';
@@ -64,22 +65,23 @@ export default function MeasurementTrendsChart({
 
         <div className="flex items-center gap-3">
           {/* Point selector dropdown */}
-          <select
+          <Select
             value={selectedSlug}
             onChange={(e) => onSelectedSlugChange(e.target.value)}
             aria-label="Seleccionar punto de medición"
-            className="rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 text-sm px-3 py-1"
+            controlSize="sm"
           >
             {selectablePoints.map((p) => (
               <option key={p.slug} value={p.slug} className="bg-panel text-text-primary">
                 {p.active ? p.label : `${p.label} (inactivo)`}
               </option>
             ))}
-          </select>
+          </Select>
 
           {/* Period toggle */}
           <div className="flex gap-1">
             <button
+              type="button"
               onClick={() => setPeriod('week')}
               className={`px-3 py-1 text-sm font-semibold transition ${
                 period === 'week' ? 'text-text-primary underline decoration-accent-teal decoration-2 underline-offset-4' : 'text-text-muted hover:text-text-primary'
@@ -88,6 +90,7 @@ export default function MeasurementTrendsChart({
               Semana
             </button>
             <button
+              type="button"
               onClick={() => setPeriod('month')}
               className={`px-3 py-1 text-sm font-semibold transition ${
                 period === 'month' ? 'text-text-primary underline decoration-accent-teal decoration-2 underline-offset-4' : 'text-text-muted hover:text-text-primary'

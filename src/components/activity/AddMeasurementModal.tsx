@@ -16,6 +16,8 @@ import { parseLocalISODate, toLocalISODate } from '@/domain/services/localDates'
 import { Modal } from '@/components/ui/Modal';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 interface AddMeasurementModalProps {
   open: boolean;
@@ -114,6 +116,13 @@ export default function AddMeasurementModal({
       return;
     }
 
+    const prepared = prepareEntries(selectedDate);
+    if (prepared) await persistEntries(prepared.entries, prepared.flagged);
+  }
+
+  // Builds the entries to save and flags invalid tiles; null when nothing is
+  // saveable.
+  function prepareEntries(selectedDate: Date) {
     const { entries, fieldErrors: buildErrors } = buildMeasurementEntries(
       activePoints,
       values,
@@ -124,10 +133,9 @@ export default function AddMeasurementModal({
 
     if (entries.length === 0) {
       if (!flagged) setGlobalError('Ingresá al menos un valor para guardar');
-      return;
+      return null;
     }
-
-    await persistEntries(entries, flagged);
+    return { entries, flagged };
   }
 
   // Saved tiles are cleared; when siblings were flagged the modal stays open
@@ -164,19 +172,16 @@ export default function AddMeasurementModal({
         {readyCount} {readyCount === 1 ? 'medida lista' : 'medidas listas'}
       </span>
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-text-muted hover:text-text-primary transition"
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={onClose}>
           Cancelar
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="accent"
+          size="sm"
           onClick={handleSubmit}
           disabled={loading}
           data-testid="add-measurement-submit"
-          className="px-4 py-2 rounded-[var(--radius-control)] neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
         >
           {loading && (
             <span className="material-symbols-outlined text-base animate-spin">
@@ -184,7 +189,7 @@ export default function AddMeasurementModal({
             </span>
           )}
           Guardar
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -201,19 +206,19 @@ export default function AddMeasurementModal({
       <div className="space-y-5">
         <div>
           <label className="block text-sm text-text-muted mb-2">Fecha</label>
-          <input
+          <Input
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
             max={toLocalISODate()}
-            className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
+            className="w-full"
           />
         </div>
 
         {globalError && (
           <div
             role="alert"
-            className="bg-danger/10 border border-danger/30 text-danger rounded-lg p-3 text-sm"
+            className="bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-3 text-sm"
           >
             {globalError}
           </div>
@@ -248,7 +253,7 @@ export default function AddMeasurementModal({
                         {point.label}
                       </span>
                       {saved && (
-                        <span className="material-symbols-outlined text-sm text-success">
+                        <span className="material-symbols-outlined text-sm text-success-text">
                           check
                         </span>
                       )}
@@ -291,7 +296,7 @@ export default function AddMeasurementModal({
                     </div>
 
                     {error ? (
-                      <p className="text-danger text-xs">{error}</p>
+                      <p className="text-danger-text text-xs">{error}</p>
                     ) : isZero ? (
                       <p className="text-text-muted text-xs">no se guarda</p>
                     ) : reference ? (

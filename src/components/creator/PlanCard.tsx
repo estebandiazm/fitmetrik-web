@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/Card';
-import { Food } from '../../domain/types/Food';
+import { Food } from '@/domain/types/Food';
 import { getDraftCardTitle, type PlanDraft } from '@/domain/services/dietPlanDrafts';
+import { Input } from '@/components/ui/Input';
 
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -31,23 +32,23 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
         {cardTitle}
       </h6>
 
-      <input
+      <Input
         type="text"
         placeholder="Days"
         value={plan.days}
         onChange={(e) => update('days', e.target.value)}
-        className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 mb-4"
+        className="w-full mb-4"
       />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label className="text-xs text-text-muted font-semibold block mb-2">Proteins</label>
           <div className="relative">
-            <input
+            <Input
               type="number"
               value={plan.proteins}
               onChange={(e) => update('proteins', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 pr-8"
+              className="w-full pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">g</span>
           </div>
@@ -55,11 +56,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
         <div>
           <label className="text-xs text-text-muted font-semibold block mb-2">Carbs</label>
           <div className="relative">
-            <input
+            <Input
               type="number"
               value={plan.carbs}
               onChange={(e) => update('carbs', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 pr-8"
+              className="w-full pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">g</span>
           </div>
@@ -70,11 +71,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
         <div>
           <label className="text-xs text-text-muted font-semibold block mb-2">Fruits</label>
           <div className="relative">
-            <input
+            <Input
               type="number"
               value={plan.fruits}
               onChange={(e) => update('fruits', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 pr-8"
+              className="w-full pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">g</span>
           </div>
@@ -82,11 +83,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, index, onUpdate }) => {
         <div>
           <label className="text-xs text-text-muted font-semibold block mb-2">Fats</label>
           <div className="relative">
-            <input
+            <Input
               type="number"
               value={plan.fats}
               onChange={(e) => update('fats', Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20 pr-8"
+              className="w-full pr-8"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">g</span>
           </div>
