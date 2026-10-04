@@ -13,6 +13,7 @@ describe('parseDailyStepInput', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.steps).toBe(8000);
+    expect(result.date.getDate()).toBe(15);
     expect(result.date.getHours()).toBe(0);
     expect(result.date.getMinutes()).toBe(0);
   });
@@ -76,3 +77,4 @@ describe('parseTargetWeight', () => {
     expect(parseTargetWeight('')).toEqual(error);
   });
 });
+

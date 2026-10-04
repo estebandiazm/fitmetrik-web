@@ -2,20 +2,18 @@
 // goal, target weight). Each returns a typed result so components only map it
 // to UI state.
 import { isFutureDate } from "./bodyMeasurements";
+import { parseLocalISODate } from "./localDates";
 
 export type ParseResult<T> = ({ ok: true } & T) | { ok: false; reason: string };
 
 const MAX_DAILY_STEPS = 100000;
 
-// `dateISO` is the `<input type="date">` value; the parsed date is normalized
-// to local midnight before the future-date check (same rule as the schema).
 export function parseDailyStepInput(
   dateISO: string,
   stepsRaw: string,
   now: Date = new Date()
 ): ParseResult<{ date: Date; steps: number }> {
-  const date = new Date(dateISO);
-  date.setHours(0, 0, 0, 0);
+  const date = parseLocalISODate(dateISO);
   if (isFutureDate(date, now)) {
     return { ok: false, reason: "Date cannot be in the future" };
   }

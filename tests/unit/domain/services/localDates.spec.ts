@@ -10,7 +10,8 @@ beforeAll(() => {
   process.env.TZ = 'America/Bogota';
 });
 afterAll(() => {
-  process.env.TZ = originalTZ;
+  if (originalTZ === undefined) delete process.env.TZ;
+  else process.env.TZ = originalTZ;
 });
 
 describe('parseLocalISODate', () => {

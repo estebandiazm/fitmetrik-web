@@ -19,6 +19,8 @@ import {
   formatMeasurementDate,
   mergeWithCatalog,
   buildMeasurementSeries,
+  needsDeactivationConfirmation,
+  countEntriesForPoint,
 } from '@/domain/services/bodyMeasurements';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
@@ -578,5 +580,40 @@ describe('buildMeasurementSeries', () => {
     const series = buildMeasurementSeries(data, 'cintura', 7, now);
     expect(series[4].value).toBe(80);
     expect(series[5].value).toBeNull();
+  });
+});
+
+// ── needsDeactivationConfirmation ─────────────────────────────────────────────
+
+describe('needsDeactivationConfirmation', () => {
+  const cintura: MeasurementPoint = { ...MEASUREMENT_POINTS_CATALOG[1], active: true };
+  const data: BodyMeasurement[] = [
+    { date: new Date('2026-01-01'), pointSlug: 'cintura', valueCm: 80 },
+  ];
+
+  it('is true when deactivating an active point that has entries', () => {
+    expect(needsDeactivationConfirmation(cintura, data)).toBe(true);
+  });
+
+  it('is false when the active point has no entries', () => {
+    expect(needsDeactivationConfirmation(cintura, [])).toBe(false);
+  });
+
+  it('is false when the point is inactive (activating never confirms)', () => {
+    expect(needsDeactivationConfirmation({ ...cintura, active: false }, data)).toBe(false);
+  });
+});
+
+// ── countEntriesForPoint ──────────────────────────────────────────────────────
+
+describe('countEntriesForPoint', () => {
+  it('counts only the entries of the given point', () => {
+    const data: BodyMeasurement[] = [
+      { date: new Date('2026-01-01'), pointSlug: 'cintura', valueCm: 80 },
+      { date: new Date('2026-02-01'), pointSlug: 'cintura', valueCm: 79 },
+      { date: new Date('2026-02-01'), pointSlug: 'pecho', valueCm: 99 },
+    ];
+    expect(countEntriesForPoint(data, 'cintura')).toBe(2);
+    expect(countEntriesForPoint(data, 'gluteo')).toBe(0);
   });
 });

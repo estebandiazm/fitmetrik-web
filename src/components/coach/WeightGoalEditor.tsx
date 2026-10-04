@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { setTargetWeight } from '../../app/actions/clientActions';
+import { setTargetWeight } from '@/app/actions/clientActions';
+import { parseTargetWeight } from '@/domain/services/activityInputs';
 
 interface WeightGoalEditorProps {
   clientId: string;
@@ -22,16 +23,16 @@ export default function WeightGoalEditor({
   const handleSave = async () => {
     setError(null);
 
-    const targetNum = parseFloat(target);
-    if (isNaN(targetNum) || targetNum <= 0) {
-      setError('Target weight must be a positive number');
+    const parsed = parseTargetWeight(target);
+    if (!parsed.ok) {
+      setError(parsed.reason);
       return;
     }
 
     setLoading(true);
 
     try {
-      await setTargetWeight(clientId, targetNum);
+      await setTargetWeight(clientId, parsed.value);
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
@@ -57,24 +58,24 @@ export default function WeightGoalEditor({
           value={target}
           onChange={(e) => setTarget(e.target.value)}
           placeholder="e.g., 70.5"
-          className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+          className="w-full px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel text-text-primary placeholder:text-text-faint focus:outline-none focus:border-accent-teal focus:ring-3 focus:ring-accent-teal/20"
         />
         {error && (
-          <div className="mt-2 text-sm bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-2">
+          <div className="mt-2 text-sm bg-danger/10 border border-danger/30 text-danger rounded-lg p-2">
             {error}
           </div>
         )}
         {success && (
-          <div className="mt-2 text-sm bg-green-500/10 border border-green-500/30 text-green-300 rounded-lg p-2">
+          <div className="mt-2 text-sm bg-success/10 border border-success/30 text-success rounded-lg p-2">
             Target weight saved!
           </div>
         )}
       </div>
-      <span className="py-2 text-gray-400 text-sm">kg</span>
+      <span className="py-2 text-text-muted text-sm">kg</span>
       <button
         onClick={handleSave}
         disabled={!canSave}
-        className="px-4 py-2 mt-1 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="px-4 py-2 mt-1 rounded-[var(--radius-control)] neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {loading ? '⏳' : 'Save'}
       </button>

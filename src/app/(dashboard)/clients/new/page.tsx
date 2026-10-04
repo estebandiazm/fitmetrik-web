@@ -1,71 +1,72 @@
 import Link from 'next/link';
 
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+
 import { inviteClient } from './actions';
 
-export default function InviteClientPage({
+export default async function InviteClientPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
+  const { error } = await searchParams;
+
   return (
     <div className="p-8 max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Invite New Client</h1>
+      <Card className="p-8">
+        <h1 className="text-2xl font-bold mb-6 text-text-primary">Invite New Client</h1>
         
-        {searchParams.error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded mb-6 text-sm">
-            {searchParams.error}
+        {error && (
+          <div className="bg-danger/10 border border-danger/30 text-danger p-3 rounded-[var(--radius-control)] mb-6 text-sm">
+            {error}
           </div>
         )}
 
         <form className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">
+            <label className="block text-sm font-medium text-text-muted mb-1" htmlFor="name">
               Full Name
             </label>
-            <input
+            <Input
               id="name"
               name="name"
               type="text"
               required
               placeholder="e.g. Jane Doe"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">
+            <label className="block text-sm font-medium text-text-muted mb-1" htmlFor="email">
               Email Address
             </label>
-            <input
+            <Input
               id="email"
               name="email"
               type="email"
               required
               placeholder="jane@example.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full"
             />
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-text-faint">
               They will receive an email with instructions to set their password.
             </p>
           </div>
 
-          <div className="flex gap-4 pt-4 border-t">
-            <button
-              formAction={inviteClient}
-              className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Send Invite
-            </button>
+          <div className="flex gap-4 pt-4 border-t border-border">
+            <Button formAction={inviteClient}>Send Invite</Button>
             <Link
               href="/clients"
-              className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-md hover:bg-gray-50 transition-colors"
+              className="neu-btn inline-flex items-center justify-center px-5 py-3 text-sm font-semibold text-text-primary rounded-[10px]"
             >
               Cancel
             </Link>
           </div>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -334,3 +334,20 @@ export function buildMeasurementSeries(
   }
   return series;
 }
+
+// ── needsDeactivationConfirmation ─────────────────────────────────────────────
+
+// Deactivating an active point that already has entries hides that history,
+// so the coach must confirm. Activating never needs confirmation.
+export function needsDeactivationConfirmation(
+  point: MeasurementPoint,
+  measurements: BodyMeasurement[]
+): boolean {
+  return point.active && measurements.some((m) => m.pointSlug === point.slug);
+}
+
+// ── countEntriesForPoint ──────────────────────────────────────────────────────
+
+export function countEntriesForPoint(measurements: BodyMeasurement[], pointSlug: string): number {
+  return measurements.filter((m) => m.pointSlug === pointSlug).length;
+}
