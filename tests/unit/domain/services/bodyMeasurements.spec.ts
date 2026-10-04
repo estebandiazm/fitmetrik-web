@@ -21,6 +21,7 @@ import {
   buildMeasurementSeries,
   needsDeactivationConfirmation,
   countEntriesForPoint,
+  getSelectablePoints,
 } from '@/domain/services/bodyMeasurements';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
@@ -615,5 +616,28 @@ describe('countEntriesForPoint', () => {
     ];
     expect(countEntriesForPoint(data, 'cintura')).toBe(2);
     expect(countEntriesForPoint(data, 'gluteo')).toBe(0);
+  });
+});
+
+// ── getSelectablePoints (REQ-BMT-05) ──────────────────────────────────────────
+
+describe('getSelectablePoints', () => {
+  const [a, b, c] = MEASUREMENT_POINTS_CATALOG;
+  const active: MeasurementPoint = { ...a, active: true };
+  const inactiveWithData: MeasurementPoint = { ...b, active: false };
+  const inactiveEmpty: MeasurementPoint = { ...c, active: false };
+  const data: BodyMeasurement[] = [
+    { date: new Date(2026, 0, 1), pointSlug: inactiveWithData.slug, valueCm: 80 },
+  ];
+
+  it('lists active points first, then inactive points that still have entries', () => {
+    expect(getSelectablePoints([inactiveWithData, active, inactiveEmpty], data)).toEqual([
+      active,
+      inactiveWithData,
+    ]);
+  });
+
+  it('excludes inactive points without entries', () => {
+    expect(getSelectablePoints([inactiveEmpty], data)).toEqual([]);
   });
 });

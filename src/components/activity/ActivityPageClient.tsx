@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Card } from '@/components/ui/Card';
 import SummaryCard from '@/components/activity/SummaryCard';
 import TrendsChart from '@/components/activity/TrendsChart';
 import RecentRecords from '@/components/activity/RecentRecords';
@@ -12,6 +13,7 @@ import MeasurementTrendsChart from '@/components/activity/MeasurementTrendsChart
 import MeasurementHistory from '@/components/activity/MeasurementHistory';
 import AddMeasurementModal from '@/components/activity/AddMeasurementModal';
 import { calculateDailyAverage } from '@/domain/services/stepsAverageService';
+import { getSelectablePoints } from '@/domain/services/bodyMeasurements';
 import DailyStepsModal from '@/components/client/DailyStepsModal';
 import DailyWeightModal from '@/components/client/DailyWeightModal';
 import { DailyStep } from '@/domain/types/DailySteps';
@@ -56,11 +58,7 @@ export function ActivityPageClient({
   const [refreshKey, setRefreshKey] = useState(0);
 
   const activePoints = measurementPoints.filter((p) => p.active);
-  // Inactive points that still have measurement entries must remain selectable (REQ-BMT-05)
-  const inactivePointsWithData = measurementPoints.filter(
-    (p) => !p.active && measurements.some((m) => m.pointSlug === p.slug)
-  );
-  const selectablePoints = [...activePoints, ...inactivePointsWithData];
+  const selectablePoints = getSelectablePoints(measurementPoints, measurements);
   const [selectedSlug, setSelectedSlug] = useState<string>(selectablePoints[0]?.slug ?? '');
   const [preselectedSlug, setPreselectedSlug] = useState<string | undefined>(undefined);
 
@@ -88,8 +86,8 @@ export function ActivityPageClient({
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-tight">Activity Tracker</h1>
-          <p className="text-on-surface-variant mt-2 font-medium">
+          <h1 className="text-4xl font-black text-text-primary tracking-tight">Activity Tracker</h1>
+          <p className="text-text-muted mt-2 font-medium">
             {activeTab === 'steps'
               ? 'Monitor your daily steps and progress toward your goals'
               : 'Track your weight and progress toward your target'}
@@ -117,13 +115,13 @@ export function ActivityPageClient({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-white/10">
+      <div className="flex gap-1 border-b border-border">
         <button
           onClick={() => handleTabChange('steps')}
           className={`px-5 py-3 text-sm font-semibold transition border-b-2 -mb-px ${
             activeTab === 'steps'
-              ? 'text-primary border-primary'
-              : 'text-gray-400 border-transparent hover:text-white'
+              ? 'text-text-primary border-primary'
+              : 'text-text-muted border-transparent hover:text-text-primary'
           }`}
         >
           <span className="material-symbols-outlined text-base align-middle mr-1">
@@ -135,8 +133,8 @@ export function ActivityPageClient({
           onClick={() => handleTabChange('weight')}
           className={`px-5 py-3 text-sm font-semibold transition border-b-2 -mb-px ${
             activeTab === 'weight'
-              ? 'text-blue-400 border-blue-400'
-              : 'text-gray-400 border-transparent hover:text-white'
+              ? 'text-text-primary border-tertiary'
+              : 'text-text-muted border-transparent hover:text-text-primary'
           }`}
         >
           <span className="material-symbols-outlined text-base align-middle mr-1">
@@ -149,8 +147,8 @@ export function ActivityPageClient({
           data-testid="activity-tab-measurements"
           className={`px-5 py-3 text-sm font-semibold transition border-b-2 -mb-px ${
             activeTab === 'measurements'
-              ? 'text-emerald-400 border-emerald-400'
-              : 'text-gray-400 border-transparent hover:text-white'
+              ? 'text-text-primary border-measurement-accent'
+              : 'text-text-muted border-transparent hover:text-text-primary'
           }`}
         >
           <span className="material-symbols-outlined text-base align-middle mr-1">
@@ -174,11 +172,11 @@ export function ActivityPageClient({
               key={`records-${refreshKey}`}
             />
           ) : (
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-2xl p-6">
-              <p className="text-gray-400 text-center">
+            <Card className="p-6">
+              <p className="text-text-muted text-center">
                 No step records yet. Start tracking by adding your first record.
               </p>
-            </div>
+            </Card>
           )}
         </>
       )}
@@ -188,7 +186,7 @@ export function ActivityPageClient({
         <>
           <WeightTrendsChart weights={dailyWeights} targetWeight={targetWeight} key={`weight-chart-${refreshKey}`} />
           <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Recent Records</h3>
+            <h3 className="text-text-primary font-semibold text-lg mb-4">Recent Records</h3>
             <WeightRecentRecords
               weights={dailyWeights}
               key={`weight-records-${refreshKey}`}
@@ -201,14 +199,14 @@ export function ActivityPageClient({
       {activeTab === 'measurements' && (
         <>
           {selectablePoints.length === 0 ? (
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-2xl p-8 text-center">
-              <span className="material-symbols-outlined text-4xl text-gray-500 mb-3 block">
+            <Card className="p-8 text-center">
+              <span className="material-symbols-outlined text-4xl text-text-faint mb-3 block">
                 straighten
               </span>
-              <p className="text-gray-400">
+              <p className="text-text-muted">
                 Tu coach aún no configuró puntos de medición.
               </p>
-            </div>
+            </Card>
           ) : (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

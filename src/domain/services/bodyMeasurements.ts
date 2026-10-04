@@ -351,3 +351,18 @@ export function needsDeactivationConfirmation(
 export function countEntriesForPoint(measurements: BodyMeasurement[], pointSlug: string): number {
   return measurements.filter((m) => m.pointSlug === pointSlug).length;
 }
+
+// ── getSelectablePoints ───────────────────────────────────────────────────────
+
+// Points the client can chart and log against: active points first, then
+// inactive points that still have entries (REQ-BMT-05).
+export function getSelectablePoints(
+  points: MeasurementPoint[],
+  measurements: BodyMeasurement[]
+): MeasurementPoint[] {
+  const active = points.filter((p) => p.active);
+  const inactiveWithData = points.filter(
+    (p) => !p.active && measurements.some((m) => m.pointSlug === p.slug)
+  );
+  return [...active, ...inactiveWithData];
+}
