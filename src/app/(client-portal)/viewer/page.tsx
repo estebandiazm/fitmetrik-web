@@ -1,90 +1,45 @@
-'use client';
+import { getClientById } from '@/app/actions/clientActions';
+import Viewer from '@/components/viewer/Viewer';
+import ClientProvider from '@/context/ClientContext';
+import { selectPlansByIndex } from '@/domain/services/planSelection';
 
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
-import { getClientById } from '../../actions/clientActions';
-import { Client } from '../../../domain/types/Client';
-import { DietPlan } from '../../../domain/types/DietPlan';
-import Viewer from '../../../components/viewer/Viewer';
-import ClientProvider from '../../../context/ClientContext';
-
-// ─── Inner component that reads search params ────────────────────────────────
-
-type ClientWithId = Client & { id: string };
-
-function ViewerContent() {
-  const searchParams = useSearchParams();
-  const clientId = searchParams.get('clientId');
-  const planIndex = searchParams.get('planIndex');
-
-  const [dbPlans, setDbPlans] = useState<DietPlan[] | null>(null);
-  const [clientName, setClientName] = useState<string | null>(null);
-  const [loading, setLoading] = useState(!!clientId);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!clientId) return;
-
-    (async () => {
-      try {
-        const client: ClientWithId | null = await getClientById(clientId);
-        if (!client) {
-          setError('Cliente no encontrado.');
-          return;
-        }
-        setClientName(client.name);
-
-        if (planIndex !== null) {
-          const idx = parseInt(planIndex, 10);
-          if (!isNaN(idx) && idx >= 0 && idx < client.plans.length) {
-            setDbPlans([client.plans[idx]]);
-          } else {
-            setDbPlans(client.plans);
-          }
-        } else {
-          setDbPlans(client.plans);
-        }
-      } catch {
-        setError('Error al cargar el plan.');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [clientId, planIndex]);
-
-  // ── Database-loaded plan ──
-  if (clientId) {
-    if (loading) {
-      return <p className="m-4 text-white">Cargando plan...</p>;
-    }
-    if (error) {
-      return <p className="m-4 text-red-400">{error}</p>;
-    }
-    if (dbPlans) {
-      return (
-        <Viewer
-          overridePlans={dbPlans}
-          overrideClientName={clientName ?? undefined}
-        />
-      );
-    }
-    return null;
-  }
-
-  // ── Fallback: use ClientContext (legacy flow from Creator) ──
-  return (
-    <ClientProvider>
-      <Viewer />
-    </ClientProvider>
-  );
+interface ViewerPageProps {
+  searchParams: Promise<{ clientId?: string; planIndex?: string }>;
 }
 
-// ─── Page wrapper with Suspense for useSearchParams ──────────────────────────
+// Database-loaded plan (fetched on the server) when `clientId` is present;
+// otherwise the legacy flow from Creator, which reads ClientContext.
+export default async function ViewerPage({ searchParams }: ViewerPageProps) {
+  const { clientId, planIndex } = await searchParams;
+  if (!clientId) {
+    return (
+      <ClientProvider>
+        <Viewer />
+      </ClientProvider>
+    );
+  }
+  return <DatabasePlanViewer clientId={clientId} planIndex={planIndex} />;
+}
 
-export default function ViewerPage() {
+interface DatabasePlanViewerProps {
+  clientId: string;
+  planIndex?: string;
+}
+
+async function DatabasePlanViewer({ clientId, planIndex }: DatabasePlanViewerProps) {
+  let client: Awaited<ReturnType<typeof getClientById>>;
+  try {
+    client = await getClientById(clientId);
+  } catch {
+    return <p className="m-4 text-danger-text">Error al cargar el plan.</p>;
+  }
+  if (!client) {
+    return <p className="m-4 text-danger-text">Cliente no encontrado.</p>;
+  }
   return (
-    <Suspense fallback={<p className="m-4 text-white">Cargando...</p>}>
-      <ViewerContent />
-    </Suspense>
+    <Viewer
+      overridePlans={selectPlansByIndex(client.plans, planIndex)}
+      overrideClientName={client.name ?? undefined}
+    />
   );
 }
