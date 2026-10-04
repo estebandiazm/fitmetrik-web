@@ -20,7 +20,7 @@ export default function BodyDiagram({ points, selectedSlug, onSelect }: BodyDiag
       <svg
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full text-white/40"
+        className="w-full h-full text-text-faint"
         aria-label="Body diagram"
         role="img"
       >
@@ -53,7 +53,7 @@ export default function BodyDiagram({ points, selectedSlug, onSelect }: BodyDiag
                 className="cursor-pointer transition-all"
                 style={
                   isSelected
-                    ? { filter: 'drop-shadow(0 0 3px rgba(16, 185, 129, 1))' }
+                    ? { filter: 'drop-shadow(0 0 3px var(--color-measurement-accent))' }
                     : undefined
                 }
                 onClick={() => onSelect(point.slug)}
@@ -69,7 +69,7 @@ export default function BodyDiagram({ points, selectedSlug, onSelect }: BodyDiag
 
       {activePoints.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <p className="text-gray-400 text-xs text-center px-4">
+          <p className="text-text-muted text-xs text-center px-4">
             Sin puntos activos
           </p>
         </div>

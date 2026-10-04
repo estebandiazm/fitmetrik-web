@@ -34,7 +34,7 @@ interface LoadMoreButtonProps {
 function LoadMoreButton({ onClick }: LoadMoreButtonProps) {
   return (
     <div className="p-4 text-center border-t border-row-border">
-      <button onClick={onClick} className="text-primary hover:text-primary/80 font-semibold transition">
+      <button onClick={onClick} className="text-accent-teal-text hover:text-accent-teal-text/80 font-semibold transition">
         Load More
       </button>
     </div>

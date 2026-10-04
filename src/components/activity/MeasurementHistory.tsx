@@ -21,10 +21,10 @@ interface DeltaCellProps {
 function DeltaCell({ delta }: DeltaCellProps) {
   if (delta === null) return <span className="text-text-faint">—</span>;
   if (delta > 0) {
-    return <span className="text-danger font-medium">+{delta.toFixed(1)} ▲</span>;
+    return <span className="text-danger-text font-medium">+{delta.toFixed(1)} ▲</span>;
   }
   if (delta < 0) {
-    return <span className="text-success font-medium">{delta.toFixed(1)} ▼</span>;
+    return <span className="text-success-text font-medium">{delta.toFixed(1)} ▼</span>;
   }
   return <span className="text-text-muted">0.0</span>;
 }
