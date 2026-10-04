@@ -6,7 +6,7 @@
     "colorMeta": {
       "bg": { "role": "neutral", "displayName": "Foil Grey", "canonical": "#f4f6f8", "tonalRamp": ["#1c2733", "#2a3440", "#424d58", "#6b7680", "#9aa3ac", "#c7ccd1", "#e1e4e7", "#f4f6f8"] },
       "panel": { "role": "neutral", "displayName": "Panel White", "canonical": "#ffffff", "tonalRamp": ["#1c2733", "#3d4751", "#6b7680", "#9aa3ac", "#c7ccd1", "#e1e4e7", "#f4f6f8", "#ffffff"] },
-      "accent-teal": { "role": "primary", "displayName": "Blíster Teal", "canonical": "#2dd4bf", "tonalRamp": ["#063d38", "#0c5a52", "#13786d", "#1a9688", "#2dd4bf", "#5fe0d0", "#91ece1", "#c3f7f0"] },
+      "accent-teal": { "role": "primary", "displayName": "Blíster Blue", "canonical": "#5e88cb", "tonalRamp": ["#0a1a33", "#17325e", "#26487f", "#3b67ad", "#5e88cb", "#8db0e8", "#b5cdf1", "#dde8f9"] },
       "accent-amber": { "role": "secondary", "displayName": "Dosage Amber", "canonical": "#f59e0b", "tonalRamp": ["#4a2f02", "#704604", "#976006", "#bd7a08", "#f59e0b", "#f8b648", "#fbce85", "#fde6c2"] },
       "danger": { "role": "error", "displayName": "Danger Clay", "canonical": "#dc6a4a", "tonalRamp": ["#3f1509", "#631f0e", "#8a2c14", "#b1451f", "#dc6a4a", "#e68f74", "#f0b49f", "#f9d9ca"] },
       "text-primary": { "role": "neutral", "displayName": "Ink", "canonical": "#1c2733" },
@@ -38,7 +38,7 @@
       "refersTo": "blister-cell",
       "description": "The tappable circular hero dose cell on the client dashboard, logged state.",
       "html": "<button type=\"button\" class=\"ds-blister-cell ds-blister-cell-popped ds-blister-cell-lg\" aria-pressed=\"true\" aria-label=\"Peso de hoy ya registrado\"><svg width=\"56\" height=\"56\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"/></svg></button>",
-      "css": ".ds-blister-cell { display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: background 220ms ease, box-shadow 220ms ease; } .ds-blister-cell-lg { width: 168px; height: 168px; border-radius: 50%; } .ds-blister-cell-popped { background: #2dd4bf; box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); } .ds-blister-cell:focus-visible { outline: 2px solid #2dd4bf; outline-offset: 2px; }"
+      "css": ".ds-blister-cell { display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: background 220ms ease, box-shadow 220ms ease; } .ds-blister-cell-lg { width: 168px; height: 168px; border-radius: 50%; } .ds-blister-cell-popped { background: #5e88cb; box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); } .ds-blister-cell:focus-visible { outline: 2px solid #5e88cb; outline-offset: 2px; }"
     },
     {
       "name": "BlisterCell — Pending (md strip)",
@@ -70,7 +70,7 @@
       "refersTo": "button-accent",
       "description": "Default call-to-action button, teal fill with punch-in active state.",
       "html": "<button class=\"ds-btn-accent\">Guardar</button>",
-      "css": ".ds-btn-accent { background: #2dd4bf; color: #063d38; border: 1px solid #e1e4e7; border-radius: 8px; padding: 10px 24px; font-weight: 700; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; transition: transform 150ms ease, box-shadow 220ms ease; } .ds-btn-accent:active { box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); transform: scale(0.98); }"
+      "css": ".ds-btn-accent { background: #5e88cb; color: #0a1a33; border: 1px solid #e1e4e7; border-radius: 8px; padding: 10px 24px; font-weight: 700; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; transition: transform 150ms ease, box-shadow 220ms ease; } .ds-btn-accent:active { box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); transform: scale(0.98); }"
     },
     {
       "name": "Card — Default",
@@ -86,7 +86,7 @@
       "refersTo": "input-default",
       "description": "Concave text field with teal focus border.",
       "html": "<input class=\"ds-input\" placeholder=\"0.0\" />",
-      "css": ".ds-input { background: #f4f6f8; border-radius: 8px; border: 1px solid transparent; padding: 8px 16px; font-size: 0.875rem; color: #1c2733; box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); } .ds-input:focus { outline: none; border-color: #2dd4bf; } .ds-input::placeholder { color: #6b7680; }"
+      "css": ".ds-input { background: #f4f6f8; border-radius: 8px; border: 1px solid transparent; padding: 8px 16px; font-size: 0.875rem; color: #1c2733; box-shadow: inset 0 3px 8px rgba(0,0,0,0.18); } .ds-input:focus { outline: none; border-color: #5e88cb; } .ds-input::placeholder { color: #6b7680; }"
     },
     {
       "name": "Badge — Status (Activo / Sin plan)",
@@ -94,7 +94,7 @@
       "refersTo": "badge-success",
       "description": "Roster plan-status pill, success (teal) or error (clay) tone.",
       "html": "<span class=\"ds-badge-success\">Activo</span>",
-      "css": ".ds-badge-success { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; color: #2dd4bf; background: rgba(45,212,191,0.1); }"
+      "css": ".ds-badge-success { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; color: #5e88cb; background: rgba(94,136,203,0.1); }"
     }
   ],
   "narrative": {

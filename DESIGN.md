@@ -10,14 +10,14 @@ colors:
   text-primary: "#1c2733"
   text-muted: "#6b7680"
   text-faint: "#9aa3ac"
-  accent-teal: "#2dd4bf"
-  accent-teal-ink: "#063d38"
+  accent-teal: "#5e88cb"
+  accent-teal-ink: "#0a1a33"
   accent-amber: "#f59e0b"
   locked-bg: "#eceef0"
   locked-border: "#e1e4e7"
   danger: "#dc6a4a"
   cell-pending-bg: "#ffffff"
-  accent-teal-text: "#0f766e"
+  accent-teal-text: "#3b67ad"
   success-text: "#15803d"
   accent-amber-text: "#b45309"
   danger-text: "#b4442a"
@@ -89,7 +89,7 @@ components:
 
 A nutrition plan is not a document to read — it's a dose to take. Every day is a cell in a blister pack that the client "pops" or leaves un-popped, and the coach's job is to scan a roster for cells that went un-popped. This world explicitly refuses the generic fitness/SaaS dashboard of flat cards and stat-tile grids: its structural atom is not a stat card, it's a single dosing cell with exactly four legible states (domed/pending, punched/popped, crossed-out/missed, locked/future).
 
-The palette reads clinical-trustworthy, not sterile-cold: a pale foil-grey base (`#F4F6F8`) with silver divider lines (`#C7CCD1`), one accent color per tracked metric rather than per client (teal for weight, amber for steps/activity). Numerals are tabular and set in a monospace face everywhere a count or dose matters ("4/7 esta semana"), while UI labels stay in a compact sans. The system is fully theme-aware (light + dark via a `data-theme` attribute), with dark mode built from the same material logic as light — a blister foil under dim light, not a generic inverted theme.
+The palette reads clinical-trustworthy, not sterile-cold: a pale foil-grey base (`#F4F6F8`) with silver divider lines (`#C7CCD1`), one accent color per tracked metric rather than per client (blue for weight, amber for steps/activity). Numerals are tabular and set in a monospace face everywhere a count or dose matters ("4/7 esta semana"), while UI labels stay in a compact sans. The system is fully theme-aware (light + dark via a `data-theme` attribute), with dark mode built from the same material logic as light — a blister foil under dim light, not a generic inverted theme.
 
 This system covers the client "Hoy" dashboard (today's dose cell as the focal action, then steps/hydration/macros and the plan), the coach roster (one row per client with its week strip, most-empty-first), the auth screens (animated blister-sheet backdrop, brand panel that fills a week strip, form card), the shared `AppHeader`/nav chrome, the `BlisterCell` primitive, inline stroke icons (`components/ui/icons.tsx`) and the re-skinned atomic layer (`Button`, `Card`, `Input`, `Badge`, `StatusPill`, `Modal`, `Table`, `Alert`). `/activity`, `/creator`, `/coaches` and the client detail page have not been redesigned yet, but the legacy Material token names (`surface-*`, `on-surface*`, `primary`, `error`…) are now aliases of the blister tokens, so they follow light/dark theming too.
 
@@ -102,13 +102,13 @@ This system covers the client "Hoy" dashboard (today's dose cell as the focal ac
 
 ## Colors
 
-The palette is a quiet clinical neutral with exactly two metric accents; it is not a brand-color system in the traditional sense — teal and amber are assigned to data types (weight, steps), not to brand identity.
+The palette is a quiet clinical neutral with exactly two metric accents; it is not a brand-color system in the traditional sense — blue and amber are assigned to data types (weight, steps), not to brand identity.
 
 ### Primary
-- **Blíster Teal** (`#2dd4bf`, dark-theme variant `#34e6cf`): the weight-tracking accent — popped `BlisterCell` fill, the client dashboard's hero interaction, active-state badges, links, and focus rings across both surfaces.
+- **Blíster Blue** (`#5e88cb`, dark-theme variant `#8db0e8`, ink `#0a1a33`; one hue, 217°): the weight-tracking accent. It replaced the original teal `#2dd4bf` in Oct 2026; token names keep the legacy `accent-teal` prefix — popped `BlisterCell` fill, the client dashboard's hero interaction, active-state badges, links, and focus rings across both surfaces.
 
 ### Secondary
-- **Dosage Amber** (`#f59e0b`, dark-theme variant `#ffb020`): reserved for the steps/activity metric track, parallel to teal's role for weight — the dashboard's steps card (icon + progress bar) is its first consumer.
+- **Dosage Amber** (`#f59e0b`, dark-theme variant `#ffb020`): reserved for the steps/activity metric track, parallel to blue's role for weight — the dashboard's steps card (icon + progress bar) is its first consumer.
 
 ### Neutral
 - **Foil Grey** (`#f4f6f8`, background): the page/app background, read as the blister pack's foil sheet.
@@ -124,13 +124,13 @@ The palette is a quiet clinical neutral with exactly two metric accents; it is n
 
 ### Accent Text
 Accent hues (`accent-teal`, `success`, `accent-amber`, `danger`) are fills: too light to carry text on white (1.9–3.4:1). Each has a theme-aware text counterpart for labels, deltas, links and status copy:
-- **accent-teal-text** (`#0f766e` light / `#34e6cf` dark) — 5.47:1 on panel, 5.05:1 on bg.
+- **accent-teal-text** (`#3b67ad` light / `#8db0e8` dark) — 5.63:1 on panel, 5.20:1 on bg (dark: 7.48:1 on panel).
 - **success-text** (`#15803d` light / `#46d17f` dark) — 5.02:1 on panel, 4.63:1 on bg.
 - **accent-amber-text** (`#b45309` light / `#ffb020` dark) — 5.02:1 on panel, 4.64:1 on bg.
 - **danger-text** (`#b4442a` light / `#e88968` dark) — 5.52:1 on panel, 5.10:1 on bg.
 
 ### Named Rules
-**The Metric-Not-Client Rule.** Accent color is assigned per tracked metric (teal = weight, amber = steps), never per client or per arbitrary UI mood. A new tracked metric earns its own accent; an existing metric's accent does not vary by client or context.
+**The Metric-Not-Client Rule.** Accent color is assigned per tracked metric (blue = weight, amber = steps), never per client or per arbitrary UI mood. A new tracked metric earns its own accent; an existing metric's accent does not vary by client or context.
 
 **The Fill-Not-Text Rule.** Accent tokens paint fills, borders, chart series and icons on tinted backgrounds; text always uses the matching `*-text` token (`text-accent-teal-text`, `text-success-text`, `text-accent-amber-text`, `text-danger-text`). Text sitting on a solid accent fill uses the fill's ink token (e.g. `accent-teal-ink`). `text-faint` stays reserved for placeholders, disabled copy and decorative glyphs, never for content that must be read.
 
@@ -194,10 +194,10 @@ Three corner languages coexist by role: `BlisterCell` is either a rounded square
 - **Focus:** border shifts to teal accent (`focus:border-accent-teal`), no glow/ring.
 
 ### BlisterCell (signature component)
-The structural atom of the entire system: a single day's dose. Four states — `pending` (domed, empty, awaiting action), `popped` (teal-filled, concave, white check icon), `missed` (same box as pending, faint-slate X icon — explicitly skipped, never bare-empty), `locked` (recessed grey fill, faint-slate padlock icon, future/unavailable). Three sizes: `sm` (22px, rounded-square, roster mini-strips), `md` (36px, rounded-square, week strips), `lg` (168px, true circle, the tappable dashboard hero). A state transition from `pending`/`missed` into `popped` triggers a 480ms cubic-bezier punch-through scale animation (`blister-pop` keyframe: 1 → 1.22 → 0.94 → 1.05 → 1) — fired only on a genuine transition, never on initial mount, so pages that render already-popped cells (e.g. roster strips) stay still.
+The structural atom of the entire system: a single day's dose. Four states — `pending` (domed, empty, awaiting action), `popped` (blue-filled, concave, white check icon), `missed` (same box as pending, faint-slate X icon — explicitly skipped, never bare-empty), `locked` (recessed grey fill, faint-slate padlock icon, future/unavailable). Three sizes: `sm` (22px, rounded-square, roster mini-strips), `md` (36px, rounded-square, week strips), `lg` (168px, true circle, the tappable dashboard hero). A state transition from `pending`/`missed` into `popped` triggers a 480ms cubic-bezier punch-through scale animation (`blister-pop` keyframe: 1 → 1.22 → 0.94 → 1.05 → 1) — fired only on a genuine transition, never on initial mount, so pages that render already-popped cells (e.g. roster strips) stay still.
 
 ### Navigation / Roster
-The coach roster (`ClientRosterTable`) is a list, not a table: one row per client inside a single panel (16px radius, row-hairline separators) with a neutral initial avatar, name plus "Último registro: …" line, a `sm` `BlisterCell` week strip, the adherence % in mono (danger <50%, faint <85%, primary otherwise) and the row action isolated behind a divider. Rows are sorted by adherence ascending (most-empty-first). Both portals share `AppHeader`: popped-cell wordmark, a small text nav (teal underline marks the active section), avatar, theme toggle and sign-out; the client portal adds a mobile `BottomNavBar`.
+The coach roster (`ClientRosterTable`) is a list, not a table: one row per client inside a single panel (16px radius, row-hairline separators) with a neutral initial avatar, name plus "Último registro: …" line, a `sm` `BlisterCell` week strip, the adherence % in mono (danger <50%, faint <85%, primary otherwise) and the row action isolated behind a divider. Rows are sorted by adherence ascending (most-empty-first). Both portals share `AppHeader`: popped-cell wordmark, a small text nav (blue underline marks the active section), avatar, theme toggle and sign-out; the client portal adds a mobile `BottomNavBar`.
 
 ### Motion
 Entrances use `.animate-enter` (560ms rise + fade, staggered via `--enter-delay`). The auth screens add a slowly drifting blister sheet whose cells pop in turn, and a brand-panel week strip that fills cell by cell; errors shake once (`shake-x`). Every animation collapses under `prefers-reduced-motion: reduce`.
@@ -207,7 +207,7 @@ Entrances use `.animate-enter` (560ms rise + fade, staggered via `--enter-delay`
 ### Do:
 - **Do** use `BlisterCell`'s four states exactly as named (`pending`/`popped`/`missed`/`locked`) — never introduce a fifth ad hoc state or repurpose an existing one for a different meaning.
 - **Do** keep numerals in IBM Plex Mono wherever a tracked metric or count is displayed.
-- **Do** assign accent color per metric (teal/weight, amber/steps), not per client, theme mood, or decoration.
+- **Do** assign accent color per metric (blue/weight, amber/steps), not per client, theme mood, or decoration.
 - **Do** theme every new color token through both `:root[data-theme="light"]` and `:root[data-theme="dark"]` selectors, following the existing dark-mode derivation logic (same material, dimmer light) rather than a generic inverted palette.
 
 ### Don't:

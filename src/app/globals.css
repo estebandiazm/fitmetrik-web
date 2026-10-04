@@ -80,8 +80,8 @@
   --color-text-primary: #1c2733;
   --color-text-muted: #6b7680;
   --color-text-faint: #9aa3ac;
-  --color-accent-teal: #2dd4bf;
-  --color-accent-teal-ink: #063d38;
+  --color-accent-teal: #5e88cb;
+  --color-accent-teal-ink: #0a1a33;
   --color-accent-amber: #f59e0b;
   --color-locked-bg: #eceef0;
   --color-locked-border: #e1e4e7;
@@ -89,7 +89,7 @@
   --color-cell-pending-bg: #ffffff;
   /* Accent *text* tokens: accents are fills; these are their readable text
      counterparts (>=4.5:1 on panel and bg in both themes). */
-  --color-accent-teal-text: #0f766e;
+  --color-accent-teal-text: #3b67ad;
   --color-success-text: #15803d;
   --color-accent-amber-text: #b45309;
   --color-danger-text: #b4442a;
@@ -153,8 +153,8 @@
   --color-text-primary: #1c2733;
   --color-text-muted: #6b7680;
   --color-text-faint: #9aa3ac;
-  --color-accent-teal: #2dd4bf;
-  --color-accent-teal-ink: #063d38;
+  --color-accent-teal: #5e88cb;
+  --color-accent-teal-ink: #0a1a33;
   --color-accent-amber: #f59e0b;
   --color-locked-bg: #eceef0;
   --color-locked-border: #e1e4e7;
@@ -162,7 +162,7 @@
   --color-cell-pending-bg: #ffffff;
   /* Accent *text* tokens: accents are fills; these are their readable text
      counterparts (>=4.5:1 on panel and bg in both themes). */
-  --color-accent-teal-text: #0f766e;
+  --color-accent-teal-text: #3b67ad;
   --color-success-text: #15803d;
   --color-accent-amber-text: #b45309;
   --color-danger-text: #b4442a;
@@ -186,15 +186,15 @@
   --color-text-primary: #eceef2;
   --color-text-muted: #8a93a0;
   --color-text-faint: #5c6470;
-  --color-accent-teal: #34e6cf;
-  --color-accent-teal-ink: #06332d;
+  --color-accent-teal: #8db0e8;
+  --color-accent-teal-ink: #0a1a33;
   --color-accent-amber: #ffb020;
   --color-locked-bg: #1e222b;
   --color-locked-border: #2b303b;
   --color-danger: #e88968;
   --color-cell-pending-bg: #191d24;
   /* Dark keeps the accent values themselves as text (>=6.4:1 on panel). */
-  --color-accent-teal-text: #34e6cf;
+  --color-accent-teal-text: #8db0e8;
   --color-success-text: #46d17f;
   --color-accent-amber-text: #ffb020;
   --color-danger-text: #e88968;
