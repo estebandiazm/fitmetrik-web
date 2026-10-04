@@ -7,6 +7,8 @@ import { getCoachByAuthId } from '@/app/actions/coachActions';
 import { getClientById, getDailyWeights } from '@/app/actions/clientActions';
 import { CoachHeader } from '@/components/coach/CoachHeader';
 import { Card } from '@/components/ui/Card';
+import { calculateDailyAverage, calculateGoalProgressPercent } from '@/domain/services/stepsAverageService';
+import { summarizeWeights } from '@/domain/services/weightAverageService';
 import TrendsChart from '@/components/activity/TrendsChart';
 import RecentRecords from '@/components/activity/RecentRecords';
 import StepGoalEditor from '@/components/coach/StepGoalEditor';
@@ -48,9 +50,9 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
 
   const weights = await getDailyWeights(clientId);
 
-  const dailyAverage = dailySteps.length > 0
-    ? Math.round(dailySteps.reduce((sum, step) => sum + step.steps, 0) / dailySteps.length)
-    : 0;
+  const dailyAverage = calculateDailyAverage(dailySteps);
+  const progressPercent = calculateGoalProgressPercent(dailyAverage, stepGoal);
+  const weightSummary = summarizeWeights(weights);
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
@@ -61,7 +63,7 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
           {/* Back Link */}
           <Link
             href="/clients"
-            className="text-primary hover:text-primary/80 text-sm font-medium transition-colors inline-flex items-center gap-2 mb-6"
+            className="text-accent-teal-text hover:text-accent-teal-text/80 text-sm font-medium transition-colors inline-flex items-center gap-2 mb-6"
           >
             ← Back to Clients
           </Link>
@@ -69,11 +71,11 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
           {/* Client Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-accent-teal-text font-semibold">
                 {client.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-on-surface">{client.name}</h1>
+                <h1 className="text-2xl font-bold text-text-primary">{client.name}</h1>
               </div>
             </div>
           </div>
@@ -82,28 +84,28 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
           <div className="space-y-6">
             {/* Goal Editor */}
             <Card padding="default">
-              <h2 className="text-lg font-semibold text-on-surface mb-4">Step Goal</h2>
+              <h2 className="text-lg font-semibold text-text-primary mb-4">Step Goal</h2>
               <StepGoalEditor clientId={clientId} currentGoal={stepGoal} />
             </Card>
 
             {/* Summary Card */}
             <Card padding="default">
-              <h2 className="text-lg font-semibold text-on-surface mb-4">Daily Average</h2>
-              <div className="text-3xl font-bold text-on-surface">{dailyAverage.toLocaleString()}</div>
-              {stepGoal && (
+              <h2 className="text-lg font-semibold text-text-primary mb-4">Daily Average</h2>
+              <div className="text-3xl font-bold text-text-primary">{dailyAverage.toLocaleString()}</div>
+              {stepGoal && progressPercent !== null && (
                 <>
-                  <p className="text-xs text-on-surface-muted mt-4 mb-2">
+                  <p className="text-xs text-text-muted mt-4 mb-2">
                     Progress to Goal ({stepGoal.toLocaleString()})
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-2 neu-inset rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${Math.min((dailyAverage / stepGoal) * 100, 100)}%` }}
+                        style={{ width: `${progressPercent}%` }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-primary min-w-fit">
-                      {Math.round(Math.min((dailyAverage / stepGoal) * 100, 100))}%
+                    <span className="text-sm font-semibold text-accent-teal-text min-w-fit">
+                      {Math.round(progressPercent)}%
                     </span>
                   </div>
                 </>
@@ -113,29 +115,29 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
             {/* Chart */}
             {dailySteps.length > 0 && (
               <Card padding="default">
-                <h2 className="text-lg font-semibold text-on-surface mb-4">Activity Trends</h2>
+                <h2 className="text-lg font-semibold text-text-primary mb-4">Activity Trends</h2>
                 <TrendsChart steps={dailySteps} density="compact" />
               </Card>
             )}
 
             {/* Recent Records */}
             <Card padding="default">
-              <h2 className="text-lg font-semibold text-on-surface mb-4">Recent Records</h2>
+              <h2 className="text-lg font-semibold text-text-primary mb-4">Recent Records</h2>
               {dailySteps.length > 0 ? (
                 <RecentRecords steps={dailySteps} stepGoal={stepGoal} />
               ) : (
-                <p className="text-on-surface-muted text-center py-8">No step records yet.</p>
+                <p className="text-text-muted text-center py-8">No step records yet.</p>
               )}
             </Card>
           </div>
 
           {/* Weight Tracking Section */}
           <div className="space-y-6 mt-8">
-            <h2 className="text-xl font-bold text-on-surface">Weight Tracking</h2>
+            <h2 className="text-xl font-bold text-text-primary">Weight Tracking</h2>
 
             {/* Weight Goal Editor */}
             <Card padding="default">
-              <h3 className="text-lg font-semibold text-on-surface mb-4">Target Weight</h3>
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Target Weight</h3>
               <WeightGoalEditor
                 clientId={clientId}
                 currentTarget={client.targetWeight ?? undefined}
@@ -143,37 +145,37 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
             </Card>
 
             {/* Weight Metrics Summary */}
-            {weights.length > 0 ? (
+            {weightSummary ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card padding="default">
-                  <div className="text-sm text-on-surface-muted mb-1">Latest Weight</div>
-                  <div className="text-3xl font-bold text-on-surface">
-                    {weights[weights.length - 1].weight} kg
+                  <div className="text-sm text-text-muted mb-1">Latest Weight</div>
+                  <div className="text-3xl font-bold text-text-primary">
+                    {weightSummary.latest} kg
                   </div>
                 </Card>
                 <Card padding="default">
-                  <div className="text-sm text-on-surface-muted mb-1">Lightest</div>
-                  <div className="text-3xl font-bold text-on-surface">
-                    {Math.min(...weights.map((w) => w.weight))} kg
+                  <div className="text-sm text-text-muted mb-1">Lightest</div>
+                  <div className="text-3xl font-bold text-text-primary">
+                    {weightSummary.lightest} kg
                   </div>
                 </Card>
                 <Card padding="default">
-                  <div className="text-sm text-on-surface-muted mb-1">Heaviest</div>
-                  <div className="text-3xl font-bold text-on-surface">
-                    {Math.max(...weights.map((w) => w.weight))} kg
+                  <div className="text-sm text-text-muted mb-1">Heaviest</div>
+                  <div className="text-3xl font-bold text-text-primary">
+                    {weightSummary.heaviest} kg
                   </div>
                 </Card>
               </div>
             ) : (
               <Card padding="default" className="text-center">
-                <p className="text-on-surface-muted">No weight data yet.</p>
+                <p className="text-text-muted">No weight data yet.</p>
               </Card>
             )}
 
             {/* Weight Trends Chart */}
             {weights.length > 0 && (
               <Card padding="default">
-                <h3 className="text-lg font-semibold text-on-surface mb-4">Weight Trend</h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Weight Trend</h3>
                 <WeightTrendsChart weights={weights} density="compact" />
               </Card>
             )}
@@ -181,7 +183,7 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
             {/* Weight History Table */}
             {weights.length > 0 && (
               <Card padding="default">
-                <h3 className="text-lg font-semibold text-on-surface mb-4">Weight History</h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Weight History</h3>
                 <WeightRecentRecords weights={weights} />
               </Card>
             )}
@@ -189,11 +191,11 @@ export default async function ClientDetailPage(props: ClientDetailPageProps) {
 
           {/* Body Measurements Section */}
           <div className="space-y-6 mt-8">
-            <h2 className="text-xl font-bold text-on-surface">Body Measurements</h2>
+            <h2 className="text-xl font-bold text-text-primary">Body Measurements</h2>
 
             <Card padding="default">
-              <h3 className="text-lg font-semibold text-on-surface mb-4">Measurement Points</h3>
-              <p className="text-sm text-on-surface-muted mb-4">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Measurement Points</h3>
+              <p className="text-sm text-text-muted mb-4">
                 Select which body measurements this client will track. Deactivating a point hides it from new entries but preserves existing history.
               </p>
               <MeasurementPointsEditor

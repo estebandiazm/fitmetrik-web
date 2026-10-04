@@ -95,6 +95,8 @@ src/
 │   ├── progress/                 # Domain components: tracking
 │   └── layout/                   # Shell, navigation, sidebars
 │
+├── context/                      # React client-state providers (no data access)
+│
 ├── hooks/                        # Shared custom hooks
 │   ├── usePlan.ts
 │   └── useProgress.ts
@@ -110,8 +112,9 @@ src/
 ### 2.3 Dependency Rules
 
 ```
-app/ → components/, hooks/, domain/, infrastructure/ports/
-components/ → domain/types/, hooks/
+app/ → components/, hooks/, context/, domain/, infrastructure/ports/
+components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions), hooks/, context/
+context/ → domain/types/ (client-side UI state only, e.g. a localStorage draft)
 hooks/ → infrastructure/ports/, domain/
 domain/ → NOTHING (pure, no imports from infra or UI)
 infrastructure/adapters/ → infrastructure/ports/, domain/types/
@@ -119,6 +122,8 @@ infrastructure/adapters/ → infrastructure/ports/, domain/types/
 
 > **Golden rule**: `domain/` NEVER imports from `infrastructure/`, `components/`, or `app/`.
 > It is the heart of the system and must work without Next.js, without Supabase, without anything external.
+>
+> `components/` NEVER imports from `infrastructure/` (adapters or ports); data access goes through Server Actions in `app/actions/` or hooks.
 
 ### 2.4 Dependency Injection (Simple)
 
@@ -282,7 +287,7 @@ AI is first a development tool (code generation) and then a product feature (pla
 - Atomic UI components in `components/ui/`
 - Domain components in `components/{feature}/`
 - Props typed with explicit interfaces
-- No business logic in components (delegate to hooks or services)
+- No business logic in components — delegate to `domain/services/` or hooks
 
 ---
 

@@ -101,3 +101,19 @@ export function getWeightMetrics(entries: DailyWeight[]): WeightMetrics {
     avg: sum / entries.length,
   };
 }
+
+export interface WeightSummary {
+  latest: number;
+  lightest: number;
+  heaviest: number;
+}
+
+/**
+ * Latest (last entry as recorded), lightest and heaviest weights.
+ * Returns null when there are no entries.
+ */
+export function summarizeWeights(entries: DailyWeight[]): WeightSummary | null {
+  const { min, max } = getWeightMetrics(entries);
+  if (min === null || max === null) return null;
+  return { latest: entries[entries.length - 1].weight, lightest: min, heaviest: max };
+}

@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { setStepGoal } from '../../app/actions/clientActions';
+import { setStepGoal } from '@/app/actions/clientActions';
+import { parseStepGoal } from '@/domain/services/activityInputs';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 interface StepGoalEditorProps {
   clientId: string;
@@ -18,16 +21,16 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
   const handleSave = async () => {
     setError(null);
 
-    const goalNum = parseInt(goal, 10);
-    if (isNaN(goalNum) || goalNum <= 0) {
-      setError('Goal must be a positive number');
+    const parsed = parseStepGoal(goal);
+    if (!parsed.ok) {
+      setError(parsed.reason);
       return;
     }
 
     setLoading(true);
 
     try {
-      await setStepGoal(clientId, goalNum);
+      await setStepGoal(clientId, parsed.value);
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
@@ -45,32 +48,28 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
   return (
     <div className="flex gap-3 items-start">
       <div className="flex-1">
-        <input
+        <Input
           type="number"
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
           placeholder="e.g., 10000"
           min="1"
-          className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+          className="w-full"
         />
         {error && (
-          <div className="mt-2 text-sm bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-2">
+          <div className="mt-2 text-sm bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-2">
             {error}
           </div>
         )}
         {success && (
-          <div className="mt-2 text-sm bg-green-500/10 border border-green-500/30 text-green-300 rounded-lg p-2">
+          <div className="mt-2 text-sm bg-success/10 border border-success/30 text-success-text rounded-lg p-2">
             Goal saved successfully!
           </div>
         )}
       </div>
-      <button
-        onClick={handleSave}
-        disabled={!canSave}
-        className="px-4 py-2 mt-1 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
-      >
+      <Button onClick={handleSave} disabled={!canSave} className="mt-1">
         {loading ? '⏳' : 'Save'}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { Card } from '@/components/ui/Card';
 import { DailyWeight } from '@/domain/types/DailyWeight';
+import { bucketByLocalDay } from '@/domain/services/chartSeries';
 
 interface WeightTrendsChartProps {
   weights: DailyWeight[];
@@ -31,41 +32,24 @@ export default function WeightTrendsChart({
   const axisFontSize = isCompact ? '0.7rem' : '0.85rem';
   const chartHeightClass = isCompact ? 'h-64' : 'h-80';
 
-  const cutoffDate = new Date();
   const daysBack = period === 'week' ? 7 : 30;
-  cutoffDate.setDate(cutoffDate.getDate() - daysBack);
-
-  // Build chart data with null for missing days (gaps, not zeros)
-  const chartData = [];
-  for (let i = daysBack - 1; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    date.setHours(0, 0, 0, 0);
-
-    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const dateISODate = date.toISOString().split('T')[0];
-    const entry = weights.find((w) => {
-      const wISODate = new Date(w.date).toISOString().split('T')[0];
-      return wISODate === dateISODate;
-    });
-
-    chartData.push({
-      date: dateStr,
-      weight: entry?.weight ?? null,
-    });
-  }
+  // null for missing days (gaps, not zeros)
+  const chartData = bucketByLocalDay(weights, daysBack).map(({ label, entry }) => ({
+    date: label,
+    weight: entry?.weight ?? null,
+  }));
 
   if (weights.length === 0) return null;
 
   return (
     <Card className="p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-white font-semibold text-lg">Weight Trends</h3>
+        <h3 className="text-text-primary font-semibold text-lg">Weight Trends</h3>
         <div className="flex gap-2">
           <button
             onClick={() => setPeriod('week')}
             className={`px-3 py-1 text-sm font-semibold transition ${
-              period === 'week' ? 'text-blue-400' : 'text-gray-400 hover:text-blue-400'
+              period === 'week' ? 'text-text-primary underline decoration-tertiary decoration-2 underline-offset-4' : 'text-text-muted hover:text-text-primary'
             }`}
           >
             Week
@@ -73,7 +57,7 @@ export default function WeightTrendsChart({
           <button
             onClick={() => setPeriod('month')}
             className={`px-3 py-1 text-sm font-semibold transition ${
-              period === 'month' ? 'text-blue-400' : 'text-gray-400 hover:text-blue-400'
+              period === 'month' ? 'text-text-primary underline decoration-tertiary decoration-2 underline-offset-4' : 'text-text-muted hover:text-text-primary'
             }`}
           >
             Month
@@ -90,10 +74,10 @@ export default function WeightTrendsChart({
                 <stop offset="95%" stopColor="var(--color-tertiary)" stopOpacity={0.01} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis dataKey="date" stroke="rgba(255,255,255,0.5)" style={{ fontSize: axisFontSize }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+            <XAxis dataKey="date" stroke="var(--color-text-muted)" style={{ fontSize: axisFontSize }} />
             <YAxis
-              stroke="rgba(255,255,255,0.5)"
+              stroke="var(--color-text-muted)"
               style={{ fontSize: axisFontSize }}
               domain={['dataMin - 2', 'dataMax + 2']}
             />
@@ -106,7 +90,7 @@ export default function WeightTrendsChart({
                 label={{
                   value: `Target: ${targetWeight} kg`,
                   position: 'right',
-                  fill: 'var(--color-primary)',
+                  fill: 'var(--color-accent-teal-text)',
                   fontSize: 12,
                   fontWeight: 'bold',
                 }}
@@ -114,12 +98,12 @@ export default function WeightTrendsChart({
             )}
             <Tooltip
               contentStyle={{
-                background: 'rgba(13, 26, 51, 0.95)',
+                background: 'var(--color-panel)',
                 border: '2px solid var(--color-tertiary)',
                 borderRadius: tooltipRadius,
                 boxShadow: '0 8px 32px color-mix(in srgb, var(--color-tertiary) 20%, transparent)',
               }}
-              labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+              labelStyle={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}
               formatter={(value) =>
                 value != null ? [`${value} kg`, 'Weight'] : ['No data', 'Weight']
               }

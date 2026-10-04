@@ -1,24 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { setMeasurementPoints } from '../../app/actions/clientActions';
-import { MEASUREMENT_POINTS_CATALOG } from '../../domain/services/bodyMeasurements';
-import type { MeasurementPoint } from '../../domain/types/MeasurementPoint';
-import type { BodyMeasurement } from '../../domain/types/BodyMeasurement';
+import { setMeasurementPoints } from '@/app/actions/clientActions';
+import {
+  countEntriesForPoint,
+  mergeWithCatalog,
+  needsDeactivationConfirmation,
+} from '@/domain/services/bodyMeasurements';
+import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
+import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
+import { Button } from '@/components/ui/Button';
 
 interface MeasurementPointsEditorProps {
   clientId: string;
   currentPoints: MeasurementPoint[];
   existingMeasurements?: BodyMeasurement[];
   onSaved?: () => void;
-}
-
-function mergeWithCatalog(currentPoints: MeasurementPoint[]): MeasurementPoint[] {
-  const storedBySlug = new Map(currentPoints.map((p) => [p.slug, p]));
-  return MEASUREMENT_POINTS_CATALOG.map((catalogEntry) => {
-    const stored = storedBySlug.get(catalogEntry.slug);
-    return stored ?? { ...catalogEntry, active: false };
-  });
 }
 
 export default function MeasurementPointsEditor({
@@ -44,20 +41,13 @@ export default function MeasurementPointsEditor({
     setPoints(mergeWithCatalog(currentPoints));
   }
 
-  function countEntriesForPoint(slug: string): number {
-    return existingMeasurements.filter((m) => m.pointSlug === slug).length;
-  }
-
   function handleToggle(slug: string) {
     const point = points.find((p) => p.slug === slug);
     if (!point) return;
 
-    if (point.active) {
-      const entryCount = countEntriesForPoint(slug);
-      if (entryCount > 0) {
-        setPendingDeactivateSlug(slug);
-        return;
-      }
+    if (needsDeactivationConfirmation(point, existingMeasurements)) {
+      setPendingDeactivateSlug(slug);
+      return;
     }
 
     applyToggle(slug);
@@ -92,11 +82,11 @@ export default function MeasurementPointsEditor({
     <div data-testid="measurement-points-editor" className="space-y-4">
       <div className="space-y-2">
         {points.map((point) => {
-          const entryCount = countEntriesForPoint(point.slug);
+          const entryCount = countEntriesForPoint(existingMeasurements, point.slug);
           return (
             <div key={point.slug} className="flex flex-col gap-1">
-              <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
-                <span className="text-sm text-white">{point.label}</span>
+              <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-bg border border-border">
+                <span className="text-sm text-text-primary">{point.label}</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -107,12 +97,12 @@ export default function MeasurementPointsEditor({
                     data-testid={`measurement-point-toggle-${point.slug}`}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500" />
+                  <div className="w-11 h-6 bg-border-strong peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-panel after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-panel after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-teal" />
                 </label>
               </div>
 
               {pendingDeactivateSlug === point.slug && (
-                <div className="px-3 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-sm">
+                <div className="px-3 py-2 rounded-lg bg-accent-amber/10 border border-accent-amber/30 text-text-primary text-sm">
                   <p>
                     Tenés {entryCount} registro{entryCount !== 1 ? 's' : ''} para este punto. Se va a
                     ocultar pero los datos no se eliminan. ¿Continuar?
@@ -120,16 +110,13 @@ export default function MeasurementPointsEditor({
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => applyToggle(point.slug)}
-                      className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-200 hover:bg-yellow-500/30 text-xs font-medium transition"
+                      className="px-3 py-1 rounded-[var(--radius-control)] bg-accent-amber/20 text-text-primary hover:bg-accent-amber/30 text-xs font-medium transition"
                     >
                       Sí, desactivar
                     </button>
-                    <button
-                      onClick={() => setPendingDeactivateSlug(null)}
-                      className="px-3 py-1 rounded-full bg-white/10 text-gray-300 hover:bg-white/20 text-xs font-medium transition"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setPendingDeactivateSlug(null)}>
                       Cancelar
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -139,24 +126,20 @@ export default function MeasurementPointsEditor({
       </div>
 
       {error && (
-        <div className="text-sm bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3">
+        <div className="text-sm bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-3">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="text-sm bg-green-500/10 border border-green-500/30 text-green-300 rounded-lg p-3">
+        <div className="text-sm bg-success/10 border border-success/30 text-success-text rounded-lg p-3">
           Puntos de medición guardados.
         </div>
       )}
 
-      <button
-        onClick={handleSave}
-        disabled={loading}
-        className="px-4 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition"
-      >
+      <Button onClick={handleSave} disabled={loading} className="self-start">
         {loading ? '⏳' : 'Save'}
-      </button>
+      </Button>
     </div>
   );
 }

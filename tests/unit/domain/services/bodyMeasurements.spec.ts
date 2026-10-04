@@ -15,6 +15,13 @@ import {
   formatMeasurementReference,
   isFutureDate,
   isNoDataValue,
+  buildMeasurementHistory,
+  formatMeasurementDate,
+  mergeWithCatalog,
+  buildMeasurementSeries,
+  needsDeactivationConfirmation,
+  countEntriesForPoint,
+  getSelectablePoints,
 } from '@/domain/services/bodyMeasurements';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
@@ -461,5 +468,176 @@ describe('formatMeasurementReference', () => {
       { date: new Date('2026-01-15'), pointSlug: 'pecho', valueCm: 102 },
     ];
     expect(formatMeasurementReference(measurements, 'pecho')).toBe('última: 102 cm (Δ +2)');
+  });
+});
+
+// ── buildMeasurementHistory ───────────────────────────────────────────────────
+
+describe('buildMeasurementHistory', () => {
+  const history: BodyMeasurement[] = [
+    { date: new Date('2026-01-01'), pointSlug: 'cintura', valueCm: 80 },
+    { date: new Date('2026-03-01'), pointSlug: 'cintura', valueCm: 78.5 },
+    { date: new Date('2026-02-01'), pointSlug: 'cintura', valueCm: 79 },
+    { date: new Date('2026-02-15'), pointSlug: 'pecho', valueCm: 100 },
+  ];
+
+  it('returns only the selected point, newest first', () => {
+    const rows = buildMeasurementHistory(history, 'cintura');
+    expect(rows.map((r) => r.entry.valueCm)).toEqual([78.5, 79, 80]);
+  });
+
+  it('computes each delta against the previous (older) entry', () => {
+    const rows = buildMeasurementHistory(history, 'cintura');
+    expect(rows.map((r) => r.delta)).toEqual([-0.5, -1, null]);
+  });
+
+  it('returns a null delta for a single entry', () => {
+    const rows = buildMeasurementHistory(history, 'pecho');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].delta).toBeNull();
+  });
+
+  it('returns an empty list when the point has no entries', () => {
+    expect(buildMeasurementHistory(history, 'gluteo')).toEqual([]);
+  });
+
+  it('does not mutate the input array', () => {
+    const copy = [...history];
+    buildMeasurementHistory(history, 'cintura');
+    expect(history).toEqual(copy);
+  });
+});
+
+// ── formatMeasurementDate ─────────────────────────────────────────────────────
+
+describe('formatMeasurementDate', () => {
+  it('formats a date with the es-AR short locale format', () => {
+    const date = new Date(2026, 2, 15, 12);
+    const expected = date.toLocaleDateString('es-AR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+    expect(formatMeasurementDate(date)).toBe(expected);
+    expect(formatMeasurementDate(date)).toContain('2026');
+  });
+
+  it('accepts a date string', () => {
+    const iso = new Date(2026, 2, 15, 12).toISOString();
+    expect(formatMeasurementDate(iso)).toBe(formatMeasurementDate(new Date(iso)));
+  });
+});
+
+// ── mergeWithCatalog ──────────────────────────────────────────────────────────
+
+describe('mergeWithCatalog', () => {
+  it('returns every catalog point, inactive when not stored', () => {
+    const merged = mergeWithCatalog([]);
+    expect(merged.map((p) => p.slug)).toEqual(MEASUREMENT_POINTS_CATALOG.map((p) => p.slug));
+    expect(merged.every((p) => p.active === false)).toBe(true);
+  });
+
+  it('prefers the stored point over the catalog entry', () => {
+    const stored: MeasurementPoint = {
+      ...MEASUREMENT_POINTS_CATALOG[1],
+      label: 'Cintura custom',
+      active: true,
+    };
+    const merged = mergeWithCatalog([stored]);
+    expect(merged[1]).toBe(stored);
+    expect(merged).toHaveLength(MEASUREMENT_POINTS_CATALOG.length);
+  });
+
+  it('drops stored points that are not in the catalog', () => {
+    const unknown = { ...MEASUREMENT_POINTS_CATALOG[0], slug: 'unknown', active: true };
+    expect(mergeWithCatalog([unknown]).some((p) => p.slug === 'unknown')).toBe(false);
+  });
+});
+
+// ── buildMeasurementSeries ────────────────────────────────────────────────────
+
+describe('buildMeasurementSeries', () => {
+  const now = new Date(2026, 3, 15, 10, 30);
+  const daysAgo = (n: number) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - n);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  it('returns one point per day, oldest first, ending today', () => {
+    const series = buildMeasurementSeries([], 'cintura', 7, now);
+    expect(series).toHaveLength(7);
+    expect(series[6].date).toBe(daysAgo(0).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }));
+    expect(series[0].date).toBe(daysAgo(6).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' }));
+    expect(series.every((p) => p.value === null)).toBe(true);
+  });
+
+  it('fills the value for days with a measurement of the selected point', () => {
+    const data: BodyMeasurement[] = [
+      { date: daysAgo(2), pointSlug: 'cintura', valueCm: 80 },
+      { date: daysAgo(1), pointSlug: 'pecho', valueCm: 99 },
+    ];
+    const series = buildMeasurementSeries(data, 'cintura', 7, now);
+    expect(series[4].value).toBe(80);
+    expect(series[5].value).toBeNull();
+  });
+});
+
+// ── needsDeactivationConfirmation ─────────────────────────────────────────────
+
+describe('needsDeactivationConfirmation', () => {
+  const cintura: MeasurementPoint = { ...MEASUREMENT_POINTS_CATALOG[1], active: true };
+  const data: BodyMeasurement[] = [
+    { date: new Date('2026-01-01'), pointSlug: 'cintura', valueCm: 80 },
+  ];
+
+  it('is true when deactivating an active point that has entries', () => {
+    expect(needsDeactivationConfirmation(cintura, data)).toBe(true);
+  });
+
+  it('is false when the active point has no entries', () => {
+    expect(needsDeactivationConfirmation(cintura, [])).toBe(false);
+  });
+
+  it('is false when the point is inactive (activating never confirms)', () => {
+    expect(needsDeactivationConfirmation({ ...cintura, active: false }, data)).toBe(false);
+  });
+});
+
+// ── countEntriesForPoint ──────────────────────────────────────────────────────
+
+describe('countEntriesForPoint', () => {
+  it('counts only the entries of the given point', () => {
+    const data: BodyMeasurement[] = [
+      { date: new Date('2026-01-01'), pointSlug: 'cintura', valueCm: 80 },
+      { date: new Date('2026-02-01'), pointSlug: 'cintura', valueCm: 79 },
+      { date: new Date('2026-02-01'), pointSlug: 'pecho', valueCm: 99 },
+    ];
+    expect(countEntriesForPoint(data, 'cintura')).toBe(2);
+    expect(countEntriesForPoint(data, 'gluteo')).toBe(0);
+  });
+});
+
+// ── getSelectablePoints (REQ-BMT-05) ──────────────────────────────────────────
+
+describe('getSelectablePoints', () => {
+  const [a, b, c] = MEASUREMENT_POINTS_CATALOG;
+  const active: MeasurementPoint = { ...a, active: true };
+  const inactiveWithData: MeasurementPoint = { ...b, active: false };
+  const inactiveEmpty: MeasurementPoint = { ...c, active: false };
+  const data: BodyMeasurement[] = [
+    { date: new Date(2026, 0, 1), pointSlug: inactiveWithData.slug, valueCm: 80 },
+  ];
+
+  it('lists active points first, then inactive points that still have entries', () => {
+    expect(getSelectablePoints([inactiveWithData, active, inactiveEmpty], data)).toEqual([
+      active,
+      inactiveWithData,
+    ]);
+  });
+
+  it('excludes inactive points without entries', () => {
+    expect(getSelectablePoints([inactiveEmpty], data)).toEqual([]);
   });
 });

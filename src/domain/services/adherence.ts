@@ -117,3 +117,21 @@ export function daysSinceLastEntry(entries: DatedEntry[], today: Date = new Date
   // Math.round absorbs the ±1h DST shift between two local midnights.
   return Math.max(0, Math.round((todayStart.getTime() - latest.getTime()) / msPerDay));
 }
+
+export type AdherenceTier = 'low' | 'fair' | 'good';
+
+// Thresholds from the "Coach — Roster" artboard: <50% needs attention,
+// 50–84% is adequate but unremarkable, 85%+ is "going well".
+export function getAdherenceTier(pct: number): AdherenceTier {
+  if (pct < 50) return 'low';
+  if (pct < 85) return 'fair';
+  return 'good';
+}
+
+// Most-empty-first ("lo que necesita atención está arriba"); name breaks ties
+// so the order is stable. Returns a new array.
+export function sortByAdherence<T extends { name: string; adherencePct: number }>(clients: T[]): T[] {
+  return [...clients].sort(
+    (a, b) => a.adherencePct - b.adherencePct || a.name.localeCompare(b.name, 'es'),
+  );
+}

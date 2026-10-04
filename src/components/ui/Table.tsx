@@ -8,7 +8,7 @@ interface TableProps {
 export function Table({ children, className = '' }: TableProps) {
   return (
     <div className={`overflow-x-auto ${className}`}>
-      <table className="w-full text-sm">{children}</table>
+      <table className="w-full text-sm text-text-primary">{children}</table>
     </div>
   );
 }
@@ -31,7 +31,8 @@ export function TableRow({ children, className = '', header = false }: TableRowP
   const base = header
     ? 'text-text-muted text-xs uppercase tracking-wider'
     : 'hover:bg-row-border transition-colors';
-  return <tr className={`border-b border-border ${base} ${className}`}>{children}</tr>;
+  const border = header ? 'border-border' : 'border-row-border';
+  return <tr className={`border-b ${border} ${base} ${className}`}>{children}</tr>;
 }
 
 interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {

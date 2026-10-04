@@ -1,27 +1,22 @@
 'use client';
 
 import React, { useContext, useState } from 'react';
-import { ClientContext } from '../../context/ClientContext';
-import { ClientContextType } from '../../context/ClientContextType';
-import { DietEngine } from '../../domain/services/DietEngine';
-import { FoodDatabase } from '../../domain/services/FoodDatabase';
+import { ClientContext } from '@/context/ClientContext';
+import { ClientContextType } from '@/context/ClientContextType';
+import {
+  buildDietPlansFromDrafts,
+  createDefaultPlanDraft,
+  type PlanDraft,
+} from '@/domain/services/dietPlanDrafts';
 import { useRouter } from 'next/navigation';
-import PlanCard, { PlanDraft } from './PlanCard';
+import PlanCard from './PlanCard';
 import SavePlanModal from './SavePlanModal';
-import { DietPlan } from '../../domain/types/DietPlan';
+import { DietPlan } from '@/domain/types/DietPlan';
+import { Button } from '@/components/ui/Button';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
-const createDefaultPlan = (): PlanDraft => ({
-  id: crypto.randomUUID(),
-  label: '',
-  days: '',
-  proteins: 20,
-  carbs: 20,
-  fruits: 0,
-  fats: 0,
-  foods: [],
-});
+const createDefaultPlan = (): PlanDraft => createDefaultPlanDraft(crypto.randomUUID());
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -53,39 +48,11 @@ const Creator = ({ coachId }: CreatorProps) => {
 
   // Save ALL plans at once → generate each DietPlan, persist, then navigate
   const handleSaveAll = () => {
-    const fruits = FoodDatabase.getFruits();
-    const firstMeal = FoodDatabase.getFirstMealFoods();
-    const base = FoodDatabase.getSecondMealFoodsByCategory('BASE');
-    const complement = FoodDatabase.getSecondMealFoodsByCategory('COMPLEMENT');
-
-    const dietPlans = plans.map((draft, index) => {
-      const generated = DietEngine.generatePlan(
-        clientName || 'Cliente',
-        fruits, draft.fruits,
-        firstMeal, draft.proteins,
-        base, draft.carbs,
-        complement, draft.fats,
-        base, draft.carbs,
-        complement, draft.fats,
-      );
-
-      // Title follows "Plan {days}" if days is set, else "Plan {n}"
-      const label = draft.days.trim()
-        ? `Plan ${draft.days.trim()}`
-        : `Plan ${index + 1}`;
-
-      return {
-        ...generated,
-        label,
-        days: draft.days,
-      };
-    });
-
     saveClient({
       name: clientName,
-      coachId: '',
+      coachId,
       targetWeight: targetWeight !== '' ? targetWeight : undefined,
-      plans: dietPlans,
+      plans: buildDietPlansFromDrafts(plans, clientName),
     });
 
     router.push('/viewer');
@@ -93,34 +60,7 @@ const Creator = ({ coachId }: CreatorProps) => {
 
   // Generate plans and open the modal so the user can choose a client to persist to
   const handleSaveToDB = () => {
-    const fruits = FoodDatabase.getFruits();
-    const firstMeal = FoodDatabase.getFirstMealFoods();
-    const base = FoodDatabase.getSecondMealFoodsByCategory('BASE');
-    const complement = FoodDatabase.getSecondMealFoodsByCategory('COMPLEMENT');
-
-    const dietPlans: DietPlan[] = plans.map((draft, index) => {
-      const generated = DietEngine.generatePlan(
-        clientName || 'Cliente',
-        fruits, draft.fruits,
-        firstMeal, draft.proteins,
-        base, draft.carbs,
-        complement, draft.fats,
-        base, draft.carbs,
-        complement, draft.fats,
-      );
-
-      const label = draft.days.trim()
-        ? `Plan ${draft.days.trim()}`
-        : `Plan ${index + 1}`;
-
-      return {
-        ...generated,
-        label,
-        days: draft.days,
-      };
-    });
-
-    setGeneratedPlans(dietPlans);
+    setGeneratedPlans(buildDietPlansFromDrafts(plans, clientName));
     setSaveModalOpen(true);
   };
 
@@ -129,23 +69,23 @@ const Creator = ({ coachId }: CreatorProps) => {
       {/* ── Client header ── */}
       <div className="max-w-2xl mx-auto mb-8">
         <div className="mb-4">
-          <label className="text-xs text-white/60 font-semibold block mb-2">Client</label>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full neu-inset border border-transparent focus-within:border-tertiary">
-            <span className="material-symbols-outlined text-white/60 text-sm">person</span>
+          <label className="text-xs text-text-muted font-semibold block mb-2">Client</label>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel focus-within:border-accent-teal focus-within:ring-3 focus-within:ring-accent-teal/20">
+            <span className="material-symbols-outlined text-text-muted text-sm">person</span>
             <input
               type="text"
               placeholder="Client name"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
+              className="flex-1 bg-transparent text-text-primary placeholder:text-text-faint outline-none"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-xs text-white/60 font-semibold block mb-2">Target Weight</label>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full neu-inset border border-transparent focus-within:border-tertiary">
-            <span className="material-symbols-outlined text-white/60 text-sm">scale</span>
+          <label className="text-xs text-text-muted font-semibold block mb-2">Target Weight</label>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-[var(--radius-control)] border border-border bg-panel focus-within:border-accent-teal focus-within:ring-3 focus-within:ring-accent-teal/20">
+            <span className="material-symbols-outlined text-text-muted text-sm">scale</span>
             <input
               type="number"
               placeholder="Target weight"
@@ -153,9 +93,9 @@ const Creator = ({ coachId }: CreatorProps) => {
               onChange={(e) =>
                 setTargetWeight(e.target.value === '' ? '' : Number(e.target.value))
               }
-              className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
+              className="flex-1 bg-transparent text-text-primary placeholder:text-text-faint outline-none"
             />
-            <span className="text-white/50 text-sm">kg</span>
+            <span className="text-text-muted text-sm">kg</span>
           </div>
         </div>
       </div>
@@ -174,23 +114,20 @@ const Creator = ({ coachId }: CreatorProps) => {
         {/* ── Add Another Plan ── */}
         <button
           onClick={handleAddPlan}
-          className="w-full px-6 py-3 mb-4 rounded-full border border-white/30 text-white/80 font-semibold hover:border-tertiary hover:text-tertiary hover:bg-tertiary/8 transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-4 rounded-[var(--radius-control)] border border-border-strong text-text-primary font-semibold hover:border-accent-teal hover:text-accent-teal-text hover:bg-accent-teal/8 transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">add_circle</span> Add Another Plan
         </button>
 
         {/* ── Save All Plans ── */}
-        <button
-          onClick={handleSaveAll}
-          className="w-full px-6 py-3 mb-6 rounded-full neu-btn-accent font-bold transition flex items-center justify-center gap-2"
-        >
+        <Button onClick={handleSaveAll} className="w-full mb-6">
           <span className="material-symbols-outlined">save</span> Guardar Planes
-        </button>
+        </Button>
 
         {/* ── Save to Database ── */}
         <button
           onClick={handleSaveToDB}
-          className="w-full px-6 py-3 mb-8 rounded-full border border-tertiary/40 text-tertiary font-semibold hover:border-tertiary hover:bg-tertiary/8 transition flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 mb-8 rounded-[var(--radius-control)] border border-accent-teal/40 text-accent-teal-text font-semibold hover:border-accent-teal hover:bg-accent-teal/8 transition flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">cloud_upload</span> Guardar en Base de Datos
         </button>

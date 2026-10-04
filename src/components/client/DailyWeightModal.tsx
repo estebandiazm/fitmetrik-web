@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { addDailyWeight } from '../../app/actions/clientActions';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { todayLocalISO, parseLocalDate } from '@/lib/utils/local-date';
+import { addDailyWeight } from '@/app/actions/clientActions';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { parseDailyWeightInput } from '@/domain/services/activityInputs';
+import { toLocalISODate } from '@/domain/services/localDates';
+import { Textarea } from '@/components/ui/textarea';
 
 interface DailyWeightModalProps {
   open: boolean;
@@ -19,7 +21,7 @@ export default function DailyWeightModal({
   clientId,
   onSuccess,
 }: DailyWeightModalProps) {
-  const [date, setDate] = useState(todayLocalISO());
+  const [date, setDate] = useState(() => toLocalISODate());
   const [weight, setWeight] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,36 +35,30 @@ export default function DailyWeightModal({
     };
   }, []);
 
+  const resetAndClose = () => {
+    setDate(toLocalISODate());
+    setWeight('');
+    setNotes('');
+    setSuccess(false);
+    onClose();
+    onSuccess?.();
+  };
+
   const handleSubmit = async () => {
     setError(null);
 
-    const selectedDate = parseLocalDate(date);
-    const today = parseLocalDate(todayLocalISO());
-
-    if (selectedDate > today) {
-      setError('Date cannot be in the future');
-      return;
-    }
-
-    const weightNum = parseFloat(weight);
-    if (isNaN(weightNum) || weightNum < 0.1 || weightNum > 500) {
-      setError('Weight must be between 0.1 and 500 kg');
+    const parsed = parseDailyWeightInput(date, weight);
+    if (!parsed.ok) {
+      setError(parsed.reason);
       return;
     }
 
     setLoading(true);
 
     try {
-      await addDailyWeight(clientId, selectedDate, weightNum, notes || undefined);
+      await addDailyWeight(clientId, parsed.date, parsed.weight, notes || undefined);
       setSuccess(true);
-      resetTimeoutRef.current = setTimeout(() => {
-        setDate(todayLocalISO());
-        setWeight('');
-        setNotes('');
-        setSuccess(false);
-        onClose();
-        onSuccess?.();
-      }, 1500);
+      resetTimeoutRef.current = setTimeout(resetAndClose, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error saving weight data');
     } finally {
@@ -83,7 +79,7 @@ export default function DailyWeightModal({
 
         <div className="p-[var(--space-card-p)]">
           {success ? (
-            <div className="bg-success/10 border border-success/30 text-success rounded-[var(--radius-control)] p-3">
+            <div className="bg-success/10 border border-success/30 text-success-text rounded-[var(--radius-control)] p-3">
               Weight recorded successfully!
             </div>
           ) : (
@@ -97,7 +93,7 @@ export default function DailyWeightModal({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  max={todayLocalISO()}
+                  max={toLocalISODate()}
                   className="w-full"
                 />
               </div>
@@ -123,18 +119,18 @@ export default function DailyWeightModal({
                 <label htmlFor="daily-weight-notes" className="block text-sm text-text-muted mb-2">
                   Notes (optional)
                 </label>
-                <textarea
+                <Textarea
                   id="daily-weight-notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g., After breakfast"
                   rows={2}
-                  className="w-full px-4 py-2 rounded-[var(--radius-control)] neu-inset border border-transparent text-text-primary placeholder-text-muted focus:border-accent-teal focus:outline-none resize-none"
+                  className="w-full"
                 />
               </div>
 
               {error && (
-                <div className="bg-danger/10 border border-danger/30 text-danger rounded-[var(--radius-control)] p-3 text-sm">
+                <div className="bg-danger/10 border border-danger/30 text-danger-text rounded-[var(--radius-control)] p-3 text-sm">
                   {error}
                 </div>
               )}

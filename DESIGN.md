@@ -17,6 +17,10 @@ colors:
   locked-border: "#e1e4e7"
   danger: "#dc6a4a"
   cell-pending-bg: "#ffffff"
+  accent-teal-text: "#0f766e"
+  success-text: "#15803d"
+  accent-amber-text: "#b45309"
+  danger-text: "#b4442a"
 typography:
   display:
     fontFamily: "IBM Plex Mono, ui-monospace, monospace"
@@ -116,10 +120,19 @@ The palette is a quiet clinical neutral with exactly two metric accents; it is n
 - **Muted Slate** (`#6b7680`, text-muted): secondary text, labels.
 - **Faint Slate** (`#9aa3ac`, text-faint): tertiary text, icon strokes on missed/locked cells, sort-indicator glyphs.
 - **Locked Grey** (`#eceef0`, locked-bg/border): the `locked` cell state's fill — visually recessed, deliberately duller than pending.
-- **Danger Clay** (`#dc6a4a`, danger): the roster's low-adherence (<50%) text color — a warm clay rather than a saturated alarm red, consistent with the clinical-calm palette.
+- **Danger Clay** (`#dc6a4a`, danger): the low-adherence / error accent — a warm clay rather than a saturated alarm red, consistent with the clinical-calm palette. As text it renders through `danger-text` (see Accent Text).
+
+### Accent Text
+Accent hues (`accent-teal`, `success`, `accent-amber`, `danger`) are fills: too light to carry text on white (1.9–3.4:1). Each has a theme-aware text counterpart for labels, deltas, links and status copy:
+- **accent-teal-text** (`#0f766e` light / `#34e6cf` dark) — 5.47:1 on panel, 5.05:1 on bg.
+- **success-text** (`#15803d` light / `#46d17f` dark) — 5.02:1 on panel, 4.63:1 on bg.
+- **accent-amber-text** (`#b45309` light / `#ffb020` dark) — 5.02:1 on panel, 4.64:1 on bg.
+- **danger-text** (`#b4442a` light / `#e88968` dark) — 5.52:1 on panel, 5.10:1 on bg.
 
 ### Named Rules
 **The Metric-Not-Client Rule.** Accent color is assigned per tracked metric (teal = weight, amber = steps), never per client or per arbitrary UI mood. A new tracked metric earns its own accent; an existing metric's accent does not vary by client or context.
+
+**The Fill-Not-Text Rule.** Accent tokens paint fills, borders, chart series and icons on tinted backgrounds; text always uses the matching `*-text` token (`text-accent-teal-text`, `text-success-text`, `text-accent-amber-text`, `text-danger-text`). Text sitting on a solid accent fill uses the fill's ink token (e.g. `accent-teal-ink`). `text-faint` stays reserved for placeholders, disabled copy and decorative glyphs, never for content that must be read.
 
 **The Never-Ambiguous-Empty Rule.** A `missed` day renders with the same bordered box as `pending` plus an explicit faint-slate X icon — it is never represented as a bare empty cell indistinguishable from "not yet due."
 

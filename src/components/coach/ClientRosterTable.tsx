@@ -3,28 +3,26 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Client } from '@/domain/types/Client';
+import {
+  getAdherenceTier,
+  sortByAdherence,
+  type AdherenceTier,
+  type WeekCell,
+  type WeekCellState,
+} from '@/domain/services/adherence';
 import { TablePagination } from './TablePagination';
-import { StatusPill } from '../ui/StatusPill';
-import { BlisterCell } from '../ui/blister-cell';
-import { ArrowRightIcon } from '../ui/icons';
+import { StatusPill } from '@/components/ui/StatusPill';
+import { BlisterCell } from '@/components/ui/blister-cell';
+import { ArrowRightIcon } from '@/components/ui/icons';
 
 const PAGE_SIZE = 10;
 
-// Structurally matches `domain/services/adherence`'s `WeekCell` without
-// importing it — components may only depend on `domain/types/`, so the
-// Server Component page (`(dashboard)/clients/page.tsx`) computes the weekly
-// strip, adherence % and days since the last log, and hands them down as
-// plain props.
-type RosterWeekCellState = 'popped' | 'missed' | 'pending' | 'locked';
-interface RosterWeekCell {
-  date: Date;
-  state: RosterWeekCellState;
-}
-
+// The Server Component page (`(dashboard)/clients/page.tsx`) computes each
+// client's weekly strip, adherence % and days since the last log.
 interface ClientRosterTableProps {
   clients: (Client & {
     id: string;
-    weekCells: RosterWeekCell[];
+    weekCells: WeekCell[];
     adherencePct: number;
     daysSinceLastLog?: number;
   })[];
@@ -32,21 +30,18 @@ interface ClientRosterTableProps {
 
 const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-const STATE_LABEL_ES: Record<RosterWeekCellState, string> = {
+const STATE_LABEL_ES: Record<WeekCellState, string> = {
   popped: 'registrado',
   missed: 'saltado',
   pending: 'pendiente',
   locked: 'bloqueado',
 };
 
-// Thresholds from the "Coach — Roster" artboard: <50% needs attention
-// (danger), 50–84% is adequate but unremarkable (faint), 85%+ reads at full
-// contrast as "going well".
-function adherenceColorClass(pct: number): string {
-  if (pct < 50) return 'text-danger';
-  if (pct < 85) return 'text-text-faint';
-  return 'text-text-primary';
-}
+const ADHERENCE_CLASS: Record<AdherenceTier, string> = {
+  low: 'text-danger-text',
+  fair: 'text-text-faint',
+  good: 'text-text-primary',
+};
 
 function lastLogLabel(days: number | undefined): string {
   if (days === undefined) return 'Sin registros todavía';
@@ -62,12 +57,7 @@ function lastLogLabel(days: number | undefined): string {
 export function ClientRosterTable({ clients }: ClientRosterTableProps) {
   const [page, setPage] = useState(0);
 
-  // Most-empty-first per the direction contract ("ordenados por celdas
-  // vacías primero… lo que necesita atención está arriba"); name breaks ties
-  // so the order is stable across renders.
-  const sorted = [...clients].sort(
-    (a, b) => a.adherencePct - b.adherencePct || a.name.localeCompare(b.name, 'es'),
-  );
+  const sorted = sortByAdherence(clients);
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paginated = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
@@ -124,7 +114,7 @@ export function ClientRosterTable({ clients }: ClientRosterTableProps) {
             </ol>
 
             <p
-              className={`w-11 shrink-0 text-right font-mono text-[15px] font-bold ${adherenceColorClass(client.adherencePct)}`}
+              className={`w-11 shrink-0 text-right font-mono text-[15px] font-bold ${ADHERENCE_CLASS[getAdherenceTier(client.adherencePct)]}`}
               aria-label={`Adherencia ${client.adherencePct}%`}
             >
               {client.adherencePct}%

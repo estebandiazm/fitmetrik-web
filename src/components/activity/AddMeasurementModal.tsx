@@ -12,9 +12,12 @@ import {
   sanitizeDecimalInput,
   stepMeasurementValue,
 } from '@/domain/services/bodyMeasurements';
+import { parseLocalISODate, toLocalISODate } from '@/domain/services/localDates';
 import { Modal } from '@/components/ui/Modal';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 interface AddMeasurementModalProps {
   open: boolean;
@@ -26,8 +29,6 @@ interface AddMeasurementModalProps {
   onSuccess?: () => void;
 }
 
-const todayISO = () => new Date().toISOString().split('T')[0];
-
 export default function AddMeasurementModal({
   open,
   onClose,
@@ -37,7 +38,7 @@ export default function AddMeasurementModal({
   measurements = [],
   onSuccess,
 }: AddMeasurementModalProps) {
-  const [date, setDate] = useState(todayISO());
+  const [date, setDate] = useState(toLocalISODate());
   const [values, setValues] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export default function AddMeasurementModal({
   if (wasOpen !== open) {
     setWasOpen(open);
     if (!open) {
-      setDate(todayISO());
+      setDate(toLocalISODate());
       setValues({});
       setFieldErrors({});
       setGlobalError(null);
@@ -109,13 +110,19 @@ export default function AddMeasurementModal({
   async function handleSubmit() {
     setGlobalError(null);
 
-    const selectedDate = new Date(date);
-    selectedDate.setHours(0, 0, 0, 0);
+    const selectedDate = parseLocalISODate(date);
     if (isFutureDate(selectedDate)) {
       setGlobalError('La fecha no puede ser futura');
       return;
     }
 
+    const prepared = prepareEntries(selectedDate);
+    if (prepared) await persistEntries(prepared.entries, prepared.flagged);
+  }
+
+  // Builds the entries to save and flags invalid tiles; null when nothing is
+  // saveable.
+  function prepareEntries(selectedDate: Date) {
     const { entries, fieldErrors: buildErrors } = buildMeasurementEntries(
       activePoints,
       values,
@@ -126,27 +133,29 @@ export default function AddMeasurementModal({
 
     if (entries.length === 0) {
       if (!flagged) setGlobalError('Ingresá al menos un valor para guardar');
-      return;
+      return null;
     }
+    return { entries, flagged };
+  }
 
+  // Saved tiles are cleared; when siblings were flagged the modal stays open
+  // and marks the saved ones, otherwise it closes.
+  function applySaved(savedSlugsNow: string[], flagged: boolean) {
+    setValues((prev) => {
+      const next = { ...prev };
+      for (const slug of savedSlugsNow) delete next[slug];
+      return next;
+    });
+    onSuccess?.();
+    if (flagged) setSavedSlugs(savedSlugsNow);
+    else onClose();
+  }
+
+  async function persistEntries(entries: BodyMeasurement[], flagged: boolean) {
     setLoading(true);
     try {
       await addMeasurementEntries(clientId, entries);
-      const savedNow = entries.map((entry) => entry.pointSlug);
-
-      setValues((prev) => {
-        const next = { ...prev };
-        for (const slug of savedNow) delete next[slug];
-        return next;
-      });
-
-      onSuccess?.();
-
-      if (flagged) {
-        setSavedSlugs(savedNow);
-      } else {
-        onClose();
-      }
+      applySaved(entries.map((entry) => entry.pointSlug), flagged);
     } catch (err) {
       setGlobalError(err instanceof Error ? err.message : 'Error al guardar medidas');
     } finally {
@@ -154,28 +163,25 @@ export default function AddMeasurementModal({
     }
   }
 
-  const { entries: readyEntries } = buildMeasurementEntries(activePoints, values, new Date(date));
+  const { entries: readyEntries } = buildMeasurementEntries(activePoints, values, parseLocalISODate(date));
   const readyCount = readyEntries.length;
 
   const footer = (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-sm text-on-surface-variant tabular-nums">
+      <span className="text-sm text-text-muted tabular-nums">
         {readyCount} {readyCount === 1 ? 'medida lista' : 'medidas listas'}
       </span>
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-on-surface-variant hover:text-on-surface transition"
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={onClose}>
           Cancelar
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="accent"
+          size="sm"
           onClick={handleSubmit}
           disabled={loading}
           data-testid="add-measurement-submit"
-          className="px-4 py-2 rounded-full neu-btn-accent font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
         >
           {loading && (
             <span className="material-symbols-outlined text-base animate-spin">
@@ -183,7 +189,7 @@ export default function AddMeasurementModal({
             </span>
           )}
           Guardar
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -199,20 +205,20 @@ export default function AddMeasurementModal({
     >
       <div className="space-y-5">
         <div>
-          <label className="block text-sm text-on-surface-variant mb-2">Fecha</label>
-          <input
+          <label className="block text-sm text-text-muted mb-2">Fecha</label>
+          <Input
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
-            max={todayISO()}
-            className="w-full px-4 py-2 rounded-full neu-inset border border-transparent text-on-surface [color-scheme:dark] focus:border-primary focus:outline-none"
+            max={toLocalISODate()}
+            className="w-full"
           />
         </div>
 
         {globalError && (
           <div
             role="alert"
-            className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3 text-sm"
+            className="bg-danger/10 border border-danger/30 text-danger-text rounded-lg p-3 text-sm"
           >
             {globalError}
           </div>
@@ -220,7 +226,7 @@ export default function AddMeasurementModal({
 
         {groups.map((group) => (
           <div key={group.group} className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">
               {group.group}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -243,11 +249,11 @@ export default function AddMeasurementModal({
                 return (
                   <div key={point.slug} className={tileClassName}>
                     <div className="flex items-center justify-between gap-1">
-                      <span className="text-xs font-medium text-on-surface-variant truncate">
+                      <span className="text-xs font-medium text-text-muted truncate">
                         {point.label}
                       </span>
                       {saved && (
-                        <span className="material-symbols-outlined text-sm text-emerald-400">
+                        <span className="material-symbols-outlined text-sm text-success-text">
                           check
                         </span>
                       )}
@@ -259,7 +265,7 @@ export default function AddMeasurementModal({
                         tabIndex={-1}
                         aria-label={`Restar 0.5 a ${point.label}`}
                         onClick={() => handleStep(point.slug, -0.5)}
-                        className="shrink-0 w-6 h-6 rounded-full neu-btn text-on-surface-variant hover:text-on-surface transition leading-none"
+                        className="shrink-0 w-6 h-6 rounded-full neu-btn text-text-muted hover:text-text-primary transition leading-none"
                       >
                         −
                       </button>
@@ -275,26 +281,26 @@ export default function AddMeasurementModal({
                         onChange={(event) => handleValueChange(point.slug, event.target.value)}
                         onKeyDown={(event) => handleInputKeyDown(event, point.slug)}
                         data-testid={`add-measurement-input-${point.slug}`}
-                        className="flex-1 min-w-[4ch] bg-transparent text-center text-lg font-semibold tabular-nums text-on-surface placeholder-gray-500 focus:outline-none"
+                        className="flex-1 min-w-[4ch] bg-transparent text-center text-lg font-semibold tabular-nums text-text-primary placeholder:text-text-faint focus:outline-none"
                       />
-                      <span className="shrink-0 text-xs text-on-surface-variant">cm</span>
+                      <span className="shrink-0 text-xs text-text-muted">cm</span>
                       <button
                         type="button"
                         tabIndex={-1}
                         aria-label={`Sumar 0.5 a ${point.label}`}
                         onClick={() => handleStep(point.slug, 0.5)}
-                        className="shrink-0 w-6 h-6 rounded-full neu-btn text-on-surface-variant hover:text-on-surface transition leading-none"
+                        className="shrink-0 w-6 h-6 rounded-full neu-btn text-text-muted hover:text-text-primary transition leading-none"
                       >
                         +
                       </button>
                     </div>
 
                     {error ? (
-                      <p className="text-red-400 text-xs">{error}</p>
+                      <p className="text-danger-text text-xs">{error}</p>
                     ) : isZero ? (
-                      <p className="text-on-surface-variant text-xs">no se guarda</p>
+                      <p className="text-text-muted text-xs">no se guarda</p>
                     ) : reference ? (
-                      <p className="text-on-surface-variant text-xs truncate">{reference}</p>
+                      <p className="text-text-muted text-xs truncate">{reference}</p>
                     ) : null}
                   </div>
                 );

@@ -44,13 +44,14 @@ Unit tests use **Vitest** (not yet configured — target `domain/services/`).
 ### Dependency rule (strict)
 
 ```
-app/ → components/, domain/, infrastructure/ports/
-components/ → domain/types/
+app/ → components/, context/, domain/, infrastructure/ports/
+components/ → domain/types/, domain/services/ (pure functions), app/actions/ (Server Actions), context/
+context/ → domain/types/ (React client-state providers only)
 domain/ → NOTHING (pure TypeScript only)
 infrastructure/adapters/ → infrastructure/ports/, domain/types/
 ```
 
-`domain/` is the heart of the system. It must never import from `infrastructure/`, `components/`, or `app/`.
+`domain/` is the heart of the system. It must never import from `infrastructure/`, `components/`, or `app/`. `components/` must never import from `infrastructure/`.
 
 ### Route groups
 

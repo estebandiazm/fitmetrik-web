@@ -87,6 +87,12 @@
   --color-locked-border: #e1e4e7;
   --color-danger: #dc6a4a;
   --color-cell-pending-bg: #ffffff;
+  /* Accent *text* tokens: accents are fills; these are their readable text
+     counterparts (>=4.5:1 on panel and bg in both themes). */
+  --color-accent-teal-text: #0f766e;
+  --color-success-text: #15803d;
+  --color-accent-amber-text: #b45309;
+  --color-danger-text: #b4442a;
 }
 
 :root {
@@ -154,6 +160,12 @@
   --color-locked-border: #e1e4e7;
   --color-danger: #dc6a4a;
   --color-cell-pending-bg: #ffffff;
+  /* Accent *text* tokens: accents are fills; these are their readable text
+     counterparts (>=4.5:1 on panel and bg in both themes). */
+  --color-accent-teal-text: #0f766e;
+  --color-success-text: #15803d;
+  --color-accent-amber-text: #b45309;
+  --color-danger-text: #b4442a;
   --shadow-dome:
     0 2px 0 rgba(0, 0, 0, 0.04),
     inset 0 2px 4px rgba(255, 255, 255, 0.9),
@@ -181,6 +193,11 @@
   --color-locked-border: #2b303b;
   --color-danger: #e88968;
   --color-cell-pending-bg: #191d24;
+  /* Dark keeps the accent values themselves as text (>=6.4:1 on panel). */
+  --color-accent-teal-text: #34e6cf;
+  --color-success-text: #46d17f;
+  --color-accent-amber-text: #ffb020;
+  --color-danger-text: #e88968;
   --shadow-dome:
     0 2px 0 rgba(0, 0, 0, 0.35),
     inset 0 1px 2px rgba(255, 255, 255, 0.05),
