@@ -36,6 +36,13 @@ describe('bucketByLocalDay', () => {
     expect(buckets[5].entry).toBe(entry);
   });
 
+  it('puts a date-only string on that calendar day, not the previous one', () => {
+    const entry = { date: '2026-10-02', weight: 70 };
+    const buckets = bucketByLocalDay([entry], 7, now());
+    expect(buckets[5].entry).toBe(entry);
+    expect(buckets[4].entry).toBeUndefined();
+  });
+
   it('keeps the first entry when a day has several', () => {
     const first = { date: new Date(2026, 9, 3, 8, 0), steps: 1 };
     const second = { date: new Date(2026, 9, 3, 18, 0), steps: 2 };

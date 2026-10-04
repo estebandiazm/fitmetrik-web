@@ -1,7 +1,15 @@
 // Day-bucketed series for the activity charts (steps, weight). Days are the
 // user's local calendar days: keying by `toISOString()` (UTC) would move
 // evening records west of UTC onto the next day.
-import { toLocalISODate } from './localDates';
+import { parseLocalISODate, toLocalISODate } from './localDates';
+
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
+// `new Date('YYYY-MM-DD')` is UTC midnight, which is the previous local day
+// west of UTC, so date-only strings are read as local calendar dates.
+function toEntryDate(date: Date | string): Date {
+  return typeof date === 'string' && DATE_ONLY.test(date) ? parseLocalISODate(date) : new Date(date);
+}
 
 export interface DayBucket<T> {
   label: string;
@@ -17,7 +25,7 @@ export function bucketByLocalDay<T extends { date: Date | string }>(
 ): DayBucket<T>[] {
   const byDay = new Map<string, T>();
   for (const entry of entries) {
-    const key = toLocalISODate(new Date(entry.date));
+    const key = toLocalISODate(toEntryDate(entry.date));
     if (!byDay.has(key)) byDay.set(key, entry);
   }
 
