@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   parseDailyStepInput,
+  parseDailyWeightInput,
   parseStepGoal,
   parseTargetWeight,
 } from '@/domain/services/activityInputs';
@@ -78,3 +79,39 @@ describe('parseTargetWeight', () => {
   });
 });
 
+
+describe('parseDailyWeightInput', () => {
+  it('accepts today with a valid weight, as local midnight', () => {
+    const result = parseDailyWeightInput('2026-04-15', '80.5', NOW);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.weight).toBe(80.5);
+    expect([result.date.getMonth(), result.date.getDate(), result.date.getHours()]).toEqual([3, 15, 0]);
+  });
+
+  it('rejects a future date', () => {
+    expect(parseDailyWeightInput('2026-04-16', '80', NOW)).toEqual({
+      ok: false,
+      reason: 'Date cannot be in the future',
+    });
+  });
+
+  it.each(['', 'abc', '0', '0.05', '500.1'])('rejects weight %j outside 0.1–500 kg', (raw) => {
+    expect(parseDailyWeightInput('2026-04-15', raw, NOW)).toEqual({
+      ok: false,
+      reason: 'Weight must be between 0.1 and 500 kg',
+    });
+  });
+
+  it.each(['0.1', '500'])('accepts the boundary weight %s', (raw) => {
+    expect(parseDailyWeightInput('2026-04-15', raw, NOW).ok).toBe(true);
+  });
+});
+
+describe('date input validation', () => {
+  it.each(['', 'abc', '2026-xx-01'])('rejects an invalid date %j', (dateISO) => {
+    const invalid = { ok: false, reason: 'Invalid date' };
+    expect(parseDailyStepInput(dateISO, '8000', NOW)).toEqual(invalid);
+    expect(parseDailyWeightInput(dateISO, '80', NOW)).toEqual(invalid);
+  });
+});

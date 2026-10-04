@@ -1,5 +1,5 @@
-// Parsers for the raw form inputs of the activity editors (daily steps, step
-// goal, target weight). Each returns a typed result so components only map it
+// Parsers for the raw form inputs of the activity editors (daily steps, daily
+// weight, step goal, target weight). Each returns a typed result so components only map it
 // to UI state.
 import { isFutureDate } from "./bodyMeasurements";
 import { parseLocalISODate } from "./localDates";
@@ -7,6 +7,16 @@ import { parseLocalISODate } from "./localDates";
 export type ParseResult<T> = ({ ok: true } & T) | { ok: false; reason: string };
 
 const MAX_DAILY_STEPS = 100000;
+const MIN_DAILY_WEIGHT_KG = 0.1;
+const MAX_DAILY_WEIGHT_KG = 500;
+
+// Reason a daily-entry date is rejected, or null when it is a valid past or
+// present day.
+function validateEntryDate(date: Date, now: Date): string | null {
+  if (isNaN(date.getTime())) return "Invalid date";
+  if (isFutureDate(date, now)) return "Date cannot be in the future";
+  return null;
+}
 
 export function parseDailyStepInput(
   dateISO: string,
@@ -14,9 +24,8 @@ export function parseDailyStepInput(
   now: Date = new Date()
 ): ParseResult<{ date: Date; steps: number }> {
   const date = parseLocalISODate(dateISO);
-  if (isFutureDate(date, now)) {
-    return { ok: false, reason: "Date cannot be in the future" };
-  }
+  const dateError = validateEntryDate(date, now);
+  if (dateError) return { ok: false, reason: dateError };
 
   const steps = parseInt(stepsRaw, 10);
   if (isNaN(steps) || steps < 0 || steps > MAX_DAILY_STEPS) {
@@ -24,6 +33,23 @@ export function parseDailyStepInput(
   }
 
   return { ok: true, date, steps };
+}
+
+export function parseDailyWeightInput(
+  dateISO: string,
+  weightRaw: string,
+  now: Date = new Date()
+): ParseResult<{ date: Date; weight: number }> {
+  const date = parseLocalISODate(dateISO);
+  const dateError = validateEntryDate(date, now);
+  if (dateError) return { ok: false, reason: dateError };
+
+  const weight = parseFloat(weightRaw);
+  if (isNaN(weight) || weight < MIN_DAILY_WEIGHT_KG || weight > MAX_DAILY_WEIGHT_KG) {
+    return { ok: false, reason: "Weight must be between 0.1 and 500 kg" };
+  }
+
+  return { ok: true, date, weight };
 }
 
 export function parseStepGoal(raw: string): ParseResult<{ value: number }> {
