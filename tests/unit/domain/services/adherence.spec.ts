@@ -5,6 +5,8 @@ import {
   findEntryForDate,
   calculateAdherencePct,
   daysSinceLastEntry,
+  getAdherenceTier,
+  sortByAdherence,
 } from '@/domain/services/adherence';
 
 // Jan 1 2024 is a Monday, so these fixtures land on known weekdays without
@@ -184,5 +186,30 @@ describe('daysSinceLastEntry', () => {
 
   it('counts across a week boundary', () => {
     expect(daysSinceLastEntry([{ date: MONDAY }], new Date(2024, 0, 15))).toBe(7);
+  });
+});
+
+describe('getAdherenceTier', () => {
+  it.each([
+    [0, 'low'],
+    [49, 'low'],
+    [50, 'fair'],
+    [84, 'fair'],
+    [85, 'good'],
+    [100, 'good'],
+  ] as const)('maps %i%% to %s', (pct, tier) => {
+    expect(getAdherenceTier(pct)).toBe(tier);
+  });
+});
+
+describe('sortByAdherence', () => {
+  it('orders lowest adherence first, then by name (es), without mutating the input', () => {
+    const input = [
+      { name: 'Óscar', adherencePct: 80 },
+      { name: 'Ana', adherencePct: 80 },
+      { name: 'Bea', adherencePct: 20 },
+    ];
+    expect(sortByAdherence(input).map((c) => c.name)).toEqual(['Bea', 'Ana', 'Óscar']);
+    expect(input[0].name).toBe('Óscar');
   });
 });
