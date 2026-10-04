@@ -251,3 +251,37 @@ export function groupPoints(
 
   return order.map((group) => ({ group, points: byGroup.get(group) ?? [] }));
 }
+
+// ── buildMeasurementHistory ───────────────────────────────────────────────────
+
+export interface MeasurementHistoryRow {
+  entry: BodyMeasurement;
+  /** Change vs. the previous (older) entry; null for the oldest entry. */
+  delta: number | null;
+}
+
+// History table rows for one point: newest first, each with its delta against
+// the next older entry.
+export function buildMeasurementHistory(
+  measurements: BodyMeasurement[],
+  pointSlug: string
+): MeasurementHistoryRow[] {
+  const forPoint = measurements
+    .filter((m) => m.pointSlug === pointSlug)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  return forPoint.map((entry, index) => {
+    const prev = forPoint[index + 1];
+    return { entry, delta: prev != null ? entry.valueCm - prev.valueCm : null };
+  });
+}
+
+// ── formatMeasurementDate ─────────────────────────────────────────────────────
+
+export function formatMeasurementDate(date: Date | string): string {
+  return new Date(date).toLocaleDateString("es-AR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}

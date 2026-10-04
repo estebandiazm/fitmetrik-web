@@ -15,6 +15,8 @@ import {
   formatMeasurementReference,
   isFutureDate,
   isNoDataValue,
+  buildMeasurementHistory,
+  formatMeasurementDate,
 } from '@/domain/services/bodyMeasurements';
 import type { BodyMeasurement } from '@/domain/types/BodyMeasurement';
 import type { MeasurementPoint } from '@/domain/types/MeasurementPoint';
@@ -461,5 +463,62 @@ describe('formatMeasurementReference', () => {
       { date: new Date('2026-01-15'), pointSlug: 'pecho', valueCm: 102 },
     ];
     expect(formatMeasurementReference(measurements, 'pecho')).toBe('última: 102 cm (Δ +2)');
+  });
+});
+
+// ── buildMeasurementHistory ───────────────────────────────────────────────────
+
+describe('buildMeasurementHistory', () => {
+  const history: BodyMeasurement[] = [
+    { date: new Date('2026-01-01'), pointSlug: 'cintura', valueCm: 80 },
+    { date: new Date('2026-03-01'), pointSlug: 'cintura', valueCm: 78.5 },
+    { date: new Date('2026-02-01'), pointSlug: 'cintura', valueCm: 79 },
+    { date: new Date('2026-02-15'), pointSlug: 'pecho', valueCm: 100 },
+  ];
+
+  it('returns only the selected point, newest first', () => {
+    const rows = buildMeasurementHistory(history, 'cintura');
+    expect(rows.map((r) => r.entry.valueCm)).toEqual([78.5, 79, 80]);
+  });
+
+  it('computes each delta against the previous (older) entry', () => {
+    const rows = buildMeasurementHistory(history, 'cintura');
+    expect(rows.map((r) => r.delta)).toEqual([-0.5, -1, null]);
+  });
+
+  it('returns a null delta for a single entry', () => {
+    const rows = buildMeasurementHistory(history, 'pecho');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].delta).toBeNull();
+  });
+
+  it('returns an empty list when the point has no entries', () => {
+    expect(buildMeasurementHistory(history, 'gluteo')).toEqual([]);
+  });
+
+  it('does not mutate the input array', () => {
+    const copy = [...history];
+    buildMeasurementHistory(history, 'cintura');
+    expect(history).toEqual(copy);
+  });
+});
+
+// ── formatMeasurementDate ─────────────────────────────────────────────────────
+
+describe('formatMeasurementDate', () => {
+  it('formats a date with the es-AR short locale format', () => {
+    const date = new Date(2026, 2, 15, 12);
+    const expected = date.toLocaleDateString('es-AR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+    expect(formatMeasurementDate(date)).toBe(expected);
+    expect(formatMeasurementDate(date)).toContain('2026');
+  });
+
+  it('accepts a date string', () => {
+    const iso = new Date(2026, 2, 15, 12).toISOString();
+    expect(formatMeasurementDate(iso)).toBe(formatMeasurementDate(new Date(iso)));
   });
 });
