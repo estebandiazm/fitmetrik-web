@@ -49,7 +49,7 @@ class CoachClientDetailPage {
   async saveMeasurementPoints() {
     await this.page
       .getByTestId('measurement-points-editor')
-      .getByRole('button', { name: /save/i })
+      .getByRole('button', { name: /guardar/i })
       .click();
   }
 
@@ -169,11 +169,7 @@ test.describe('Coach: Measurement Points Configuration (REQ-BMT-01)', () => {
     await coachPage.saveMeasurementPoints();
 
     // Wait for success feedback
-    await expect(
-      page.locator('text=saved, text=guardado').or(
-        page.getByText('saved', { exact: false })
-      )
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Puntos de medición guardados')).toBeVisible({ timeout: 5000 });
   });
 });
 

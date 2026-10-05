@@ -72,7 +72,7 @@ export default function MeasurementPointsEditor({
         onSaved?.();
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error saving measurement points');
+      setError(err instanceof Error ? err.message : 'No se pudieron guardar los puntos de medición');
     } finally {
       setLoading(false);
     }
@@ -138,7 +138,7 @@ export default function MeasurementPointsEditor({
       )}
 
       <Button onClick={handleSave} disabled={loading} className="self-start">
-        {loading ? '⏳' : 'Save'}
+        {loading ? 'Guardando…' : 'Guardar'}
       </Button>
     </div>
   );
