@@ -1,20 +1,20 @@
 'use client'
 
-import FoodTable from "../food-table/FoodTable";
 import { useContext, useState } from "react";
 import { ClientContext } from "../../context/ClientContext";
 import { ClientContextType } from "../../context/ClientContextType";
-import { useRouter } from "next/navigation";
 import { DietPlan, Meal, MealBlock, FoodOption } from "../../domain/types/DietPlan";
-import type { FoodCategory } from "../../domain/types/Food";
+import { Card } from "../ui/Card";
+import { ChevronDownIcon } from "../ui/icons";
 
 interface ViewerProps {
   overridePlans?: DietPlan[];
   overrideClientName?: string;
 }
 
+const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-teal";
+
 const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
-  const router = useRouter();
   const { client } = useContext(ClientContext) as ClientContextType;
   const [expandedMeal, setExpandedMeal] = useState<string | null>(null);
 
@@ -22,94 +22,104 @@ const Viewer = ({ overridePlans, overrideClientName }: ViewerProps = {}) => {
   const plans: DietPlan[] = overridePlans ?? client.plans ?? [];
 
   if (!clientName && !overridePlans) {
-    return <p className="m-4 text-white">Cargando cliente...</p>;
+    return <p className="m-4 text-text-muted">Cargando cliente...</p>;
   }
 
-  const saveHandler = () => {
-    router.back();
-  };
-
   return (
-    <div className="m-4 bg-surface-dim min-h-screen p-6">
-      {/* Client header */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 rounded-full bg-tertiary/20 flex items-center justify-center text-white font-bold text-lg">
-          {clientName ? clientName.charAt(0).toUpperCase() : "U"}
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-white">Nombre: {clientName}</h2>
-          {!overridePlans && client.targetWeight && (
-            <p className="text-sm text-white/60">Peso objetivo: {client.targetWeight} kg</p>
-          )}
-        </div>
-      </div>
-
-      {plans.length === 0 && (
-        <p className="mt-4 text-white/60">No hay planes guardados para este cliente.</p>
-      )}
-
-      {plans.map((plan: DietPlan, planIndex: number) => (
-        <div key={planIndex} className="mb-8">
-          {/* Plan header */}
-          <div className="flex items-center gap-3 mb-4">
-            <h3 className="text-lg font-bold text-white">
-              {plan.label ?? `Plan ${planIndex + 1}`}
-            </h3>
-            {plan.days && (
-              <span className="text-xs px-3 py-1 rounded-full border border-tertiary/40 text-tertiary font-semibold">
-                {plan.days}
-              </span>
+    <main className="min-h-screen bg-bg px-4 py-6 text-text-primary">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <header className="flex items-center gap-4">
+          <div
+            aria-hidden="true"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-panel font-mono text-lg font-bold text-accent-teal-text"
+          >
+            {clientName ? clientName.charAt(0).toUpperCase() : "U"}
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-text-primary">{clientName}</h1>
+            {!overridePlans && client.targetWeight && (
+              <p className="text-sm text-text-muted">
+                Peso objetivo: <span className="font-mono">{client.targetWeight}</span> kg
+              </p>
             )}
           </div>
-          <div className="border-t border-white/10 mb-4" />
+        </header>
 
-          {/* Meals */}
-          {plan.meals.map((meal: Meal, mealIndex: number) => {
-            const isExpanded = expandedMeal === `${planIndex}-${mealIndex}`;
-            return (
-              <div key={mealIndex} className="mb-4 border border-white/10 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setExpandedMeal(isExpanded ? null : `${planIndex}-${mealIndex}`)}
-                  className="w-full px-4 py-3 flex items-center justify-between bg-white/5 hover:bg-white/10 transition text-white font-semibold"
-                >
-                  <span>{meal.mealName}</span>
-                  <span className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
-                </button>
+        {plans.length === 0 && (
+          <p className="text-text-muted">No hay planes guardados para este cliente.</p>
+        )}
 
-                {isExpanded && (
-                  <div className="p-4 bg-white/2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {meal.blocks.map((block: MealBlock, bIndex: number) => (
-                        <div key={bIndex} className="space-y-3">
-                          <span className="text-xs px-3 py-1 rounded-full border border-tertiary/40 text-tertiary font-semibold inline-block">
-                            {block.blockType}
-                          </span>
-                          <FoodTable
-                            list={block.options.map((opt: FoodOption) => ({
-                              name: opt.foodName,
-                              totalGrams: opt.grams,
-                              category: block.blockType as FoodCategory,
-                              grams: opt.grams
-                            }))}
-                          />
-                        </div>
-                      ))}
+        {plans.map((plan: DietPlan, planIndex: number) => (
+          <section key={planIndex} aria-labelledby={`plan-${planIndex}-title`} className="space-y-3">
+            <div className="flex flex-wrap items-center gap-3 border-b border-border pb-2">
+              <h2 id={`plan-${planIndex}-title`} className="text-lg font-bold text-text-primary">
+                {plan.label ?? `Plan ${planIndex + 1}`}
+              </h2>
+              {plan.days && (
+                <span className="rounded-full border border-border px-3 py-0.5 text-xs font-semibold text-accent-teal-text">
+                  {plan.days}
+                </span>
+              )}
+            </div>
+
+            {plan.meals.map((meal: Meal, mealIndex: number) => {
+              const key = `${planIndex}-${mealIndex}`;
+              const isExpanded = expandedMeal === key;
+              const panelId = `meal-panel-${key}`;
+              const buttonId = `meal-button-${key}`;
+              return (
+                <Card key={mealIndex} className="overflow-hidden">
+                  <h3>
+                    <button
+                      id={buttonId}
+                      type="button"
+                      aria-expanded={isExpanded}
+                      aria-controls={panelId}
+                      onClick={() => setExpandedMeal(isExpanded ? null : key)}
+                      className={`flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-text-primary transition hover:bg-row-border ${FOCUS}`}
+                    >
+                      <span>{meal.mealName}</span>
+                      <ChevronDownIcon
+                        className={`text-text-muted transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  </h3>
+
+                  {isExpanded && (
+                    <div
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      className="border-t border-border p-4"
+                    >
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {meal.blocks.map((block: MealBlock, bIndex: number) => (
+                          <div key={bIndex} className="space-y-2">
+                            <span className="text-xs font-bold uppercase tracking-widest text-accent-teal-text">
+                              {block.blockType}
+                            </span>
+                            <ul className="divide-y divide-row-border">
+                              {block.options.map((opt: FoodOption, oIndex: number) => (
+                                <li key={oIndex} className="flex items-baseline justify-between gap-4 py-2 text-sm">
+                                  <span className="text-text-primary">{opt.foodName}</span>
+                                  <span className="font-mono text-xs font-medium text-text-muted">
+                                    {opt.grams} g
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ))}
-
-      <button
-        onClick={saveHandler}
-        className="w-full mt-6 px-6 py-3 neu-btn-accent font-bold rounded-full transition"
-      >
-        Regresar
-      </button>
-    </div>
+                  )}
+                </Card>
+              );
+            })}
+          </section>
+        ))}
+      </div>
+    </main>
   );
 };
 

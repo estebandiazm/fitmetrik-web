@@ -239,16 +239,17 @@ test.describe('Daily Weight Tracking', () => {
 
       if (clientExists) {
         await viewLink.click();
+        await page.getByRole('link', { name: 'Progreso' }).click();
 
         // Target Weight section heading
-        await expect(page.getByRole('heading', { name: 'Target Weight' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Peso objetivo' })).toBeVisible();
 
         // Input field for entering target
-        const targetInput = page.getByPlaceholder('e.g., 70.5');
+        const targetInput = page.getByPlaceholder('ej. 70.5');
         await expect(targetInput).toBeVisible();
 
         // Save button
-        await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Guardar' })).toBeVisible();
       }
     });
 
@@ -265,12 +266,13 @@ test.describe('Daily Weight Tracking', () => {
 
       if (clientExists) {
         await viewLink.click();
+        await page.getByRole('link', { name: 'Progreso' }).click();
 
         // Enter a valid target weight
-        await page.getByPlaceholder('e.g., 70.5').fill('72.0');
-        await page.getByRole('button', { name: 'Save' }).click();
+        await page.getByPlaceholder('ej. 70.5').fill('72.0');
+        await page.getByRole('button', { name: 'Guardar' }).click();
 
-        await expect(page.getByText('Target weight saved!')).toBeVisible({ timeout: 5000 });
+        await expect(page.getByText('¡Peso objetivo guardado!')).toBeVisible({ timeout: 5000 });
       }
     });
 
@@ -287,17 +289,18 @@ test.describe('Daily Weight Tracking', () => {
 
       if (clientExists) {
         await viewLink.click();
+        await page.getByRole('link', { name: 'Progreso' }).click();
 
         // Metrics section is conditional on weights.length > 0
-        const latestCard = page.getByText('Latest Weight');
+        const latestCard = page.getByText('Último', { exact: true });
         const hasMetrics = await latestCard.isVisible().catch(() => false);
 
         if (hasMetrics) {
-          await expect(page.getByText('Lightest')).toBeVisible();
-          await expect(page.getByText('Heaviest')).toBeVisible();
+          await expect(page.getByText('Más bajo')).toBeVisible();
+          await expect(page.getByText('Más alto')).toBeVisible();
         } else {
           // Empty state
-          await expect(page.getByText('No weight data yet.')).toBeVisible();
+          await expect(page.getByText('Aún no hay registros de peso.')).toBeVisible();
         }
       }
     });
@@ -315,9 +318,10 @@ test.describe('Daily Weight Tracking', () => {
 
       if (clientExists) {
         await viewLink.click();
+        await page.getByRole('link', { name: 'Progreso' }).click();
 
         // Weight History heading only renders when weights.length > 0
-        const historyHeading = page.getByRole('heading', { name: 'Weight History' });
+        const historyHeading = page.getByRole('heading', { name: 'Historial' });
         const hasHistory = await historyHeading.isVisible().catch(() => false);
 
         if (hasHistory) {
@@ -326,7 +330,7 @@ test.describe('Daily Weight Tracking', () => {
       }
     });
 
-    test('DWT-E2E-16: should display Weight Tracking section heading on coach client page', async ({ page }) => {
+    test('DWT-E2E-16: should display Peso section heading on coach client page', async ({ page }) => {
       await page.goto('/login');
       await page.getByLabel('Correo electrónico').fill(coachEmail);
       await page.getByLabel('Contraseña', { exact: true }).fill(coachPassword);
@@ -339,8 +343,9 @@ test.describe('Daily Weight Tracking', () => {
 
       if (clientExists) {
         await viewLink.click();
+        await page.getByRole('link', { name: 'Progreso' }).click();
 
-        await expect(page.getByRole('heading', { name: 'Weight Tracking' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Peso', exact: true })).toBeVisible();
       }
     });
   });

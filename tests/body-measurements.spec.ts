@@ -37,7 +37,7 @@ class CoachClientDetailPage {
   constructor(private page: Page) {}
 
   async goto(clientId: string) {
-    await this.page.goto(`/clients/${clientId}`);
+    await this.page.goto(`/clients/${clientId}?tab=medidas`);
   }
 
   async toggleMeasurementPoint(slug: string) {
@@ -49,13 +49,17 @@ class CoachClientDetailPage {
   async saveMeasurementPoints() {
     await this.page
       .getByTestId('measurement-points-editor')
-      .getByRole('button', { name: /save/i })
+      .getByRole('button', { name: /guardar/i })
       .click();
   }
 
   async expectPointActive(slug: string) {
     const toggle = this.page.getByTestId(`measurement-point-toggle-${slug}`);
     await expect(toggle).toBeChecked();
+  }
+
+  async openMeasurementsTab() {
+    await this.page.getByRole('link', { name: 'Medidas' }).click();
   }
 
   async expectEditorVisible() {
@@ -143,6 +147,7 @@ test.describe('Coach: Measurement Points Configuration (REQ-BMT-01)', () => {
     await firstClientLink.click();
 
     const coachPage = new CoachClientDetailPage(page);
+    await coachPage.openMeasurementsTab();
     await coachPage.expectEditorVisible();
   });
 
@@ -156,6 +161,7 @@ test.describe('Coach: Measurement Points Configuration (REQ-BMT-01)', () => {
     await firstClientLink.click();
 
     const coachPage = new CoachClientDetailPage(page);
+    await coachPage.openMeasurementsTab();
     await coachPage.expectEditorVisible();
 
     // Toggle cintura ON
@@ -163,11 +169,7 @@ test.describe('Coach: Measurement Points Configuration (REQ-BMT-01)', () => {
     await coachPage.saveMeasurementPoints();
 
     // Wait for success feedback
-    await expect(
-      page.locator('text=saved, text=guardado').or(
-        page.getByText('saved', { exact: false })
-      )
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Puntos de medición guardados')).toBeVisible({ timeout: 5000 });
   });
 });
 

@@ -37,7 +37,7 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
         onSuccess?.();
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error saving goal');
+      setError(err instanceof Error ? err.message : 'No se pudo guardar la meta');
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
           type="number"
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
-          placeholder="e.g., 10000"
+          placeholder="ej. 10000"
           min="1"
           className="w-full"
         />
@@ -63,12 +63,12 @@ export default function StepGoalEditor({ clientId, currentGoal, onSuccess }: Ste
         )}
         {success && (
           <div className="mt-2 text-sm bg-success/10 border border-success/30 text-success-text rounded-lg p-2">
-            Goal saved successfully!
+            ¡Meta guardada!
           </div>
         )}
       </div>
       <Button onClick={handleSave} disabled={!canSave} className="mt-1">
-        {loading ? '⏳' : 'Save'}
+        {loading ? 'Guardando…' : 'Guardar'}
       </Button>
     </div>
   );

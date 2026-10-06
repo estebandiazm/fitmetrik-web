@@ -215,22 +215,23 @@ test.describe('Daily Steps Tracking', () => {
       if (clientExists) {
         await viewLink.click();
 
-        // Verify we're on client detail page
-        await expect(page.getByRole('heading', { name: 'Step Goal' })).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Daily Average' })).toBeVisible();
+        // Steps live in the "Progreso" tab of the client detail page
+        await page.getByRole('link', { name: 'Progreso' }).click();
+        await expect(page.getByRole('heading', { name: 'Meta de pasos' })).toBeVisible();
+        await expect(page.getByText('Promedio diario')).toBeVisible();
 
         // Set a step goal
         const goalInput = page.locator('input[type="number"]').first();
         await goalInput.fill('10000');
 
         // Click save button
-        await page.getByRole('button', { name: 'Save' }).click();
+        await page.getByRole('button', { name: 'Guardar' }).click();
 
         // Verify success message
-        await expect(page.getByText('Goal saved successfully')).toBeVisible({ timeout: 5000 });
+        await expect(page.getByText('¡Meta guardada!')).toBeVisible({ timeout: 5000 });
 
         // Verify the goal is updated
-        await expect(page.locator('text=Progress to Goal')).toBeVisible();
+        await expect(page.locator('text=Progreso hacia la meta')).toBeVisible();
       }
     });
   });
