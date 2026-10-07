@@ -15,6 +15,9 @@ const INPUT_CLASSES =
 const SUBMIT_CLASSES =
   'group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-accent-teal px-4 py-3.5 text-sm font-semibold text-accent-teal-ink transition-[transform,filter] duration-200 hover:brightness-[0.97] active:scale-[0.98] disabled:cursor-wait disabled:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-teal';
 
+const TEXT_LINK_CLASSES =
+  '-mx-1 rounded-md px-1 py-1 text-xs font-medium text-text-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-text-primary hover:decoration-accent-teal focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-teal';
+
 function Spinner() {
   return (
     <span
@@ -86,23 +89,25 @@ function RememberedAccount({ email, delayMs }: { email: string; delayMs: number 
       style={{ '--enter-delay': `${delayMs}ms` } as React.CSSProperties}
     >
       <input type="hidden" name="email" value={email} autoComplete="username" />
+      <input type="hidden" name="remembered" value="1" />
       <span
         aria-hidden="true"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-teal text-sm font-semibold uppercase text-accent-teal-ink"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-locked-bg text-sm font-bold uppercase text-text-muted"
       >
         {email.charAt(0)}
       </span>
-      <span className="min-w-0 flex-1 truncate text-[15px] text-text-primary" title={email}>
-        {email}
-      </span>
-      <button
-        type="submit"
-        formAction={switchAccount}
-        formNoValidate
-        className="shrink-0 text-xs font-medium text-text-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-text-primary hover:decoration-accent-teal"
-      >
-        Usar otra cuenta
-      </button>
+      <div className="flex min-w-0 flex-1 flex-col items-start">
+        <span className="text-sm font-medium text-text-primary [overflow-wrap:anywhere]">
+          <span className="sr-only">Cuenta: </span>
+          {/* Prefer wrapping long addresses right after the @ */}
+          {email.slice(0, email.indexOf('@') + 1)}
+          <wbr />
+          {email.slice(email.indexOf('@') + 1)}
+        </span>
+        <button type="submit" formAction={switchAccount} formNoValidate className={TEXT_LINK_CLASSES}>
+          Usar otra cuenta
+        </button>
+      </div>
     </div>
   );
 }
@@ -162,7 +167,7 @@ export function LoginForm({ rememberedEmail }: LoginFormProps) {
               <button
                 type="button"
                 onClick={() => setTab('magic')}
-                className="text-xs font-medium text-text-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-text-primary hover:decoration-accent-teal"
+                className={TEXT_LINK_CLASSES}
               >
                 ¿La olvidaste? Entra con un enlace
               </button>

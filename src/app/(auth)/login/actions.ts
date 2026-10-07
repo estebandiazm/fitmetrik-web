@@ -23,7 +23,9 @@ export async function loginWithPassword(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent('Correo o contraseña incorrectos')}`);
+    // A remembered account only typed the password, so don't blame the email.
+    const message = formData.get('remembered') ? 'Contraseña incorrecta. Inténtalo de nuevo.' : 'Correo o contraseña incorrectos';
+    redirect(`/login?error=${encodeURIComponent(message)}`);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
