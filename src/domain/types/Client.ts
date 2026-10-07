@@ -3,6 +3,7 @@ import { DailyStep } from "./DailySteps";
 import { DailyWeight } from "./DailyWeight";
 import { MeasurementPoint } from "./MeasurementPoint";
 import { BodyMeasurement } from "./BodyMeasurement";
+import { MealLog } from "./MealLog";
 
 export interface Client {
     name: string;
@@ -16,4 +17,5 @@ export interface Client {
     updatedAt?: string | Date;
     measurementPoints?: MeasurementPoint[];
     measurements?: BodyMeasurement[];
+    mealLogs?: MealLog[];
 }

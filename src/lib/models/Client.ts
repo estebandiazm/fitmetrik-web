@@ -4,6 +4,7 @@ import { Client as IClient } from '../../domain/types/Client';
 import { DailyWeight } from '../../domain/types/DailyWeight';
 import { MeasurementPoint } from '../../domain/types/MeasurementPoint';
 import { BodyMeasurement } from '../../domain/types/BodyMeasurement';
+import { MealLog } from '../../domain/types/MealLog';
 
 // --- Sub-Schemas based on domain/types ---
 
@@ -29,12 +30,20 @@ const SnackOptionSchema = new Schema({
   description: { type: String, required: true }
 }, { _id: false });
 
+const CarbPoolSchema = new Schema({
+  referenceFood: { type: String, required: true },
+  totalGrams: { type: Number, required: true, min: 0 },
+  mealNames: { type: [String], required: true },
+  tolerancePct: { type: Number, default: 10, min: 0, max: 100 }
+}, { _id: false });
+
 const DietPlanSchema = new Schema({
   label: { type: String },
   days: { type: String },
   recommendations: { type: String },
   meals: [MealSchema],
   snacks: [SnackOptionSchema],
+  carbPool: { type: CarbPoolSchema, required: false },
 }, { timestamps: true });
 
 const DailyStepsSchema = new Schema({
@@ -69,9 +78,17 @@ const BodyMeasurementSubSchema = new Schema({
   notes: { type: String },
 }, { _id: false });
 
+// `date` is the client's local calendar day ("YYYY-MM-DD"), see MealLog.
+const MealLogSubSchema = new Schema({
+  date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
+  mealName: { type: String, required: true },
+  foodName: { type: String, required: true },
+  grams: { type: Number, required: true, min: 0 },
+}, { _id: false });
+
 // --- Main Client Schema ---
 
-export interface ClientDocument extends Omit<IClient, 'plans' | 'coachId' | 'authId' | 'dailySteps' | 'dailyWeights' | 'measurementPoints' | 'measurements'>, Document {
+export interface ClientDocument extends Omit<IClient, 'plans' | 'coachId' | 'authId' | 'dailySteps' | 'dailyWeights' | 'measurementPoints' | 'measurements' | 'mealLogs'>, Document {
   plans: DietPlan[];
   coachId: mongoose.Types.ObjectId;
   authId?: string;
@@ -81,6 +98,7 @@ export interface ClientDocument extends Omit<IClient, 'plans' | 'coachId' | 'aut
   apiKey?: string;
   measurementPoints: Array<MeasurementPoint>;
   measurements: Array<BodyMeasurement>;
+  mealLogs: Array<MealLog>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -97,6 +115,7 @@ const ClientSchema = new Schema<ClientDocument>({
   apiKey: { type: String, unique: true, sparse: true, index: true },
   measurementPoints: { type: [MeasurementPointSubSchema], default: [] },
   measurements: { type: [BodyMeasurementSubSchema], default: [] },
+  mealLogs: { type: [MealLogSubSchema], default: [] },
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
