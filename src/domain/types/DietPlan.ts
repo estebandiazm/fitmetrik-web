@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CarbPoolSchema } from "./CarbPool";
 
 export const FoodOptionSchema = z.object({
   foodName: z.string(),
@@ -35,6 +36,7 @@ export const DietPlanSchema = z.object({
   recommendations: z.string().optional(),
   meals: z.array(MealSchema),
   snacks: z.array(SnackOptionSchema).optional(),
+  carbPool: CarbPoolSchema.optional(),
 });
 
 export type DietPlan = z.infer<typeof DietPlanSchema>;
