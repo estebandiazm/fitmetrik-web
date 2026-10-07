@@ -7,12 +7,15 @@ import { HydrationTracker } from '@/components/dashboard/HydrationTracker';
 import { MacrosHUD } from '@/components/dashboard/MacrosHUD';
 import { PlanSectionCard } from '@/components/dashboard/PlanSectionCard';
 import { PlanSwitcher } from '@/components/dashboard/PlanSwitcher';
+import { CarbPoolCard } from '@/components/dashboard/carb-pool-card';
 
 import { DietPlan } from '@/domain/types/DietPlan';
 import { createClient } from '@/infrastructure/adapters/supabase/server';
 import { getClientByAuthId } from '@/app/actions/clientActions';
 import { buildPlanCards, resolveActivePlanIndex } from '@/domain/services/planView';
 import { buildWeeklyStrip, countPopped, findEntryForDate } from '@/domain/services/adherence';
+import { getCarbPoolOptions, shiftISODate } from '@/domain/services/mealLogs';
+import { toLocalISODate } from '@/domain/services/localDates';
 import { redirect } from 'next/navigation';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -93,6 +96,13 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
 
   const allCards = buildPlanCards(activePlan);
 
+  // Carb pool ("bolsa"): only plans that define one get the daily card, in
+  // place of the placeholder macros. Today is resolved in the browser, so send
+  // a short window of recent logs (today, plus history for "Repetir último").
+  const hasCarbPool = getCarbPoolOptions(activePlan).length > 0;
+  const logsSince = shiftISODate(toLocalISODate(), -8);
+  const recentMealLogs = (clientRecord?.mealLogs ?? []).filter((log) => log.date >= logsSince);
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-bg pb-32 text-text-primary lg:pb-0">
       <TopAppBar clientName={clientRecord?.name || 'Cliente'} />
@@ -116,11 +126,20 @@ export default async function ClientDashboard(props: { searchParams: SearchParam
           />
 
           <div className="animate-enter grid grid-cols-1 gap-4 sm:grid-cols-2" style={{ '--enter-delay': '240ms' } as React.CSSProperties}>
+            <div className="sm:col-span-2">
+              {hasCarbPool ? (
+                <CarbPoolCard
+                  plan={activePlan}
+                  logs={recentMealLogs}
+                  planIndex={activeIndex}
+                  canLog={!isMock}
+                />
+              ) : (
+                <MacrosHUD />
+              )}
+            </div>
             <StepsCounter current={dailyAverage} goal={stepGoal} />
             <HydrationTracker current={3.5} />
-            <div className="sm:col-span-2">
-              <MacrosHUD />
-            </div>
           </div>
         </div>
 

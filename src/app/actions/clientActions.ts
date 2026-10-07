@@ -41,6 +41,7 @@ function toClient(doc: ClientDocument): Client & { id: string; updatedAt: Date }
     updatedAt: new Date(plain.updatedAt),
     measurementPoints: plain.measurementPoints ?? [],
     measurements: plain.measurements ?? [],
+    mealLogs: plain.mealLogs ?? [],
   };
 }
 
