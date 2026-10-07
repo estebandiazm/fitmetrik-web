@@ -87,6 +87,16 @@ describe('calculatePoolProgress', () => {
     expect(progress.usedGrams).toBe(0);
   });
 
+  it('rejects a protein logged against the carb pool', () => {
+    const foods = [
+      { name: 'Arroz', grams: 200, category: 'COMPLEMENT' },
+      { name: 'Pollo', grams: 253, category: 'BASE' },
+    ];
+    expect(() =>
+      calculatePoolProgress(POOL, [{ mealName: 'Comida 2', foodName: 'Pollo', grams: 150 }], foods),
+    ).toThrow('categories');
+  });
+
   it('throws when a logged food has no equivalence', () => {
     expect(() =>
       calculatePoolProgress(POOL, [{ mealName: 'Comida 2', foodName: 'Pan', grams: 50 }], FOODS),

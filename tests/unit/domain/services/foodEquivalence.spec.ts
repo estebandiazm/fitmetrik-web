@@ -41,6 +41,18 @@ describe('convertEquivalent', () => {
     expect(convertEquivalent(253, POLLO, TILAPIA)).toBe(310);
   });
 
+  it('refuses to swap across categories (cooked carbs ↔ raw protein)', () => {
+    const arroz = { ...ARROZ, category: 'COMPLEMENT' };
+    const pollo = { ...POLLO, category: 'BASE' };
+    expect(() => convertEquivalent(150, arroz, pollo)).toThrow('categories');
+  });
+
+  it('allows swaps within the same category', () => {
+    const arroz = { ...ARROZ, category: 'COMPLEMENT' };
+    const papa = { ...PAPA, category: 'COMPLEMENT' };
+    expect(convertEquivalent(200, arroz, papa)).toBe(275);
+  });
+
   it('rejects a non-positive portion', () => {
     expect(() => convertEquivalent(100, { name: 'X', grams: 0 }, ARROZ)).toThrow();
   });

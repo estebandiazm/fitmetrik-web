@@ -1,12 +1,15 @@
 // Swapping one food for another by equivalence. In the exchange table
-// (`domain/data/foods.ts`) a food's `grams` is the cooked weight of ONE
-// equivalent portion — 200 g de arroz ≡ 275 g de papa — so converting between
+// (`domain/data/foods.ts`) a food's `grams` is the weight of ONE equivalent
+// portion — 200 g de arroz ≡ 275 g de papa — so converting between
 // foods of the same table is just the ratio of their portions. Works the same
-// for carbohydrates (arroz ↔ papa) and proteins (pollo ↔ tilapia).
+// for carbohydrates (arroz ↔ papa) and proteins (pollo ↔ tilapia), but never
+// across them: carbohydrates are weighed cooked and proteins raw, so a swap
+// is only valid between foods of the same `category`.
 
 export interface FoodPortion {
   name: string;
   grams: number;
+  category?: string;
 }
 
 export interface Equivalent {
@@ -31,6 +34,9 @@ export function findFood<T extends FoodPortion>(foods: T[], name: string): T {
 export function convertEquivalent(grams: number, from: FoodPortion, to: FoodPortion): number {
   if (from.grams <= 0 || to.grams <= 0) {
     throw new Error(`Invalid equivalence portion: ${from.name} → ${to.name}`);
+  }
+  if (from.category && to.category && from.category !== to.category) {
+    throw new Error(`Cannot swap across categories: ${from.name} (${from.category}) → ${to.name} (${to.category})`);
   }
   return (grams * to.grams) / from.grams;
 }
