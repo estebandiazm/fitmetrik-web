@@ -75,3 +75,6 @@ ds-bundle/
 .impeccable/surface-brief-addendum.md
 .impeccable/hook.cache.json
 .impeccable/questions/
+
+# Local data backups written by scripts/ (contain personal data)
+backups/

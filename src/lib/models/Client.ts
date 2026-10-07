@@ -29,12 +29,20 @@ const SnackOptionSchema = new Schema({
   description: { type: String, required: true }
 }, { _id: false });
 
+const CarbPoolSchema = new Schema({
+  referenceFood: { type: String, required: true },
+  totalGrams: { type: Number, required: true, min: 0 },
+  mealNames: { type: [String], required: true },
+  tolerancePct: { type: Number, default: 10, min: 0, max: 100 }
+}, { _id: false });
+
 const DietPlanSchema = new Schema({
   label: { type: String },
   days: { type: String },
   recommendations: { type: String },
   meals: [MealSchema],
   snacks: [SnackOptionSchema],
+  carbPool: { type: CarbPoolSchema, required: false },
 }, { timestamps: true });
 
 const DailyStepsSchema = new Schema({
