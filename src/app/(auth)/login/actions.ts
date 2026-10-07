@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/infrastructure/adapters/supabase/server';
+import { forgetEmail, rememberEmail } from './remembered-user';
 
 function getRedirectUrl(role: string | undefined): string {
   if (role === 'coach') return '/clients';
@@ -28,6 +29,7 @@ export async function loginWithPassword(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   const role = user?.user_metadata?.role;
 
+  await rememberEmail(user?.email);
   redirect(getRedirectUrl(role));
 }
 
@@ -53,4 +55,10 @@ export async function loginWithMagicLink(formData: FormData) {
   }
 
   redirect(`/login?message=${encodeURIComponent('Revisa tu correo: te enviamos el enlace de acceso.')}`);
+}
+
+/** "Usar otra cuenta": drops the remembered email so the full login form shows again. */
+export async function switchAccount() {
+  await forgetEmail();
+  redirect('/login');
 }

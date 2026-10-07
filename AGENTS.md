@@ -224,6 +224,24 @@ A `DietPlan` contains 1-2 `Diet` (day-of-week variants):
 | **DB** | To be decided | Evaluate costs: Supabase vs PlanetScale vs Neon |
 | **Auth** | Supabase Auth | Unified login at `/login`, explicit invite process via Supabase Admin API, and Middleware RBAC. |
 
+### 4.4 Sessions & Login Friction
+
+FitMetrik is a daily-use app with no sensitive PII, so the login favors low friction over strict session control.
+
+**Current behavior**
+
+- **Session lifetime** is owned by Supabase (current plan: ~7 days). The app does not add its own expiry layer.
+- **Single Supabase client per request in middleware.** `updateSession()` refreshes the cookies and returns `{ response, user }`; `src/middleware.ts` must reuse that `user` and never create a second client. Every redirect copies the refreshed cookies from `response` (`redirectTo()`), otherwise a rotated refresh token is lost and the user is logged out unexpectedly.
+- **Remember last user.** After a successful sign-in (password or magic link/callback) the email is stored in the `fm_last_user` cookie (httpOnly, SameSite=Lax, 90 days). When the session expires, `/login` shows the remembered account and asks only for the password. "Usar otra cuenta" clears the cookie. Logout keeps it (Google/Slack pattern). Rules live in `domain/services/rememberedUser.ts`; cookie I/O in `app/(auth)/login/remembered-user.ts`.
+
+**Future options (not implemented — evaluate when needed)**
+
+| Option | What it adds | Cost / notes |
+|--------|--------------|--------------|
+| **Trusted device window** | App-level signed cookie `fm_device` (HMAC over `{ userId, issuedAt, lastSeenAt }`) validated in middleware: sliding N-day window, optional absolute cap, "Recordar este dispositivo" checkbox (session cookie when unchecked). On expiry → `signOut()` + `/login?reason=expired`. | No DB, edge-compatible. Only worth it if Supabase session control (time-box / inactivity timeout, Pro plan) is insufficient or unavailable. |
+| **Trusted device registry** | Mongo collection `trusted_devices` `{ userId, tokenHash, label, createdAt, lastSeenAt, expiresAt, revokedAt }`. Enables "ver mis dispositivos", "cerrar sesión en otros dispositivos", coach-side revocation. | Mongoose can't run in edge middleware → validate in server layouts or a cached endpoint. Extend the trusted device cookie with a device ID first so this is additive. |
+| **Passkeys / WebAuthn** | Face ID / fingerprint login for the remembered user ("Entrar con Face ID"). | Best UX for daily use. Requires a WebAuthn library (e.g. SimpleWebAuthn) and credential storage, or Supabase passkey support if available. |
+
 ---
 
 ## 5. AI-Native Development
@@ -370,3 +388,13 @@ When a design URL from Stitch is provided in a requirement or OpenSpec (e.g., `h
 1. **Mandatory MCP Usage**: The AI MUST use the `mcp_StitchMCP_get_screen` tool to fetch the actual layout details, HTML Code, and dimensions of the specific node.
 2. **Never Hallucinate Designs**: Do not rely solely on text descriptions or high-level goals. You must extract and adapt the exact structure provided by the Stitch MCP response.
 3. **Integration**: Adapt the fetched semantic structure into the project's Next.js component structure as faithfully as possible to match the provided Premium Design.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

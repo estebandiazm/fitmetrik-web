@@ -1,28 +1,17 @@
 import { updateSession } from '@/infrastructure/adapters/supabase/middleware'
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Update the session cookie
-  const response = await updateSession(request)
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-        },
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
+  // Refresh the session cookie (single Supabase client per request)
+  const { response, user } = await updateSession(request)
   const role = user?.user_metadata?.role
+
+  // Redirects must carry the refreshed auth cookies, or the rotated refresh token is lost
+  const redirectTo = (path: string) => {
+    const redirect = NextResponse.redirect(new URL(path, request.url))
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
+    return redirect
+  }
 
   // RBAC Routing Logic
   const { pathname } = request.nextUrl;
@@ -34,23 +23,23 @@ export async function middleware(request: NextRequest) {
   // Root redirect: always send "/" to the correct destination
   if (isRoot) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return redirectTo('/login');
     }
-    if (role === 'client') return NextResponse.redirect(new URL('/dashboard', request.url));
-    if (role === 'coach') return NextResponse.redirect(new URL('/clients', request.url));
-    return NextResponse.redirect(new URL('/login?error=Unknown+role.+Contact+your+administrator.', request.url));
+    if (role === 'client') return redirectTo('/dashboard');
+    if (role === 'coach') return redirectTo('/clients');
+    return redirectTo('/login?error=Unknown+role.+Contact+your+administrator.');
   }
 
   if (!user && !isLoginPage && !isAuthCallback) {
     // Unauthenticated users trying to access protected routes
-    return NextResponse.redirect(new URL('/login', request.url))
+    return redirectTo('/login')
   }
 
   if (user && isLoginPage) {
     // Unknown role — let them stay on login with the error
     if (role !== 'coach' && role !== 'client') return response;
     // Authenticated users with a valid role — redirect to their home
-    return NextResponse.redirect(new URL(role === 'coach' ? '/clients' : '/dashboard', request.url))
+    return redirectTo(role === 'coach' ? '/clients' : '/dashboard')
   }
 
   // If they are on the update-password page, let them stay there
@@ -60,12 +49,12 @@ export async function middleware(request: NextRequest) {
 
   // Prevent clients from accessing dashboard
   if (user && role === 'client' && request.nextUrl.pathname.startsWith('/clients')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return redirectTo('/dashboard')
   }
 
   // Prevent coaches from accessing client portal
   if (user && role === 'coach' && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/clients', request.url))
+    return redirectTo('/clients')
   }
 
   return response

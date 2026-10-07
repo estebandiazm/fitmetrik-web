@@ -3,6 +3,7 @@ import { authProvider } from '@/lib/registry';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Alert } from '@/components/ui/Alert';
 import { LoginForm } from './_LoginForm';
+import { getRememberedEmail } from './remembered-user';
 
 /** Translate raw error codes / legacy English messages from redirects into Spanish copy. */
 function resolveErrorMessage(error: string): string {
@@ -26,6 +27,7 @@ export default async function LoginPage(props: {
   }
 
   const searchParams = await props.searchParams;
+  const rememberedEmail = await getRememberedEmail();
 
   return (
     <AuthShell>
@@ -41,7 +43,9 @@ export default async function LoginPage(props: {
         </span>
         <div>
           <h1 className="text-2xl font-bold tracking-[-0.01em] text-text-primary">Hola de nuevo</h1>
-          <p className="mt-1 text-sm text-text-muted">Inicia sesión para registrar tu día.</p>
+          <p className="mt-1 text-sm text-text-muted">
+            {rememberedEmail ? 'Ingresa tu contraseña para continuar.' : 'Inicia sesión para registrar tu día.'}
+          </p>
         </div>
       </div>
 
@@ -56,7 +60,7 @@ export default async function LoginPage(props: {
         </div>
       )}
 
-      <LoginForm />
+      <LoginForm rememberedEmail={rememberedEmail ?? undefined} />
 
       <p className="mt-7 border-t border-row-border pt-5 text-center text-[13px] text-text-muted">
         ¿No tienes cuenta? Tu coach te envía la invitación por correo.

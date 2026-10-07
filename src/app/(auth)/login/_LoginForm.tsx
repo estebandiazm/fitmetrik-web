@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ArrowRightIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon } from '@/components/ui/icons';
-import { loginWithPassword, loginWithMagicLink } from './actions';
+import { loginWithPassword, loginWithMagicLink, switchAccount } from './actions';
 
 type Tab = 'password' | 'magic';
 
@@ -44,7 +44,13 @@ function SubmitButton({ idleLabel, pendingLabel }: { idleLabel: string; pendingL
   );
 }
 
-function EmailField({ id, delayMs }: { id: string; delayMs: number }) {
+interface EmailFieldProps {
+  id: string;
+  delayMs: number;
+  defaultValue?: string;
+}
+
+function EmailField({ id, delayMs, defaultValue }: EmailFieldProps) {
   return (
     <div className="animate-enter" style={{ '--enter-delay': `${delayMs}ms` } as React.CSSProperties}>
       <label className={LABEL_CLASSES} htmlFor={id}>
@@ -61,6 +67,7 @@ function EmailField({ id, delayMs }: { id: string; delayMs: number }) {
           placeholder="nombre@correo.com"
           required
           autoComplete="email"
+          defaultValue={defaultValue}
           className={INPUT_CLASSES}
         />
       </div>
@@ -68,7 +75,44 @@ function EmailField({ id, delayMs }: { id: string; delayMs: number }) {
   );
 }
 
-export function LoginForm() {
+/**
+ * Shown instead of the email input when the last signed-in user is remembered.
+ * The hidden input keeps the email in the form (and lets password managers match the account).
+ */
+function RememberedAccount({ email, delayMs }: { email: string; delayMs: number }) {
+  return (
+    <div
+      className="animate-enter flex items-center gap-3 rounded-xl border border-border bg-bg px-3 py-2.5"
+      style={{ '--enter-delay': `${delayMs}ms` } as React.CSSProperties}
+    >
+      <input type="hidden" name="email" value={email} autoComplete="username" />
+      <span
+        aria-hidden="true"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-teal text-sm font-semibold uppercase text-accent-teal-ink"
+      >
+        {email.charAt(0)}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-[15px] text-text-primary" title={email}>
+        {email}
+      </span>
+      <button
+        type="submit"
+        formAction={switchAccount}
+        formNoValidate
+        className="shrink-0 text-xs font-medium text-text-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-text-primary hover:decoration-accent-teal"
+      >
+        Usar otra cuenta
+      </button>
+    </div>
+  );
+}
+
+interface LoginFormProps {
+  /** Last signed-in email; when present only the password is asked. */
+  rememberedEmail?: string;
+}
+
+export function LoginForm({ rememberedEmail }: LoginFormProps) {
   const [tab, setTab] = useState<Tab>('password');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -104,7 +148,11 @@ export function LoginForm() {
 
       {tab === 'password' ? (
         <form key="password" className="flex flex-col gap-5" action={loginWithPassword}>
-          <EmailField id="email-pw" delayMs={180} />
+          {rememberedEmail ? (
+            <RememberedAccount email={rememberedEmail} delayMs={180} />
+          ) : (
+            <EmailField id="email-pw" delayMs={180} />
+          )}
 
           <div className="animate-enter" style={{ '--enter-delay': '240ms' } as React.CSSProperties}>
             <div className="mb-2 flex items-center justify-between">
@@ -130,6 +178,7 @@ export function LoginForm() {
                 placeholder="••••••••"
                 required
                 autoComplete="current-password"
+                autoFocus={Boolean(rememberedEmail)}
                 className={`${INPUT_CLASSES} pr-12`}
               />
               <button
@@ -150,7 +199,7 @@ export function LoginForm() {
         </form>
       ) : (
         <form key="magic" className="flex flex-col gap-5" action={loginWithMagicLink}>
-          <EmailField id="email-magic" delayMs={60} />
+          <EmailField id="email-magic" delayMs={60} defaultValue={rememberedEmail} />
 
           <p className="animate-enter text-[13px] leading-relaxed text-text-muted" style={{ '--enter-delay': '120ms' } as React.CSSProperties}>
             Te enviamos un enlace de acceso a tu correo. Sin contraseña.
