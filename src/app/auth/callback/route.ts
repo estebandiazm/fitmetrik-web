@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/infrastructure/adapters/supabase/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
+import { rememberEmail } from '@/app/(auth)/login/remembered-user';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -22,7 +23,9 @@ export async function GET(request: Request) {
   const supabase = await createClient();
 
   // Helper to handle the redirect logic consistently
-  const doRedirect = () => {
+  const doRedirect = async (email: string | undefined) => {
+    await rememberEmail(email);
+
     const forwardedHost = request.headers.get('x-forwarded-host');
     const isLocalEnv = process.env.NODE_ENV === 'development';
 
@@ -38,20 +41,20 @@ export async function GET(request: Request) {
   try {
     // 1. Handle OTP magic links and invites (token_hash + type)
     if (token_hash && type) {
-      const { error } = await supabase.auth.verifyOtp({
+      const { data, error } = await supabase.auth.verifyOtp({
         type,
         token_hash,
       });
       if (!error) {
-        return doRedirect();
+        return await doRedirect(data.user?.email);
       }
     }
 
     // 2. Handle PKCE flow (code)
     if (code) {
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error) {
-        return doRedirect();
+        return await doRedirect(data.user?.email);
       }
     }
   } catch {
